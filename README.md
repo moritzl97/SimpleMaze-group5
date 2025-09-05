@@ -22,7 +22,4 @@ Perfect for new Python learners or small-scale academic use.
 ## How to Run
 
 1. Make sure Python 3 is installed on your system.
-2. Clone or download the repository:
-   ```bash
-   git clone https://github.com/pb12/SimpleMaze.git
-   cd SimpleMaze
+2. Clone or download the repository
