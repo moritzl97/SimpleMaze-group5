@@ -1,0 +1,20 @@
+Tieme van Rees room story (CyberRoom)
+
+You enter a glowing data chamber. 
+In front of you, a terminal blocks the exit, its screen flashing:“Access denied, security code required”. 
+The walls are tall screens filled with cascading green code, but most of it is glitching, stuttering, and breaking apart. 
+Next to it, three panels flicker with mathematical clues. 
+Each panel represents one digit of the 3-digit escape code. 
+Each panel contains a scratched of number with a math equation above it. 
+The player must solve every equation to get a number for the security code. 
+The three computer panels are not in a specific order that is the same as the security code. 
+So you must try all the sequences with the numbers you obtained. 
+Once you have the right security code the middle computer panel opens so you can take the key for the next room. 
+
+Acceptance criteria
+
+-Locked terminal requires a 3-digit code.
+-Player is shown three complex math problems.
+-Wrong answer -> “Access denied” (retry).
+-Correct answer (…) -> terminal shows “Access granted” and the panel opens up with the key for the next room.
+
