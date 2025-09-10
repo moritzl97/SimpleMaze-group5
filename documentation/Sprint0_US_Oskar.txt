@@ -1,0 +1,27 @@
+Entering the Room
+You approach Classroom 1.07. The door is locked, and a small note is taped to it: “Hall Pass Required.”
+If you don’t have the hall pass, you are sent back into the corridor.
+If you do have it, the door clicks open and you step inside.
+Looking Around
+Inside, the air smells of chemicals. Beakers and test tubes bubble quietly on the counters.
+On the teacher’s desk sits a locked glass case containing something shiny — it looks like a magnet.
+On the chalkboard is written in large letters: “Only those who think clearly may proceed.”
+The Challenge
+The science teacher in a white lab coat steps forward and asks:
+“I am taken from a mine, locked in a wooden case, never released, yet almost everyone uses me. What am I?”
+Outcome if Correct
+If you answer “pencil”, the teacher smiles and unlocks the glass case.
+Inside is the shiny magnet, now available for you to take.
+Outcome if Incorrect
+If you give the wrong answer, the teacher shakes his head.
+He points to the door, and you are sent back into the corridor empty-handed.
+Item to Collect
+The magnet (inside the glass case).
+Once collected, you can carry it in your inventory for future puzzles.
+Visiting Again
+If you return after solving the riddle:
+The teacher nods, acknowledging you’ve already succeeded.
+If you haven’t taken the magnet yet, it’s still waiting in the glass case.
+If you already took it, the case is empty.
+Exits
+The only exit leads back into the corridor.
