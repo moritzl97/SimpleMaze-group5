@@ -29,7 +29,7 @@ def control_room(state):
             if cables == correct:
                 print("Correct! You connected the cables properly.")
                 print("You get a USB stick to move on.")
-                break
+                return "corridor"
             else:
                 attempts += 1
                 print("Wrong order. Try again.")
