@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 
 from rooms import enterCorridor, enterStudyLandscape, enterClassroom2015, enterProjectRoom3, enterCyberRoom, \
-    enterCloudRoom
+    enterCloudRoom, enterDragonRoom, control_room, enterRiddleroom, enterComputerlab
 
 print("****************************************************************************")
 print("*                      Welcome to the School Maze!                         *")
@@ -51,6 +51,14 @@ while True:
 
     elif current == "riddleroom":
         state["current_room"] = enterRiddleroom(state)
+    elif current == "dragonroom":
+        state["current_room"] = enterDragonRoom(state)
+    elif current == "controlroom":
+        state["current_room"] = control_room(state)
+    elif current == "computerlab":
+        state["current_room"] = enterComputerlab(state)
+
+
 
     else:
         print("Unknown room. Exiting game.")

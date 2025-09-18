@@ -13,3 +13,7 @@ from .projectroom3 import enterProjectRoom3
 from .cloudroom import enterCloudRoom
 from .utils import chooseNextRoom
 from .Cyberroom import enterCyberRoom
+from .dragon_room import enterDragonRoom
+from .riddleroom import enterRiddleroom
+from .controlroom import control_room
+from .computerlab import enterComputerlab

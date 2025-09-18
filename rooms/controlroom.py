@@ -1,4 +1,4 @@
-def control_room():
+def control_room(state):
     print("You enter the control room.")
     print("You see a keycard on the floor")
     print("The door you just came through is now closed.")
@@ -37,6 +37,3 @@ def control_room():
                     print("Hint: Look at the diagram on the wall.")
         else:
             print("You need to arrange the cables to continue.")
-
-
-control_room()
