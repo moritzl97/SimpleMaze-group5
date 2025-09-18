@@ -327,13 +327,13 @@ dialogue_tree_chest = {
                 "1": {"text": "Break the chest open.",
                       "next_success": "open_chest",
                       "next_failure": "failed_break_chest",
-                      "base_success_rate": 0.4,
+                      "base_success_rate": 0.6,
                       "success_modifiers": {"Pickaxe" : 0.10}},
                 "2": {"text": "Try lock picking.",
                       "next_success": "open_chest",
                       "next_failure": "failed_open_chest",
                       "base_success_rate": 0.05,
-                      "success_modifiers": {"Lockpick" : 0.60}},
+                      "success_modifiers": {"Lockpick" : 0.90}},
             }
         },
         "open_chest": {
@@ -346,6 +346,11 @@ dialogue_tree_chest = {
             "action":("wait",5),
             "next_chapter":"first_encounter"
         },
+        "failed_break_chest": {
+            "text": "You destroy the chest. What ever was in there, now it is destroyed.",
+            "action":("remove_object", "Chest"),
+            "next_chapter":"end"
+        }
     }
 }
 
