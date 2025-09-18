@@ -283,12 +283,12 @@ def handle_interact(noun, room_state):
         print("Interact with what?")
     else:
         if noun in room_state["interactable_objects"]:
+            open_dialog(room_state["interactable_objects"][noun], room_state)
+        elif noun in noun in room_state["npcs"]:
             if noun == "Shopkeeper":
                 trade_with_shopkeeper(room_state["npcs"]["Shopkeeper"], room_state)
             else:
-                open_dialog(room_state["interactable_objects"][noun], room_state)
-        elif noun in noun in room_state["npcs"]:
-            open_dialog(room_state["npcs"][noun], room_state)
+                open_dialog(room_state["npcs"][noun], room_state)
         else:
             print(f"There is no {noun} here to interact with.")
     return True
