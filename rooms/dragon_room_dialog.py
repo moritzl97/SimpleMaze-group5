@@ -23,7 +23,7 @@ dialogue_tree_dragon = {
         },
         "failed_attack": {
             "text": "Your attack misses and you are hit by the Dragons claw.",
-            "action":("wait",15),
+            "action":("wait",10),
             "next_chapter":"dragon_angry"
         },
         "give_gem": {
@@ -40,7 +40,7 @@ dialogue_tree_dragon = {
     "dragon_angry": {
         "start": {
             "text": "Dragon:'You have made me angry. That is what you get!'\nYou are engulfed in flames.",
-            "action":("wait",20),
+            "action":("wait",10),
             "options": {
                 "1": {"text": "Attempt to attack the dragon",
                       "next_success": "kill_dragon",
@@ -56,7 +56,7 @@ dialogue_tree_dragon = {
         },
         "failed_attack": {
             "text": "Your attack misses and you are hit by the Dragons tail.",
-            "action":("wait",15),
+            "action":("wait",10),
             "next_chapter":"dragon_angry"
         },
     }
@@ -343,7 +343,7 @@ dialogue_tree_chest = {
         },
         "failed_open_chest": {
             "text": "After a while you slip and have to start all over again. Maybe you need the right tools to open the chest... At leats there was no harm done.",
-            "action":("wait",10),
+            "action":("wait",5),
             "next_chapter":"first_encounter"
         },
     }
@@ -380,7 +380,7 @@ dialogue_tree_desk = {
         },
         "failed_open_drawer": {
             "text": "After a while you slip and have to start all over again. Maybe you need the right tools to open the drawer... At leats there was no harm done.",
-            "action":("wait",10),
+            "action":("wait",5),
             "next_chapter":"second_encounter"
         },
         "failed_break_drawer": {
@@ -427,12 +427,12 @@ dialogue_tree_hole = {
         },
         "steal_failure": {
             "text": "You try to steal the Trophy, but the Dragon sees you. \nDragon:'You will not get my treasure!' \nHe flings you out of the hole and moves the Trophy further under his belly.",
-            "action":[("wait",40),("make_dragon_angry",None)],
+            "action":[("wait",10),("make_dragon_angry",None)],
             "next_chapter":"empty"
         },
         "failed_climb": {
-            "text": "The Dragon sees you immediately and spits fire at you. \nDragon:'You really tried to steal my treasure?'",
-            "action":[("wait",20),("make_dragon_angry",None)],
+            "text": "The Dragon sees you immediately and spits fire at you. \nDragon:'You really tried to steal my treasure?'\nYou retreat immediately.",
+            "action":[("wait",10),("make_dragon_angry",None)],
             "next_chapter":"second_encounter"
         },
     },
@@ -449,8 +449,8 @@ dialogue_tree_hole = {
             "next_chapter":"empty"
         },
         "failed_climb": {
-            "text": "The Dragon sees you immediately and spits fire at you. \nDragon:'You really tried to steal my treasure?'",
-            "action": ("wait", 20) ,
+            "text": "The Dragon sees you immediately and spits fire at you. \nDragon:'You really tried to steal my treasure?'\nYou retreat immediately.",
+            "action": ("wait", 10) ,
             "next_chapter": "empty"
         }
     }
@@ -469,7 +469,7 @@ dialogue_tree_blackboard = {
         },
         "decipher_success": {
             "text": "Written in small letters you read: 'Fairies like to color white.'",
-            "action":("wait",20),
+            "action":("wait",10),
             "next_chapter":"second_encounter"
         },
         "decipher_failure": {
