@@ -207,11 +207,11 @@ def handle_look(noun, room_state):
           "Only the teachers desk is still standing on its right place. "
           "On the blackboard is something written, but it is to small to read from here.")
         if room_state['items']:
-            print(f"You see the following items in the room: {", ".join(room_state['items'])}")
+            print(f"You see the following items in the room: {', '.join(room_state['items'])}")
         if room_state['npcs']:
-            print(f"You can talk to the following NPCs in the room: {", ".join(room_state['npcs'].keys())}")
+            print(f"You can talk to the following NPCs in the room: {', '.join(room_state['npcs'].keys())}")
         if room_state['interactable_objects']:
-            print(f"You see these points of interest in the room: {", ".join(room_state['interactable_objects'].keys())}")
+            print(f"You see these points of interest in the room: {', '.join(room_state['interactable_objects'].keys())}")
 
     return True
 
