@@ -1,6 +1,6 @@
 # --- Adventure Game: Riddle Room ---
 
-def enterRiddleroom():
+def enterRiddleroom(state):
     inventory = []
     magnet_taken = False
     game_running = True
