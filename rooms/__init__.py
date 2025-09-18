@@ -5,9 +5,10 @@
 # Location: Delft
 # Date: July 2025
 # -----------------------------------------------------------------------------
-
+import sys
 from .corridor import enterCorridor
 from .studylandscape import enterStudyLandscape
 from .classroom2015 import enterClassroom2015
 from .projectroom3 import enterProjectRoom3
 from .utils import chooseNextRoom
+from .Cyberroom import enterCyberRoom
