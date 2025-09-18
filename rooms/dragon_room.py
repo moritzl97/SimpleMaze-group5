@@ -4,8 +4,7 @@ import time
 #---define open dialog---#
 # Called if player talks to an NPC or interacts with objects
 def open_dialog(npc, room_state):
-
-    # If a dialog option causes something to happen, the function is looked up here
+    # If a dialog option causes something to happen, the function is looked up in this table
     action_map = {
         "wait": wait,
         "add_npc": add_npc,
@@ -21,6 +20,9 @@ def open_dialog(npc, room_state):
         #get current dialog node by looking up the current chapter and node for the npc
         node = npc["dialog_tree"][npc["current_chapter"]][npc["current_node"]]
 
+        # Print dialog text
+        print(f"{node['text']}")
+
         # Run action if defined. When in a list execute all actions. If not wrap action in list.
         if "action" in node:
             actions = node["action"]
@@ -30,9 +32,6 @@ def open_dialog(npc, room_state):
                 function, argument = executable_action
                 function = action_map.get(function)
                 function(argument, room_state)
-
-        # Print dialog text
-        print(f"{node['text']}")
 
         # If there are no branching dialog options end dialog
         if "next_chapter" in node:
@@ -100,7 +99,6 @@ def open_dialog(npc, room_state):
 
 #---define shop keeper---#
 def trade_with_shopkeeper(npc, room_state):
-
     #Get items that the shopkeeper wants to trade
     items_sell = npc["items_for_sale"]
     wanted_items = npc["wanted_items"]
@@ -236,10 +234,10 @@ def handle_look(noun, room_state):
         else:
             print(f"You don't see a {noun} here.")
     else:
-        print("You are in a classroom with a huge hole in the ground. You see smoke rising from the hole. "
-              "The chairs and desks of the students are scatterd through the room."
-              "Only the teachers desk is still standing on its right place. "
-              "On the blackboard is something written, but it is to small to read from here.")
+        print("You are in a classroom with a huge hole in the ground. You see smoke rising from the hole.\n"
+              "The chairs and desks of the students are scatterd through the room.\n"
+              "Only the teachers desk is still standing on its right place.\n"
+              "On the blackboard is something written, but it is to small to read from here.\n")
         if room_state['items']:
             print(f"You see the following items in the room: {', '.join(room_state['items'])}")
         if room_state['npcs']:
@@ -251,9 +249,12 @@ def handle_look(noun, room_state):
 def handle_go(noun, room_state):
     if not noun:
         print("Go to which room?")
-    elif noun.lower() in ["corridor", "back", "room"]:
+    elif noun.lower() in ["corridor", "back", "room", "dragonroom"]:
         print("You flee the dragon room.")
         return False
+    elif noun in room_state["interactable_objects"]:
+        handle_interact(noun, room_state)
+        return True
     else:
         print(f"You can't go to '{noun}' from here.")
     return True
@@ -340,8 +341,9 @@ def enterDragonRoom(state):
     #---room setup finished---#
 
     # start room
-    print("You enter the classroom and are immediately drawn to the huge hole in the ground. You see smoke rising from the hole. The chairs and desks of the students are scatterd through the room."
-          "Only the teachers desk is still standing on its right place. "
+    print("You enter the classroom and are immediately drawn to the huge hole in the ground.You see smoke rising from the hole.\n"
+          "The chairs and desks of the students are scatterd through the room.\n"
+          "Only the teachers desk is still standing on its right place.\n"
           "On the blackboard is something written, but it is to small to read from here.")
 
     # main loop
