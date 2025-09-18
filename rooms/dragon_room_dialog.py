@@ -40,7 +40,7 @@ dialogue_tree_dragon = {
     "dragon_angry": {
         "start": {
             "text": "Dragon:'You have made me angry. That is what you get!'\nYou are engulfed in flames.",
-            "action":("wait",10),
+            "action":("wait",5),
             "options": {
                 "1": {"text": "Attempt to attack the dragon",
                       "next_success": "kill_dragon",
@@ -255,8 +255,8 @@ dialogue_tree_cracked_wall = {
         },
         "failed_open_wall": {
             "text": "Trying to open the wall lets the other side collapse. Now heavy rubble is blocking the way and there is no way to get through. However you see a Lockpick between the stones.",
-            "action":("add_item","Lockpick"),
-            "next_chapter":"last_encounter"
+            "action":[("add_item","Lockpick"), ("remove_object","Cracked-Wall")],
+            "next_chapter":"end"
         },
     },
     "second_encounter": {
@@ -286,36 +286,29 @@ dialogue_tree_cracked_wall = {
         },
         "get_sneaking_boots": {
             "text": "You take the Sneaking-Boots.",
-            "action":("give_item","Sneaking-Boots"),
-            "next_chapter": "last_encounter"
+            "action":[("give_item","Sneaking-Boots"), ("remove_object","Cracked-Wall")],
+            "next_chapter": "end"
         },
         "get_lockpick": {
             "text": "You take the Lockpick.",
-            "action":("give_item","Lockpick"),
-            "next_chapter": "last_encounter"
+            "action":[("give_item","Lockpick"), ("remove_object","Cracked-Wall")],
+            "next_chapter": "end"
         },
         "crawl_failure": {
             "text": "You get stuck in the wall. You are not in the mood to try it again.",
-            "action":("wait",5),
-            "next_chapter": "last_encounter"
+            "action":[("wait",5), ("remove_object","Cracked-Wall")],
+            "next_chapter": "end"
         },
         "reach_success": {
             "text": "You find a Lockpick and add it to your inventory.",
-            "action":("give_item","Lockpick"),
-            "next_chapter": "last_encounter"
+            "action":[("give_item","Lockpick"), ("remove_object","Cracked-Wall")],
+            "next_chapter": "end"
         },
         "reach_failure": {
             "text": "You try to reach into the hole, but something sharp cuts your hand. You hear something falling. If there was something in there, now its gone.",
-            "action":("wait",5),
-            "next_chapter": "last_encounter"
+            "action":[("wait",5), ("remove_object","Cracked-Wall")],
+            "next_chapter": "end"
         }
-    },
-    "last_encounter": {
-        "start": {
-            "text": "There is nothing to do here anymore.",
-            "action":("remove_object","Cracked-Wall"),
-            "next_chapter":"end"
-            }
     }
 }
 
@@ -324,10 +317,10 @@ dialogue_tree_chest = {
         "start": {
             "text": "A Chest with a heavy lock.",
             "options": {
-                "1": {"text": "Break the chest open.",
+                "1": {"text": "Break the chest open. You will only have one chance at this",
                       "next_success": "open_chest",
                       "next_failure": "failed_break_chest",
-                      "base_success_rate": 0.6,
+                      "base_success_rate": 0.4,
                       "success_modifiers": {"Pickaxe" : 0.10}},
                 "2": {"text": "Try lock picking.",
                       "next_success": "open_chest",
@@ -370,7 +363,7 @@ dialogue_tree_desk = {
                       "next_success": "open_drawer",
                       "next_failure": "failed_break_drawer",
                       "base_success_rate": 0.2,
-                      "success_modifiers": {"Pickaxe" : 0.60}},
+                      "success_modifiers": {"Pickaxe" : 0.50}},
                 "2": {"text": "Try lock picking.",
                       "next_success": "open_drawer",
                       "next_failure": "failed_open_drawer",
@@ -412,17 +405,17 @@ dialogue_tree_hole = {
                       "next_success": "climbing_down",
                       "next_failure": "failed_climb",
                       "base_success_rate": 0.3,
-                      "success_modifiers": {"Sneaking-Boots" : 0.30, "Invisibility-Cloak":0.40}},
+                      "success_modifiers": {"Sneaking-Boots" : 0.30, "Invisibility-Cloak":0.50}},
             }
         },
         "climbing_down": {
             "text": "You made it past the Dragon. But to get the Trophy out under him will be even more difficult.",
             "options": {
-                "1": {"text": "Try to steal the Trophy.",
+                "1": {"text": "Try to steal the Trophy. You get just one chance to snatch the Trophy.",
                       "next_success": "steal_success",
                       "next_failure": "steal_failure",
                       "base_success_rate": 0.05,
-                      "success_modifiers": {"Sneaking-Boots" : 0.30, "Invisibility-Cloak":0.40}},
+                      "success_modifiers": {"Sneaking-Boots" : 0.15, "Invisibility-Cloak":0.60}},
             }
         },
         "steal_success": {

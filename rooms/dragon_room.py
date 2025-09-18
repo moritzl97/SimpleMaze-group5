@@ -12,7 +12,8 @@ def open_dialog(npc, room_state):
         "remove_object": remove_object,
         "add_item": add_item,
         "make_dragon_angry" : make_dragon_angry,
-        "remove_item": remove_item
+        "remove_item": remove_item,
+        "remove_npc": remove_npc
     }
 
     # Loop through all dialog nodes in the current chapter. Ends if the chapter is finished
@@ -213,6 +214,9 @@ def remove_item(argument, room_state):
 
 def remove_object(argument, room_state):
     room_state["interactable_objects"].pop(argument)
+
+def remove_npc(argument, room_state):
+    room_state["npcs"].pop(argument)
 
 def make_dragon_angry(argument, room_state):
     if "Dragon" in room_state["npcs"]:
