@@ -6,7 +6,7 @@ import time
 def interact(npc, room_state):
     # if dialog branch is exhausted display this:
     if npc["current_chapter"] not in npc["dialog_tree"]:
-        print(f"{npc["name"]} has nothing more to say.")
+        print(f"{npc['name']} has nothing more to say.")
         return
 
     # Define which string calls which function
@@ -32,20 +32,17 @@ def interact(npc, room_state):
                     if callable(function):
                         function(argument, room_state)
                     else:
-                        raise Exception(f"Action function {node["action"]} missing")
+                        raise Exception(f"Action function {node['action']} missing")
             else:
                 function, argument = node["action"]
                 function = action_map.get(function)
                 if callable(function):
                     function(argument, room_state)
                 else:
-                    raise Exception(f"Action function {node["action"]} missing")
+                    raise Exception(f"Action function {node['action']} missing")
 
         # Print node text
-        if npc.get("name"):
-            print(f"{npc["name"]}: '{node["text"]}'")
-        else:
-            print(f"{node["text"]}")
+        print(f"{node['text']}")
 
         # If there are no branching dialog options end dialog
         if "next_chapter" in node:
@@ -72,14 +69,14 @@ def interact(npc, room_state):
                 success_rate = 1
 
             # Print option number, the text and the success rate if you choose this option
-            print(f" {option_number}. {option_entry["text"]} ({int(success_rate*100)}%) ")
+            print(f" {option_number}. {option_entry['text']} ({int(success_rate*100)}%) ")
             # If there are items that helped, list them
             if added_modifier_list:
                 print("Helping items: ")
                 for item in added_modifier_list:
                     print(f"{item} ")
 
-        print(f" {len(node["options"])+1}. Leave")
+        print(f" {len(node['options'])+1}. Leave")
 
         # Input loop
         # Checks if the player entered a valid option
