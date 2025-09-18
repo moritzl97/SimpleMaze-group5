@@ -91,10 +91,10 @@ def open_dialog(npc, room_state):
 
                 if success_rate > random.uniform(0, 1):
                     npc["current_node"] = option_entry["next_success"]
-                    print("Success!")
+                    print("\033[32mSuccess!\033[0m") #The wired stuff \033[32m and \033[0m makes the text green
                 else:
                     npc["current_node"] = option_entry["next_failure"]
-                    print("Failure!")
+                    print("\033[31mFailure!\033[0m") #The wired stuff \033[31m and \033[0m makes the text red
                 break
 #---end talk definition---#
 
@@ -293,6 +293,26 @@ def handle_interact(noun, room_state):
             if noun == "Shopkeeper":
                 trade_with_shopkeeper(room_state["npcs"]["Shopkeeper"], room_state)
             else:
+                #Print ASCII art if you talk with dragon
+                if noun == "Dragon":
+                    print(r"""                                              /(  /(
+                                            /   \/   \
+                              |\___/|      //||\//|| \\
+                             (,\  /,)\__  // ||// || \\ \
+                             /     /   /_//  |//  ||  \\ \\
+                            (@_^_@)/    /_   //   ||   \\  \\
+                             W//W_/      /_ //    ||    \\   \\
+                           (//) |         ///     ||     \\    \\
+                         (/ /) _|_ /   )  //      ||      \\   __\
+                       (// /) '/,_ _ _/  ( ; -.   ||    _ _\\.-~        .-~~~^-.
+                     (( // )) ,-{        _      `-||.-~-.           .~         `.
+                    (( /// ))  '/\      /                 ~-. _ .-~      .-~^-.  \
+                    (( ///))      `.   {            }                   /      \  \
+                     ((/ ))     .----~-.\        \-'                 .~         \  `. \^-.
+                               ///.----..>    (   \             _ -~             `.  ^-`   ^-_
+                                 ///-._ _ _ _ _ _ _}^ - - - - ~                    ~--_.   .-~
+                                                                                       /.-~""")
+
                 open_dialog(room_state["npcs"][noun], room_state)
         else:
             print(f"There is no {noun} here to interact with.")

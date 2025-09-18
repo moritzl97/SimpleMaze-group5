@@ -33,7 +33,7 @@ dialogue_tree_dragon = {
             "next_chapter":"end"
         },
         "failed_gem": {
-            "text": "Dragon:'I can see that this Gemstone is fake. Begone.'",
+            "text": "Dragon:'You have to present me a real Gemstone. Begone!'",
             "next_chapter":"dragon_angry"
         },
     },
