@@ -49,6 +49,9 @@ while True:
     elif current == "cloudroom":
         state["current_room"] = enterCloudRoom(state)
 
+    elif current == "riddleroom":
+        state["current_room"] = enterRiddleroom(state)
+
     else:
         print("Unknown room. Exiting game.")
         break
