@@ -121,6 +121,3 @@ def enterRiddleroom(state):
         else:
             print("Invalid choice.")
 
-# --- Main Function ---
-if __name__ == "__main__":
-    riddleroom()
