@@ -87,6 +87,7 @@ def enterRiddleroom(state):
         if final_input == code:
             print("Correct! The glass case clicks open. You may now take the magnet.")
             inventory.append("challenge_solved")
+            state["visited"]["riddleroom"] = True
             return True
         else:
             print("Incorrect code. The challenge remains unsolved.")
@@ -114,9 +115,9 @@ def enterRiddleroom(state):
             take("magnet")
         elif selected_option == "Check inventory":
             print("Inventory:", inventory)
-        elif selected_option == "Quit":
+        elif selected_option == "Leave":
             print("Thanks for playing!")
-            game_running = False
+            return "corridor"
         else:
             print("Invalid choice.")
 
