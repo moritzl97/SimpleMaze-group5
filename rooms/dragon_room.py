@@ -328,7 +328,8 @@ def handle_inventory(noun, room_state):
     return True
 
 def handle_help(noun, room_state):
-    print("Type in a verb and a noun to interact with the things in the room. You can leave the room by typing: 'leave'")
+    print("Type in a verb and a noun to interact with the things in the room.\nType 'look around' to see what is in the room. You can leave the room by typing: 'leave room'.")
+    return True
 #---Command handlers finished---#
 
 #---Main function---#
