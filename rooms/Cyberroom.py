@@ -1,8 +1,8 @@
-
+import sys
 
 def enterCyberRoom(state):
 
-    if state["visited"]["cyberroom"] == True:
+    if state["visited"]["cyberroom"]:
         print("There is nothing left to do here.")
         return "corridor"
 
@@ -82,10 +82,10 @@ def enterCyberRoom(state):
         elif command == "take key":
             if code_unlocked and "cyber_key" not in CR["inventory"]:
                 print("You take the key and put it in your backpack.")
+                state["visited"]["cyberroom"] = True
                 CR["inventory"].append("cyber_key")
             elif "cyber_key" in CR["inventory"]:
                 print("You already have the key.")
-                state["visited"]["cyberroom"] = True
             else:
                 print("There is no key yet.")
 
@@ -98,4 +98,4 @@ def enterCyberRoom(state):
             sys.exit()
 
         else:
-            print("Unknown command. Try: look, panel <n>, code <123>, take key, leave, quit.")
+            print("Unknown command. Try: look, panel <>, code <123>, take key, leave, quit.")
