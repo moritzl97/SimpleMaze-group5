@@ -47,11 +47,11 @@ def enterComputerlab(state):
             print("'Don't forget it!'")
             print(f"You managed to successfully obtain the password.")
             print("It's worth to check out that laptop out.")
+            state["visited"]["computerlab"] = True
         else:
             print("The student looks amused.")
             print("👩'Yeah, I think you need to think it over.'")
             print("You return to the corridor in shame.")
-            state["visited"]["computerlab"] = True
             return "corridor"
 
     def handle_help():
