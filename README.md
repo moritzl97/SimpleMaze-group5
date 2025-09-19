@@ -1,25 +1,29 @@
-# SimpleMaze
+# SimpleMaze – Group 5
 
-A simple maze game written in Python, created for a school project for ACS at THUAS (The Hague University of Applied Sciences).  
-You are free to use, modify, and share this code — but it comes **as-is**, with no guarantees or support.
-
----
-
-## Project Description
-
-SimpleMaze is a basic Python-based maze game intended as a starting point or template for building more advanced projects.  
-It is deliberately kept simple and beginner-friendly:
-
-- No classes or object-oriented structure
-- No persistent storage
-- No multiplayer features
-- No external libraries required
-
-Perfect for new Python learners or small-scale academic use.
+A text-based adventure/maze game developed as part of the **Applied Computer Science** project at THUAS.  
+The goal is to explore rooms, solve small puzzles, and complete challenges to mark rooms as visited.
 
 ---
 
-## How to Run
+## Features
+- CLI-based game (runs in the terminal).
+- Explore multiple rooms (Study Landscape, Classroom, Project Room, Cloud Room, …).
+- Each room has its own challenge:
+  - **Cloud Room**: find letters around the room to unlock a robot, then answer a short quiz.
+- State management (visited rooms, inventory).
+- Easy to extend with new rooms.
 
-1. Make sure Python 3 is installed on your system.
-2. Clone or download the repository
+---
+
+## Getting Started
+
+### Prerequisites
+- Python 3.9+ installed
+- Git (optional, for cloning the repo)
+
+### Installation
+Clone the repository:
+
+```bash
+git clone https://github.com/moritzl97/SimpleMaze-group5.git
+cd SimpleMaze-group5
