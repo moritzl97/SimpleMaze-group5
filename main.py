@@ -24,7 +24,8 @@ state = {
         "projectroom3": False,
         "cloudroom": False,
         "cyberroom": False,
-        "dragonroom": False
+        "dragonroom": False,
+        "computerlab": False
     },
     "inventory": []
 }
