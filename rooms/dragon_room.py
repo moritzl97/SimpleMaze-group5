@@ -1,5 +1,6 @@
 import random
 import time
+import sys
 
 #---define open dialog---#
 # Called if player talks to an NPC or interacts with objects
@@ -156,17 +157,24 @@ def parse(user_input):
     verb_aliases = {
         "inspect": "look",
         "examine": "look",
-        "check inventory": "inventory",
+        "explore": "look",
         "inv": "inventory",
         "pick": "take",
         "grab": "take",
+        "collect": "take",
+        "fetch": "take",
         "walk": "go",
         "move": "go",
         "leave": "go",
-        "use": "interact",
         "sell": "trade",
         "buy": "trade",
+        "barter": "trade",
+        "use": "interact",
         "talk": "interact",
+        "speak": "interact",
+        "converse": "interact",
+        "chat": "interact",
+        "communicate": "interact",
         "?": "help"
     }
 
@@ -328,8 +336,12 @@ def handle_inventory(noun, room_state):
     return True
 
 def handle_help(noun, room_state):
-    print("Type in a verb and a noun to interact with the things in the room.\nType 'look around' to see what is in the room. You can leave the room by typing: 'leave room'.")
+    print("Type in a verb and a noun to interact with the things in the room.\nType 'look around' to see what is in the room. You can leave the room by typing: 'go corridor'.\nUse 'inventory' to look in your inventory.\nUse verbs lik: 'look', 'talk', 'inspect', 'trade'")
     return True
+
+def handle_quit(noun, room_state):
+    print("👋 You leave the school and the adventure comes to an end. Game over.")
+    sys.exit()
 #---Command handlers finished---#
 
 #---Main function---#
@@ -348,7 +360,8 @@ def enterDragonRoom(state):
         "interact": handle_interact,
         "inventory": handle_inventory,
         "trade": handle_trade,
-        "help": handle_help
+        "help": handle_help,
+        "quit": handle_quit
     }
 
     #---setup room---#
