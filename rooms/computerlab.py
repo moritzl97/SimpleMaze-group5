@@ -27,26 +27,40 @@ def enterComputerlab(state):
 
     def handle_ask(target):
         if state["visited"]["computerlab"]:
-            print(f"You already asked the student a question.")
+            print("👩'Did you forget the password? It's crypt0.'")
         if target == "student":
-            print("'Oh, the laptop? Yeah, I know the password, but I need you to solve my riddle.'")
+            print("👩'Oh, the laptop? Yeah, I know the password, but I need you to solve my riddle first.'")
             print("\nI'm made of only ones and zeros,")
             print("yet I can store music, pictures and prose.")
             print("What am I?")
         else:
             print(f"❌There is no {target} here to ask")
 
+    def handle_answer(response):
+        if state["visited"]["computerlab"]:
+            print(f"The student looks annoyed and decides to ignore you.")
+            return None
+        normalized = response.lower().strip()
+        if normalized in ["binary", "binary code", "bits"]:
+            print("👩'Yeah, that's right! I was curious if you knew.'")
+            print("'Anyway, the password to the laptop is: crypt0'")
+            print("'Don't forget it!'")
+            print(f"You managed to successfully obtain the password.")
+            print("It's worth to check out that laptop out.")
+        else:
+            print("The student looks amused.")
+            print("👩'Yeah, I think you need to think it over.'")
+            print("You return to the corridor in shame.")
+            return "corridor"
+
     def handle_help():
         # ---- Handle help commands ----
         print("\nAvailable commands:")
         print("- look around         : Examine the room and its contents.")
-        if not state["visited"]["computerlab"]:
-            print("- answer     :.")
-        if state["visited"]["computerlab"] and "key" not in state["inventory"]:
-            print("- take key            : Pick up the key once it's revealed.")
         print("- go corridor / back  : Leave the room and return to the corridor.")
         print("- talk student        : Talk to the student.")
         print("- ask student         : Ask a student a question.")
+        print("- answer              : Answer the question.")
         print("- ?                   : Show this help message.")
         print("- quit                : Quit the game entirely.")
 
@@ -59,33 +73,35 @@ def enterComputerlab(state):
             print(f"❌ You can't go to '{destination}' from here.")
             return None
 
-    # --- Commandoloop ---
-    while True:
-        command = input("\n> ").strip().lower()
+    if command == "look around":
+        handle_look()
 
-        if command == "look around":
-            handle_look()
+    elif command == "?":
+        handle_help()
 
-        elif command == "?":
-            handle_help()
+    elif command.startswith("go "):
+        destination = command[3:].strip()
+        result = handle_go(destination)
+        if result:
+            return result
 
-        elif command.startswith("go "):
-            destination = command[3:].strip()
-            result = handle_go(destination)
-            if result:
-                return result
+    elif command.startswith("talk "):
+        target = command[5:].strip()
+        handle_talk(target)
 
-        elif command.startswith("talk "):
-            target = command[5:].strip()
-            handle_talk(target)
+    elif command.startswith("ask "):
+        target = command[4:].strip()
+        handle_ask(target)
 
-        elif command.startswith("ask "):
-            target = command[4:].strip()
-            handle_ask(target)
+    elif command.startswith("answer "):
+        response = command[7:].strip()
+        result = handle_answer(response)
+        if result:
+            return result
 
-        elif command == "quit":
-            print("👋 You drop your backpack, leave the maze behind, and step back into the real world.")
-            sys.exit()
+    elif command == "quit":
+        print("👋 You decide there's nothing for you to do here.")
+        sys.exit()
 
-        else:
-            print("❓ Unknown command. Type '?' to see available commands.")
+    else:
+        print("❓ Unknown command. Type '?' to see available commands.")
