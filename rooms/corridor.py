@@ -48,6 +48,10 @@ def enterCorridor(state):
     while True:
         command = input("\n> ").strip().lower()
 
+        if all(state["visited"].values()):
+            print("You have successfully completed all rooms!")
+            sys.exit()
+
         if command == "look around":
             handle_look()
 

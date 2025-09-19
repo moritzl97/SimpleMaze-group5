@@ -51,6 +51,7 @@ def enterComputerlab(state):
             print("The student looks amused.")
             print("👩'Yeah, I think you need to think it over.'")
             print("You return to the corridor in shame.")
+            state["visited"]["computerlab"] = True
             return "corridor"
 
     def handle_help():
@@ -72,36 +73,38 @@ def enterComputerlab(state):
         else:
             print(f"❌ You can't go to '{destination}' from here.")
             return None
+    while True:
+        command = input("> ")
 
-    if command == "look around":
-        handle_look()
+        if command == "look around":
+            handle_look()
 
-    elif command == "?":
-        handle_help()
+        elif command == "?":
+            handle_help()
 
-    elif command.startswith("go "):
-        destination = command[3:].strip()
-        result = handle_go(destination)
-        if result:
-            return result
+        elif command.startswith("go "):
+            destination = command[3:].strip()
+            result = handle_go(destination)
+            if result:
+                return result
 
-    elif command.startswith("talk "):
-        target = command[5:].strip()
-        handle_talk(target)
+        elif command.startswith("talk "):
+            target = command[5:].strip()
+            handle_talk(target)
 
-    elif command.startswith("ask "):
-        target = command[4:].strip()
-        handle_ask(target)
+        elif command.startswith("ask "):
+            target = command[4:].strip()
+            handle_ask(target)
 
-    elif command.startswith("answer "):
-        response = command[7:].strip()
-        result = handle_answer(response)
-        if result:
-            return result
+        elif command.startswith("answer "):
+            response = command[7:].strip()
+            result = handle_answer(response)
+            if result:
+                return result
 
-    elif command == "quit":
-        print("👋 You decide there's nothing for you to do here.")
-        sys.exit()
+        elif command == "quit":
+            print("👋 You decide there's nothing for you to do here.")
+            sys.exit()
 
-    else:
-        print("❓ Unknown command. Type '?' to see available commands.")
+        else:
+            print("❓ Unknown command. Type '?' to see available commands.")

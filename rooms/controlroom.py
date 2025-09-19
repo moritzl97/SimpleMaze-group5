@@ -63,4 +63,5 @@ def control_room(state):
         print("\nYou connected all the cables in the correct order!")
         print("You get a USB stick to move on.")
         state["has_usb"] = True
+        state["visited"]["controlroom"] = True
         return "corridor"
