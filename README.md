@@ -8,10 +8,8 @@ The goal is to explore rooms, solve small puzzles, and complete challenges to ma
 ## Features
 - CLI-based game (runs in the terminal).
 - Explore multiple rooms (Study Landscape, Classroom, Project Room, Cloud Room, …).
-- Each room has its own challenge:
-  - **Cloud Room**: find letters around the room to unlock a robot, then answer a short quiz.
-- State management (visited rooms, inventory).
-- Easy to extend with new rooms.
+- Each room has its own challenge
+- You win when you complete the challange of each room
 
 ## Tutorial
 Type the commands in the console
