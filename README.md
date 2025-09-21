@@ -13,9 +13,9 @@ The goal is to explore rooms, solve small puzzles, and complete challenges to ma
 
 ## Tutorial
 Type the commands in the console
--go room (Enter the specified room)
--look around (Learn more what is in the room room)
--? (List all available commands. There can be different commands for each room.)
+- go room (Enter the specified room)
+- look around (Learn more what is in the room room)
+- ? (List all available commands. There can be different commands for each room.)
 
 ---
 
