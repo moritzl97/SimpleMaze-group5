@@ -1,3 +1,6 @@
+# This file contains all functions of the dragonroom.
+# Scroll down to the main function enterDragonRoom() which is called when the dragonroom is entered.
+
 import random
 import time
 import sys
@@ -5,19 +8,7 @@ import sys
 #---define open dialog---#
 # Called if player talks to an NPC or interacts with objects
 def open_dialog(npc, room_state):
-    # If a dialog option causes something to happen, the function is looked up in this table
-    action_map = {
-        "wait": wait,
-        "add_npc": add_npc,
-        "give_item": give_item,
-        "remove_object": remove_object,
-        "add_item": add_item,
-        "make_dragon_angry" : make_dragon_angry,
-        "remove_item": remove_item,
-        "remove_npc": remove_npc
-    }
-
-    # Loop through all dialog nodes in the current chapter. Ends if the chapter is finished
+    # Loop through all dialog nodes in the current chapter. Ends if the chapter is finishedg
     while True:
         #get current dialog node by looking up the current chapter and node for the npc
         node = npc["dialog_tree"][npc["current_chapter"]][npc["current_node"]]
@@ -25,15 +16,30 @@ def open_dialog(npc, room_state):
         # Print dialog text
         print(f"{node['text']}")
 
-        # Run action if defined. When in a list execute all actions. If not wrap action in list.
+        # Call function if there is an action defined at this point in the dialog
         if "action" in node:
+            #lookup the function that should be called from the dialog
             actions = node["action"]
             if type(actions) != list:
+                # Make a list of it, if it is not a list
                 actions = [actions]
-            for executable_action in actions:
-                function, argument = executable_action
-                function = action_map.get(function)
-                function(argument, room_state)
+            for action, argument in actions: # loop over the list
+                if action  == "wait":
+                    wait(argument, room_state)
+                elif action == "add_npc":
+                    add_npc(argument, room_state)
+                elif action == "give_item":
+                    give_item(argument, room_state)
+                elif action == "remove_object":
+                    remove_object(argument, room_state)
+                elif action == "add_item":
+                    add_item(argument, room_state)
+                elif action == "make_dragon_angry":
+                    make_dragon_angry(argument, room_state)
+                elif action == "remove_item":
+                    remove_item(argument, room_state)
+                elif action == "remove_npc":
+                    remove_npc(argument, room_state)
 
         # If there are no branching dialog options end dialog
         if "next_chapter" in node:
@@ -48,7 +54,6 @@ def open_dialog(npc, room_state):
             # Calculate success rate and see if helpful items are in the players inventory
             success_rate = option_entry["base_success_rate"]
             added_modifier_list = []
-
             for item, modifier in option_entry.get("success_modifiers", {}).items():
                 if item in room_state["inventory"]:
                     success_rate += modifier
@@ -80,23 +85,22 @@ def open_dialog(npc, room_state):
                 print("Please choose a valid option.")
                 continue
             else:
+                # If valid choice, calculate the success rate again
                 option_entry = node["options"][choice]
                 success_rate = option_entry["base_success_rate"]
-
                 for item, modifier in option_entry.get("success_modifiers", {}).items():
                     if item in room_state["inventory"]:
                         success_rate += modifier
-
                 if success_rate > 1:
                     success_rate = 1
-
+                # Roll the dice and see if successful or failure:
                 if success_rate > random.uniform(0, 1):
-                    npc["current_node"] = option_entry["next_success"]
+                    npc["current_node"] = option_entry["next_success"] # set the next dialog to success
                     print("\033[32mSuccess!\033[0m") #The wired stuff \033[32m and \033[0m makes the text green
                 else:
-                    npc["current_node"] = option_entry["next_failure"]
+                    npc["current_node"] = option_entry["next_failure"] # set the next dialog to failure
                     print("\033[31mFailure!\033[0m") #The wired stuff \033[31m and \033[0m makes the text red
-                break
+                break # go back to the first loop and print the next dialog node
 #---end talk definition---#
 
 #---define shop keeper---#
@@ -117,11 +121,12 @@ def trade_with_shopkeeper(npc, room_state):
         print(f"{number_of_options}. I don't want to trade.")
 
         choice = int(input("\n> ").strip())
-        # If choice is in options check for success, else ask again for an input
+
         if choice < number_of_options:
+            # if correct input
             item_sell = items_sell[choice-1]
             item_wanted = wanted_items[choice-1]
-
+            # Check if the player really has the item that he want to give the shopkeeper in the inventory
             if item_wanted in room_state["inventory"]:
                 room_state["inventory"].remove(item_wanted)
                 room_state["inventory"].append(item_sell)
@@ -133,63 +138,17 @@ def trade_with_shopkeeper(npc, room_state):
                 print(f"Do you want to swindle me? You don't have {item_wanted} in your inventory!")
                 continue
         elif choice == number_of_options:
+            # Leave and dont trade
             print("Maybe next time we can make a deal.")
             return
         else:
             print("Please choose a valid option.")
 #---end of shopkeeper---#
 
-#---Parser---#
-def parse(user_input):
-    #Transform input string into a list
-    words = user_input.lower().split()
-
-    #Remove unnecessary words
-    fluff = {"the", "a", "an", "to", "up", "with", "around"}
-    words = [word for word in words if word not in fluff]
-
-    if not words:
-        return None, None
-
-    verb = words[0]
-    noun = None
-
-    verb_aliases = {
-        "inspect": "look",
-        "examine": "look",
-        "explore": "look",
-        "inv": "inventory",
-        "pick": "take",
-        "grab": "take",
-        "collect": "take",
-        "fetch": "take",
-        "walk": "go",
-        "move": "go",
-        "leave": "go",
-        "sell": "trade",
-        "buy": "trade",
-        "barter": "trade",
-        "use": "interact",
-        "talk": "interact",
-        "speak": "interact",
-        "converse": "interact",
-        "chat": "interact",
-        "communicate": "interact",
-        "?": "help"
-    }
-
-    if verb in verb_aliases.keys():
-        verb = verb_aliases[verb]
-
-    if len(words) > 1:
-        noun = words[1].title()
-
-    return verb, noun
-#---Parser end---#
-
 #---Action functions---#
-# Functions that change the room if the player makes choices
+# Functions that change the room if the player makes choices. Called when something in the dialog happens.
 def wait(seconds, room_state):
+    # Wait for input seconds
     for i in range(seconds, 0, -1):
         # print the whole line each time, start with \r to return to line start
         print(f"\rYou are stunned for {i} seconds.  ", end='', flush=True)
@@ -197,36 +156,43 @@ def wait(seconds, room_state):
     print("\nYou shake it off and can act again.")
 
 def add_npc(argument, room_state):
+    # Adds npc to the room
     if argument == "Shopkeeper":
         room_state["npcs"]["Shopkeeper"] = {"items_for_sale": ["Broadsword","Sneaking-Boots","Lockpick"], "wanted_items": ["Gemstone","Chalk","Pickaxe"]}
     elif argument == "Fairy":
         from .dragon_room_dialog import dialogue_tree_fairy
-        room_state["npcs"]["Fairy"] = {"current_chapter":"first_encounter", "current_node":"start", "dialog_tree":dialogue_tree_fairy}
+        room_state["npcs"]["Fairy"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":dialogue_tree_fairy}
     elif argument == "Kobold":
         from .dragon_room_dialog import dialogue_tree_kobold
-        room_state["npcs"]["Kobold"] = {"current_chapter":"first_encounter", "current_node":"start", "dialog_tree":dialogue_tree_kobold}
+        room_state["npcs"]["Kobold"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":dialogue_tree_kobold}
     elif argument == "Dragon":
         from .dragon_room_dialog import dialogue_tree_dragon
-        room_state["npcs"]["Dragon"] = {"current_chapter": "first_encounter", "current_node": "start", "dialog_tree": dialogue_tree_dragon}
+        room_state["npcs"]["Dragon"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": dialogue_tree_dragon}
 
 def add_item(argument, room_state):
+    #Adds item to the room
     room_state["items"].append(argument)
 
 def give_item(argument, room_state):
+    #Adds item to players inventory
     if not argument in room_state["inventory"]:
         room_state["inventory"].append(argument)
 
 def remove_item(argument, room_state):
+    # Removes item from room
     if argument in room_state["inventory"]:
         room_state["inventory"].remove(argument)
 
 def remove_object(argument, room_state):
+    # Remove object from room
     room_state["interactable_objects"].pop(argument)
 
 def remove_npc(argument, room_state):
+    #Remove npc from room
     room_state["npcs"].pop(argument)
 
 def make_dragon_angry(argument, room_state):
+    # Sets the next dialog of the dragon to angry
     if "Dragon" in room_state["npcs"]:
         room_state["npcs"]["Dragon"]["current_chapter"] = "dragon_angry"
         room_state["npcs"]["Dragon"]["current_node"] = "start"
@@ -235,6 +201,7 @@ def make_dragon_angry(argument, room_state):
 #---Command handlers---#
 def handle_look(noun, room_state):
     if noun:
+        # States where the given noun is (if in the room)
         if noun in room_state["items"]:
             print(f"You look at the {noun}. It might be useful if you pick it up.")
         elif noun in room_state["npcs"]:
@@ -246,6 +213,7 @@ def handle_look(noun, room_state):
         else:
             print(f"You don't see a {noun} here.")
     else:
+        #Prints a description of the room and lists all things that are in the room
         print("You are in a classroom with a huge hole in the ground. You see smoke rising from the hole.\n"
               "The chairs and desks of the students are scatterd through the room.\n"
               "Only the teachers desk is still standing on its right place.\n"
@@ -259,9 +227,10 @@ def handle_look(noun, room_state):
     return True
 
 def handle_go(noun, room_state):
+    # Lets the player go to another room (for now only corridor)
     if not noun:
         print("Go to which room?")
-    elif noun.lower() in ["corridor", "back", "room", "dragonroom"]:
+    elif noun.lower() in ["corridor", "back", "room"]:
         print("You flee the dragon room.")
         return False
     elif noun in room_state["interactable_objects"]:
@@ -272,6 +241,7 @@ def handle_go(noun, room_state):
     return True
 
 def handle_take(noun, room_state):
+    #Pick up item and add it to inventory
     if not noun:
         print("Take what?")
     elif noun in room_state["inventory"]:
@@ -285,6 +255,7 @@ def handle_take(noun, room_state):
     return True
 
 def handle_trade(noun, room_state):
+    # opens trade menu with the shopkeeper
     if "Shopkeeper" in room_state["npcs"]:
         trade_with_shopkeeper(room_state["npcs"]["Shopkeeper"], room_state)
     else:
@@ -292,6 +263,7 @@ def handle_trade(noun, room_state):
     return True
 
 def handle_interact(noun, room_state):
+    # opens dialog with an object or a npc
     if not noun:
         print("Interact with what?")
     else:
@@ -327,6 +299,7 @@ def handle_interact(noun, room_state):
     return True
 
 def handle_inventory(noun, room_state):
+    #list items in inventory
     if room_state["inventory"]:
         print("You are carrying:")
         for item in room_state["inventory"]:
@@ -336,45 +309,87 @@ def handle_inventory(noun, room_state):
     return True
 
 def handle_help(noun, room_state):
+    # list commands
     print("Type in a verb and a noun to interact with the things in the room.\nType 'look around' to see what is in the room. You can leave the room by typing: 'go corridor'.\nUse 'inventory' to look in your inventory.\nUse verbs lik: 'look', 'talk', 'inspect', 'trade'")
     return True
 
 def handle_quit(noun, room_state):
+    #exit game
     print("👋 You leave the school and the adventure comes to an end. Game over.")
     sys.exit()
 #---Command handlers finished---#
+
+# ---Parser---#
+def parse(user_input):
+    # transforms input of the user into verb and a noun. Synonyms of verbs are converted into known commands. Removes unnecessary words like "the", "to", "with".
+
+    # Transform input string into a list
+    words = user_input.lower().split()
+    # Remove unnecessary words
+    fluff = {"the", "a", "an", "to", "up", "with", "around"}
+    words = [word for word in words if word not in fluff]
+
+    if not words:
+        return None, None
+
+    # First word is assumed to be the verb
+    verb = words[0]
+    noun = None
+    # synonym list of verbs
+    verb_aliases = {
+        "inspect": "look",
+        "examine": "look",
+        "explore": "look",
+        "inv": "inventory",
+        "pick": "take",
+        "grab": "take",
+        "collect": "take",
+        "fetch": "take",
+        "walk": "go",
+        "move": "go",
+        "leave": "go",
+        "sell": "trade",
+        "buy": "trade",
+        "barter": "trade",
+        "use": "interact",
+        "talk": "interact",
+        "speak": "interact",
+        "converse": "interact",
+        "chat": "interact",
+        "communicate": "interact",
+        "?": "help"
+    }
+    # Get command for synonyms of verb
+    if verb in verb_aliases.keys():
+        verb = verb_aliases[verb]
+
+    # Define the noun as the second word
+    if len(words) > 1:
+        noun = words[1].title()
+
+    return verb, noun
+# ---Parser end---#
 
 #---Main function---#
 # Called when dragon room is entered
 def enterDragonRoom(state):
 
+    # If player has finished the dragon room print this message and return them to the corridor
     if state["visited"]["dragonroom"]:
         print("You have already dealt with the dragon and are ready to move to another room.")
         return "corridor"
 
-    # dict to store command handler functions
-    commands = {
-        "go": handle_go,
-        "take": handle_take,
-        "look": handle_look,
-        "interact": handle_interact,
-        "inventory": handle_inventory,
-        "trade": handle_trade,
-        "help": handle_help,
-        "quit": handle_quit
-    }
-
     #---setup room---#
-    # initialize room state, everything what is in the room is stored here
+    # initialize room state: everything what is in the room is stored here
     room_state = {"items":[], "interactable_objects":{}, "npcs":{}, "inventory":[]}
 
     # import the dialog tree from the dragon_room_dialog.py file and create objects starting in the room
     from .dragon_room_dialog import dialogue_tree_cracked_wall, dialogue_tree_blackboard, dialogue_tree_desk, dialogue_tree_chest, dialogue_tree_hole
-    room_state["interactable_objects"]["Cracked-Wall"] = {"current_chapter":"first_encounter", "current_node":"start", "dialog_tree":dialogue_tree_cracked_wall}
-    room_state["interactable_objects"]["Blackboard"] = {"current_chapter": "first_encounter", "current_node": "start", "dialog_tree": dialogue_tree_blackboard}
-    room_state["interactable_objects"]["Desk"] = {"current_chapter": "first_encounter", "current_node": "start", "dialog_tree": dialogue_tree_desk}
-    room_state["interactable_objects"]["Chest"] = {"current_chapter": "first_encounter", "current_node": "start","dialog_tree": dialogue_tree_chest}
-    room_state["interactable_objects"]["Hole"] = {"current_chapter": "first_encounter", "current_node": "start", "dialog_tree": dialogue_tree_hole}
+    room_state["interactable_objects"]["Cracked-Wall"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":dialogue_tree_cracked_wall}
+    room_state["interactable_objects"]["Blackboard"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": dialogue_tree_blackboard}
+    room_state["interactable_objects"]["Desk"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": dialogue_tree_desk}
+    room_state["interactable_objects"]["Chest"] = {"current_chapter": "first_chapter", "current_node": "start","dialog_tree": dialogue_tree_chest}
+    room_state["interactable_objects"]["Hole"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": dialogue_tree_hole}
     room_state["items"].append("Pickaxe")
     #---room setup finished---#
 
@@ -385,21 +400,30 @@ def enterDragonRoom(state):
           "On the blackboard is something written, but it is to small to read from here.")
 
     # main loop
-    in_room = True
+    in_room = True # Turns to false if player wants to leave the room
     while in_room:
         command = input("\n> ")
-        # transforms input into verb and a noun. Verbs are converted into commands aliases if possible. Cleans articles, prepositions.
+        # transforms input of the user into verb and a noun. Synonyms of verbs are converted into known commands. Removes unnecessary words like "the", "to", "with".
         verb, noun = parse(command)
 
         if verb is None:
             print("What do you want to do?")
-            continue
-
-        # Tries to look up my python function(handler) associated with the input string
-        handler = commands.get(verb)
-        if handler:
-            # Calls handler, if it is a function. All handlers return True, unless the room should be exited
-            in_room = handler(noun, room_state)
+        elif verb == "look":
+            in_room = handle_look(noun, room_state)
+        elif verb == "go":
+            in_room = handle_go(noun, room_state)
+        elif verb == "take":
+            in_room = handle_take(noun, room_state)
+        elif verb == "trade":
+            in_room = handle_trade(noun, room_state)
+        elif verb == "interact":
+            in_room = handle_interact(noun, room_state)
+        elif verb == "inventory":
+            in_room = handle_inventory(noun, room_state)
+        elif verb == "help":
+            in_room = handle_help(noun, room_state)
+        elif verb == "quit":
+            in_room = handle_quit(noun, room_state)
         else:
             print(f"I don't know how to '{verb}'.")
 

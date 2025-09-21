@@ -1,27 +1,27 @@
 #-----------NPCs-----------#
 dialogue_tree_dragon = {
-    "first_encounter": {
-        "start": {
-            "text": "Dragon:'You come to may lair. What do you want?'",
-            "options": {
-                "1": {"text": "Attempt to attack the dragon",
-                      "next_success": "kill_dragon",
-                      "next_failure": "failed_attack",
-                      "base_success_rate": 0.01,
-                      "success_modifiers":{"Broadsword":0.8}},
-                "2": {"text": "Try to bribe the Dragon with a Gemstone.",
+    "first_chapter": { # first entry is allways "first_chapter". This part will be printed if you talk the first time to the dragon. The other chapters are parts that are printed when you talk to the character again.
+        "start": { # This represents one dialog entry. A dialog "node". It can have options or an ending. If it is an ending it has to define another chapter
+            "text": "Dragon:'You come to may lair. What do you want?'", # Here the text is stored
+            "options": { # list of the options, from which the player can choose
+                "1": {"text": "Attempt to attack the dragon", # The text of the option
+                      "next_success": "kill_dragon", # The next dialog entry, if successful
+                      "next_failure": "failed_attack", # The next dialog entry, if NOT successful
+                      "base_success_rate": 0.01, # The success rate of being successful (times 100 gives you the percent)
+                      "success_modifiers":{"Broadsword":0.8}}, # Items that boost the success rate and by how much they boost it
+                "2": {"text": "Try to bribe the Dragon with a Gemstone.", # A second option (with everything like above)
                       "next_success": "give_gem",
                       "next_failure": "failed_gem",
                       "base_success_rate": 0,
                       "success_modifiers":{"Gemstone":0.5}},
             }
         },
-        "kill_dragon": {
-            "text": "You slay the beast. Triumphantly you fetch the trophy that it was hiding. You feel heroic and ready to move on to another room.",
-            "action":[("give_item","Trophy"), ("remove_npc","Dragon")],
-            "next_chapter":"end"
+        "kill_dragon": { # another dialog node
+            "text": "You slay the beast. Triumphantly you fetch the trophy that it was hiding. You feel heroic and ready to move on to another room.", # printed text
+            "action":[("give_item","Trophy"), ("remove_npc","Dragon")], # actions define functions that will be called at this point. for example here it gives the player a trophy and removes the dragon from the room
+            "next_chapter":"end" # the next chapter if you talk to the npc in the future. However in this case, it is the last time you will speak with the npc forever, therefore we just write "end" in the next chapter.
         },
-        "failed_attack": {
+        "failed_attack": { # another dialog node
             "text": "Your attack misses and you are hit by the Dragons claw.",
             "action":("wait",10),
             "next_chapter":"dragon_angry"
@@ -63,7 +63,7 @@ dialogue_tree_dragon = {
 }
 
 dialogue_tree_fairy = {
-    "first_encounter": {
+    "first_chapter": {
         "start": {
             "text": "Fairy:'Thank you for saving me!'",
             "options": {
@@ -135,10 +135,10 @@ dialogue_tree_fairy = {
         },
         "correct_color": {
             "text": "Fairy:'Bring me as many items of my favorite color and I will reward you!'",
-            "next_chapter":"second_encounter"
+            "next_chapter":"second_chapter"
         },
     },
-    "second_encounter": {
+    "second_chapter": {
         "start": {
             "text": "Fairy:'Have you gathered items of my favorite color for me? What item do you want?'",
             "options": {
@@ -162,24 +162,24 @@ dialogue_tree_fairy = {
         "give_broadsword": {
             "text": "Fairy:'Here you go. Now you can deal with the dragon!'",
             "action":("give_item","Broadsword"),
-            "next_chapter":"last_encounter"
+            "next_chapter":"last_chapter"
         },
         "give_gem": {
             "text": "Fairy:'Here you go. Now you can deal with the dragon!'",
             "action":("give_item","Gemstone"),
-            "next_chapter":"last_encounter"
+            "next_chapter":"last_chapter"
         },
     },
-    "last_encounter": {
+    "last_chapter": {
         "start": {
             "text": "Fairy:'I have given you all I have. Now go deal with the Dragon.'",
-            "next_chapter":"last_encounter"
+            "next_chapter":"last_chapter"
         }
     }
 }
 
 dialogue_tree_kobold = {
-    "first_encounter": {
+    "first_chapter": {
         "start": {
             "text": "The Kobold looks at you with fear.",
             "options": {
@@ -237,7 +237,7 @@ dialogue_tree_kobold = {
 
 #-----interactable object------#
 dialogue_tree_cracked_wall = {
-    "first_encounter": {
+    "first_chapter": {
         "start": {
             "text": "There is a crack in the wall. You hear the sound of a someone digging beyond it. Trying to break it open without the right tools could have devastating results.",
             "options": {
@@ -251,7 +251,7 @@ dialogue_tree_cracked_wall = {
         "open_wall": {
             "text": "You break open the wall. A surprised dwarf with a huge backpack looks at you and comes crawling out of the hole. \nShopkeeper: 'Hi I have useful items to trade, if you want.'",
             "action": ("add_npc","Shopkeeper"),
-            "next_chapter":"second_encounter"
+            "next_chapter":"second_chapter"
         },
         "failed_open_wall": {
             "text": "Trying to open the wall lets the other side collapse. Now heavy rubble is blocking the way and there is no way to get through. However you see a Lockpick between the stones.",
@@ -259,7 +259,7 @@ dialogue_tree_cracked_wall = {
             "next_chapter":"end"
         },
     },
-    "second_encounter": {
+    "second_chapter": {
         "start": {
             "text": "The cracked wall has an opening the size of a dwarf.",
             "options": {
@@ -313,7 +313,7 @@ dialogue_tree_cracked_wall = {
 }
 
 dialogue_tree_chest = {
-    "first_encounter": {
+    "first_chapter": {
         "start": {
             "text": "A Chest with a heavy lock.",
             "options": {
@@ -337,7 +337,7 @@ dialogue_tree_chest = {
         "failed_open_chest": {
             "text": "After a while you slip and have to start all over again. Maybe you need the right tools to open the chest... At leats there was no harm done.",
             "action":("wait",5),
-            "next_chapter":"first_encounter"
+            "next_chapter":"first_chapter"
         },
         "failed_break_chest": {
             "text": "You destroy the chest. What ever was in there, now it is destroyed.",
@@ -348,14 +348,14 @@ dialogue_tree_chest = {
 }
 
 dialogue_tree_desk = {
-    "first_encounter": {
+    "first_chapter": {
         "start": {
             "text": "The teachers desk has a locked drawer. You get closer to inspect it. However you are startled by a sleeping kobold that lies under the desk.",
             "action":("add_npc", "Kobold"),
-            "next_chapter":"second_encounter"
+            "next_chapter":"second_chapter"
         }
     },
-    "second_encounter": {
+    "second_chapter": {
         "start": {
             "text": "The teachers desk has a locked drawer.",
             "options": {
@@ -379,7 +379,7 @@ dialogue_tree_desk = {
         "failed_open_drawer": {
             "text": "After a while you slip and have to start all over again. Maybe you need the right tools to open the drawer... At leats there was no harm done.",
             "action":("wait",5),
-            "next_chapter":"second_encounter"
+            "next_chapter":"second_chapter"
         },
         "failed_break_drawer": {
             "text": "After you are done with the desk only a pile of wood is left over. Some paper is scatterd through the room.",
@@ -390,14 +390,14 @@ dialogue_tree_desk = {
 }
 
 dialogue_tree_hole = {
-    "first_encounter": {
+    "first_chapter": {
         "start": {
             "text": "In the hole you see a huge dragon resting on a pile of gold. You see a Trophy shimmering between the treasurers. \nYou know you want it, but it will be not easy to convince the dragon. \n"
                     "You can also climb into the hole, but with the dragon in there it could be dangerous.",
-            "action":("add_npc", "Dragon"), "next_chapter":"second_encounter"
+            "action":("add_npc", "Dragon"), "next_chapter":"second_chapter"
         }
     },
-    "second_encounter": {
+    "second_chapter": {
         "start": {
             "text": "You approach the hole. It will be hard to avoid the dragon.",
             "options": {
@@ -424,14 +424,14 @@ dialogue_tree_hole = {
             "next_chapter":"end"
         },
         "steal_failure": {
-            "text": "You try to steal the Trophy, but the Dragon sees you. \nDragon:'You will not get my treasure!' \nHe flings you out of the hole and moves the Trophy further under his belly.",
+            "text": "You try to steal the Trophy, but the Dragon sees you. \nDragon:'You will not get my treasure!' \nHe flings you out of the hole and moves the Trophy further under her belly.",
             "action":[("wait",10),("make_dragon_angry",None)],
             "next_chapter":"empty"
         },
         "failed_climb": {
             "text": "The Dragon sees you immediately and spits fire at you. \nDragon:'You really tried to steal my treasure?'\nYou retreat immediately.",
             "action":[("wait",10),("make_dragon_angry",None)],
-            "next_chapter":"second_encounter"
+            "next_chapter":"second_chapter"
         },
     },
     "empty": {
@@ -455,7 +455,7 @@ dialogue_tree_hole = {
 }
 
 dialogue_tree_blackboard = {
-    "first_encounter": {
+    "first_chapter": {
         "start": {
             "text": "You see something written on the blackboard, but it is hard to decipher.",
             "options": {
@@ -468,15 +468,15 @@ dialogue_tree_blackboard = {
         "decipher_success": {
             "text": "Written in small letters you read: 'Fairies like to color white.'",
             "action":("wait",10),
-            "next_chapter":"second_encounter"
+            "next_chapter":"second_chapter"
         },
         "decipher_failure": {
             "text": "You can not figure out what is written on the blackboard. By accident you smudge the writing. No it is definitely impossible to decipher the writing...",
             "action":("wait",5),
-            "next_chapter":"second_encounter"
+            "next_chapter":"second_chapter"
         },
     },
-    "second_encounter": {
+    "second_chapter": {
         "start": {
             "text": "There is nothing left to do here. However, you find a small piece of white chalk that you add to your inventory.",
             "action":[("remove_object", "Blackboard"), ("give_item", "Chalk")],
