@@ -13,17 +13,36 @@ The goal is to explore rooms, solve small puzzles, and complete challenges to ma
 - State management (visited rooms, inventory).
 - Easy to extend with new rooms.
 
+## Tutorial
+Type the commands in the console
+-go room (Enter the specified room)
+-look around (Learn more what is in the room room)
+-? (List all available commands. There can be different commands for each room.)
+
 ---
 
 ## Getting Started
 
 ### Prerequisites
 - Python 3.9+ installed
-- Git (optional, for cloning the repo)
 
 ### Installation
-Clone the repository:
-
+Clone the repository
 ```bash
 git clone https://github.com/moritzl97/SimpleMaze-group5.git
 cd SimpleMaze-group5
+```
+
+### Launching
+Start the game by executing main.py
+```bash
+python main.py
+```
+
+## Credits
+Moritz Lackner
+Oskar Lukáč
+Dominika Nowakiewicz
+Mihail Petrov
+Rodrigo Polo Lopez
+Tieme van Rees
