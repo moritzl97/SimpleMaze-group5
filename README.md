@@ -39,8 +39,14 @@ python main.py
 
 ## Credits
 Moritz Lackner
+
 Oskar Lukáč
+
 Dominika Nowakiewicz
+
 Mihail Petrov
+
 Rodrigo Polo Lopez
+
 Tieme van Rees
+
