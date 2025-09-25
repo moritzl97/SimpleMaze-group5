@@ -1,5 +1,7 @@
 # All commands that are available in all rooms are stored here
 
+import sys
+
 def handle_help(additional_help = None):
     #Show help message with available commands.
     print("\nAvailable commands:")
@@ -27,5 +29,7 @@ def pause():
     pass
 
 def quit_game():
-    pass
+    print(f"👋 You come to the conclusion that this isn't for you."
+          "You turn around and leave the building.")
+    sys.exit()
 
