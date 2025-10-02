@@ -6,6 +6,8 @@
 # Date: July 2025
 # -----------------------------------------------------------------------------
 
+
+
 import time
 from rooms import *
 from game.basic_commands import handle_basic_commands, handle_go
@@ -54,6 +56,9 @@ state = {
         "controlroom": False
     },
     "inventory": [],
+    "paused": False,
+    "start_time": time.time(),
+    "elapsed_time": 0,
     "dragon_room": {}
 }
 
