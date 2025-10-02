@@ -103,8 +103,6 @@ while True:
     if type(room_command_executed) == str:
         command = room_command_executed
 
-    if command.start
-
     go_executed = handle_go(command, state, room_functions)
 
     if not (go_executed or room_command_executed, basic_command_executed):
