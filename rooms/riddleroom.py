@@ -115,8 +115,9 @@ def enterRiddleroom(state):
             take("magnet")
         elif selected_option == "Check inventory":
             print("Inventory:", inventory)
-        elif selected_option == "Leave":
+        elif selected_option == "Quit":
             print("Thanks for playing!")
+            game_running = False
             return "corridor"
         else:
             print("Invalid choice.")
