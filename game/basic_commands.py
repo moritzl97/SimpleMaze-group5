@@ -2,6 +2,9 @@
 
 import sys
 import time
+import math
+from game.utils import clear_screen
+
 
 def display_time(state):
     elapsed = int(time.time() - state["time"])
@@ -9,30 +12,43 @@ def display_time(state):
 
 def handle_go(command, state, room_functions):
     if command.startswith("go "):
-        destination_input = command[3:]
-        if destination_input == "back":
+        destination_room = command[3:]
+        if destination_room == "back":
             destination_room = state["previous_room"][:]
         else:
-            destination_room = destination_input.replace(" ", "_")
+            destination_room = destination_room.replace(" ", "_").replace("-", "_")
+        destination_room_display_name = destination_room.replace("_", " ").title()
 
         current_room = state["current_room"]
 
         if destination_room in state["exits"].get(current_room, []):
+            clear_screen()
+            print(f"You walk toward the door to {destination_room_display_name}.")
+            destination_name_len = len(destination_room_display_name)
+            banner = """
+        .-=~=-.                                                                 .-=~=-.
+        (__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
+        ( _ __)                                                                 ( _ __)
+        (__  _)                                                                 (__  _)
+        ( _ __)                                                                 ( _ __)
+        (_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
+        `-._.-'                                                                 `-._.-'
+        """
+            print(banner[:314-int(destination_name_len/2)]+destination_room_display_name+banner[314+math.ceil(destination_name_len/2):])
 
-            print(f"You walk toward the door to {destination_room}.")
             entry_allowed = room_functions[destination_room]["enter_function"](state)
 
             if entry_allowed:
                 state["previous_room"] = state["current_room"]
                 state["current_room"] = destination_room
         else:
-            print(f"❌ You can't go to '{destination_input}' from here.")
+            print(f"❌ You can't go to '{destination_room_display_name}' from here.")
         return True
     else:
         return False
 
 def handle_admin_go(command, state, room_functions):
-    destination_room = command[9:]
+    destination_room = command[9:].replace(" ", "_").replace("-", "_")
 
     current_room = state["current_room"]
 
@@ -44,7 +60,7 @@ def handle_admin_go(command, state, room_functions):
         state["current_room"] = destination_room
 
     else:
-        print(f"❌'{destination_room}' doesn't exists.")
+        print(f"You can't enter right now.")
     return True
 
 def handle_help():
@@ -53,6 +69,8 @@ def handle_help():
     print("- look around         : See what’s in the lobby.")
     print("- go <room>           : Go to the entered room.")
     print("- go back             : Return to the room you came from.")
+    print("- map                 : Shows the map and all exits.")
+    print("- inventory           : Shows all items in your inventory.")
     print("- ?                   : Show this help message.")
     print("- pause               : Pause the game")
     print("- quit                : Quit the game.")
@@ -112,7 +130,7 @@ def show_map(state):
     # Insert X in the map for the player position the other stuff \033[93m is just to print the X in a specific color
     current_map = floor_map[:current_position] + "\033[93mX\033[00m" + floor_map[current_position + 1:]
     print(current_map)
-    print(f"Possible exits: {', '.join(state['exits'][current_room])}")
+    print(f"Possible exits: {', '.join(state['exits'][current_room]).replace("_"," ").title()}")
 
 def handle_basic_commands(command, state):
     if command == "quit":
