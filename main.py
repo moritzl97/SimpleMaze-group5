@@ -6,8 +6,6 @@
 # Date: July 2025
 # -----------------------------------------------------------------------------
 
-
-
 import time
 from rooms import *
 from game.basic_commands import handle_basic_commands, handle_go
@@ -28,9 +26,10 @@ def show_progress(state):
 # ----------------------------------------------------------------------
 # Game State
 # ----------------------------------------------------------------------
+starting_room = "study_landscape"
 state = {
-    "current_room": "study_landscape",
-    "previous_room": "study_landscape",
+    "current_room": starting_room,
+    "previous_room": starting_room,
     "exits": {
         "cloudroom": ["lab_corridor"],
         "computerlab": ["lab_corridor"],
@@ -41,7 +40,7 @@ state = {
         "classroom_2015": ["e_w_corridor"],
         "project_room_3": ["study_landscape"],
         "study_landscape": ["e_w_corridor","lab_corridor","project_room_3"],
-        "e_w_corridor": ["classroom_2015","controlroom"],
+        "e_w_corridor": ["classroom_2015","controlroom", "n_s_corridor"],
         "lab_corridor": ["coputerlab","cloudroom"],
         "n_s_corridor": ["study_landscape"],
     },
@@ -101,10 +100,16 @@ while True:
 
     room_command_executed = room_functions[current_room]["room_commands"](command, state)
 
+    if type(room_command_executed) == str:
+        command = room_command_executed
+
+    if command.start
+
     go_executed = handle_go(command, state, room_functions)
 
-    if not (go_executed):
+    if not (go_executed or room_command_executed, basic_command_executed):
         print("Please enter a valid command. Type '?' to get help.")
+
 
 
     # Show progress after each move
