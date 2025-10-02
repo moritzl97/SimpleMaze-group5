@@ -7,18 +7,11 @@
 # -----------------------------------------------------------------------------
 
 import time
+from rooms import *
+from game.basic_commands import handle_basic_commands, handle_go
+from game.screens import *
 
-from rooms import enterCorridor, enterStudyLandscape, enterClassroom2015, enterProjectRoom3, enterCyberRoom, \
-    enterCloudRoom, enterDragonRoom, control_room, enterRiddleroom, enterComputerlab
-
-print("****************************************************************************")
-print("*                      Welcome to the School Maze!                         *")
-print("*        Your goal is to explore all important rooms in the school.        *")
-print("*    You may need to solve challenges to collect items and unlock rooms.   *")
-print("*               Once you've visited all rooms, you win!                    *")
-print("****************************************************************************")
-
-
+title_screen()
 # ----------------------------------------------------------------------
 # Progress Helper
 # ----------------------------------------------------------------------
@@ -34,8 +27,22 @@ def show_progress(state):
 # Game State
 # ----------------------------------------------------------------------
 state = {
-    "current_room": "corridor",
-    "previous_room": "corridor",
+    "current_room": "study_landscape",
+    "previous_room": "study_landscape",
+    "exits": {
+        "cloudroom": ["lab_corridor"],
+        "computerlab": ["lab_corridor"],
+        "controlroom": ["e_w_corridor"],
+        "cyberroom": ["n_s_corridor"],
+        "dragon_room": ["n_s_corridor"],
+        "riddleroom": ["n_s_corridor"],
+        "classroom_2015": ["e_w_corridor"],
+        "project_room_3": ["study_landscape"],
+        "study_landscape": ["e_w_corridor","lab_corridor","project_room_3"],
+        "e_w_corridor": ["classroom_2015","controlroom"],
+        "lab_corridor": ["coputerlab","cloudroom"],
+        "n_s_corridor": ["study_landscape"],
+    },
     "visited": {
         "classroom2015": False,
         "projectroom3": False,
@@ -46,7 +53,23 @@ state = {
         "riddleroom": False,
         "controlroom": False
     },
-    "inventory": []
+    "inventory": [],
+    "dragon_room": {}
+}
+
+room_functions = {
+    "cloudroom": {"enter_function": None, "room_commands": None},
+    "computerlab": {"enter_function": None, "room_commands": None},
+    "controlroom": {"enter_function": None, "room_commands": None},
+    "cyberroom": {"enter_function": None, "room_commands": None},
+    "dragon_room": {"enter_function": dragon_room_enter, "room_commands": dragon_room_commands},
+    "riddleroom": {"enter_function": None, "room_commands": None},
+    "classroom_2015": {"enter_function": None, "room_commands": None},
+    "project_room_3": {"enter_function": None, "room_commands": None},
+    "study_landscape": {"enter_function": study_landscape_enter, "room_commands": study_landscape_commands},
+    "e_w_corridor": {"enter_function": e_w_corridor_enter, "room_commands": e_w_corridor_commands},
+    "lab_corridor": {"enter_function": lab_corridor_enter, "room_commands": lab_corridor_commands},
+    "n_s_corridor": {"enter_function": n_s_corridor_enter, "room_commands": n_s_corridor_commands},
 }
 
 state["time"] = time.time()
@@ -55,50 +78,26 @@ state["time"] = time.time()
 # ----------------------------------------------------------------------
 # Game Loop
 # ----------------------------------------------------------------------
+print("****************************************************************************")
+print("*                      Welcome to the School Maze!                         *")
+print("*        Your goal is to explore all important rooms in the school.        *")
+print("*    You may need to solve challenges to collect items and unlock rooms.   *")
+print("*               Once you've visited all rooms, you win!                    *")
+print("****************************************************************************")
+
 while True:
-    current = state["current_room"]
+    current_room = state["current_room"]
+    command = input("> ")
 
-    if current == "corridor":
-        state["current_room"] = enterCorridor(state)
+    basic_command_executed = handle_basic_commands(command, state)
 
-    elif current == "studylandscape":
-        state["current_room"] = enterStudyLandscape(state)
+    room_command_executed = room_functions[current_room]["room_commands"](command, state)
 
-    elif current == "classroom2015":
-        state["visited"]["classroom2015"] = True
-        state["current_room"] = enterClassroom2015(state)
+    go_executed = handle_go(command, state, room_functions)
 
-    elif current == "projectroom3":
-        state["visited"]["projectroom3"] = True
-        state["current_room"] = enterProjectRoom3(state)
+    if not (go_executed):
+        print("Please enter a valid command. Type '?' to get help.")
 
-    elif current == "cyberroom":
-        state["visited"]["cyberroom"] = True
-        state["current_room"] = enterCyberRoom(state)
-
-    elif current == "cloudroom":
-        state["visited"]["cloudroom"] = True
-        state["current_room"] = enterCloudRoom(state)
-
-    elif current == "riddleroom":
-        state["visited"]["riddleroom"] = True
-        state["current_room"] = enterRiddleroom(state)
-
-    elif current == "dragonroom":
-        state["visited"]["dragonroom"] = True
-        state["current_room"] = enterDragonRoom(state)
-
-    elif current == "controlroom":
-        state["visited"]["controlroom"] = True
-        state["current_room"] = control_room(state)
-
-    elif current == "computerlab":
-        state["visited"]["computerlab"] = True
-        state["current_room"] = enterComputerlab(state)
-
-    else:
-        print("Unknown room. Exiting game.")
-        break
 
     # Show progress after each move
     show_progress(state)

@@ -29,7 +29,7 @@ dialogue_tree_dragon = {
         "give_gem": {
             "text": "The Dragon gives you a sceptical look. \nDragon:'Hmm. You really flatter me. I think I am ready to part with this old Trophy' "
                     "\nThe Dragon hands you the Trophy. Satisfied you take the trophy. You feel accomplished and ready to move on to another room.",
-            "action":[("give_item","Trophy"), ("remove_npc","Dragon")],
+            "action":[("give_item","Trophy"), ("remove_npc","Dragon"), ("try_remove_item_from_inv", "Gemstone")],
             "next_chapter":"end"
         },
         "failed_gem": {
@@ -156,17 +156,17 @@ dialogue_tree_fairy = {
         },
         "not_enough_items": {
             "text": "Fairy:'Sorry that's not enough for me. I have wasted my time here. I will leave now.'",
-            "action":("remove_npc","Fairy"),
+            "action":[("remove_npc","Fairy"), ("try_remove_item_from_inv","Chalk"), ("try_remove_item_from_inv","Milk-Carton"), ("try_remove_item_from_inv","Paper")],
             "next_chapter":"end"
         },
         "give_broadsword": {
             "text": "Fairy:'Here you go. Now you can deal with the dragon!'",
-            "action":("give_item","Broadsword"),
+            "action":[("give_item","Broadsword"), ("try_remove_item_from_inv","Chalk"), ("try_remove_item_from_inv","Milk-Carton"), ("try_remove_item_from_inv","Paper")],
             "next_chapter":"last_chapter"
         },
         "give_gem": {
             "text": "Fairy:'Here you go. Now you can deal with the dragon!'",
-            "action":("give_item","Gemstone"),
+            "action":[("give_item","Gemstone"), ("try_remove_item_from_inv","Chalk"), ("try_remove_item_from_inv","Milk-Carton"), ("try_remove_item_from_inv","Paper")],
             "next_chapter":"last_chapter"
         },
     },
@@ -420,7 +420,7 @@ dialogue_tree_hole = {
         },
         "steal_success": {
             "text": "Triumphantly you steal the trophy that the Dragon was hiding. You feel sneaky and ready to move on to another room.",
-            "action":[("give_item","Trophy"), ("remove_npc","Dragon")],
+            "action":[("give_item","Trophy"), ("remove_npc","Dragon"), ("try_remove_item_from_inv","Sneaking-Boots"), ("try_remove_item_from_inv","Invisibility-Cloak")],
             "next_chapter":"end"
         },
         "steal_failure": {
