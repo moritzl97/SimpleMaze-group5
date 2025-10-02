@@ -8,7 +8,7 @@
 from .cloudroom import enterCloudRoom
 from .computerlab import enterComputerlab
 from .controlroom import control_room
-from .Cyberroom import enterCyberRoom
+from .Cyberroom import cyberroom_enter, cyberroom_commands
 from .dragon_room import dragon_room_enter, dragon_room_commands
 from .riddleroom import enterRiddleroom
 
