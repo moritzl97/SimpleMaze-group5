@@ -1,4 +1,5 @@
 import sys
+from rooms.basic_commands import display_time
 
 def enterCyberRoom(state):
 
@@ -96,6 +97,9 @@ def enterCyberRoom(state):
         elif command == "quit":
             print("You quit the game.")
             sys.exit()
+
+        elif command == "time":
+            display_time(state)
 
         else:
             print("Unknown command. Try: look, panel <>, code <123>, take key, leave, quit.")

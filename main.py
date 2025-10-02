@@ -6,6 +6,14 @@
 # Date: July 2025
 # -----------------------------------------------------------------------------
 
+
+
+import time
+
+
+
+
+
 from rooms import enterCorridor, enterStudyLandscape, enterClassroom2015, enterProjectRoom3, enterCyberRoom, \
     enterCloudRoom, enterDragonRoom, control_room, enterRiddleroom, enterComputerlab
 
@@ -15,6 +23,9 @@ print("*        Your goal is to explore all important rooms in the school.      
 print("*    You may need to solve challenges to collect items and unlock rooms.   *")
 print("*               Once you've visited all rooms, you win!                    *")
 print("****************************************************************************")
+
+
+
 
 state = {
     "current_room": "corridor",
@@ -32,8 +43,14 @@ state = {
     "inventory": []
 }
 
+state["time"] = time.time()
+
 while True:
     current = state["current_room"]
+
+
+
+
 
     if current == "corridor":
         state["current_room"] = enterCorridor(state)
@@ -67,3 +84,7 @@ while True:
     else:
         print("Unknown room. Exiting game.")
         break
+
+
+
+

@@ -1,6 +1,10 @@
 # All commands that are available in all rooms are stored here
 
 import sys
+import time
+
+start = time.time
+
 
 def handle_help(additional_help = None):
     #Show help message with available commands.
@@ -33,3 +37,6 @@ def quit_game():
           "You turn around and leave the building.")
     sys.exit()
 
+def display_time(state):
+    elapsed = int(time.time() - state["time"])
+    print(f"Elapsed time: {elapsed} seconds")
