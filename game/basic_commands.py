@@ -28,6 +28,24 @@ def handle_go(command, state, room_functions):
         else:
             print(f"❌ You can't go to '{destination_input}' from here.")
         return True
+    else:
+        return False
+
+def handle_admin_go(command, state, room_functions):
+    destination_room = command[9:]
+
+    current_room = state["current_room"]
+
+    print(f"You walk toward the door to {destination_room}.")
+    entry_allowed = room_functions[destination_room]["enter_function"](state)
+
+    if entry_allowed:
+        state["previous_room"] = state["current_room"]
+        state["current_room"] = destination_room
+
+    else:
+        print(f"❌'{destination_room}' doesn't exists.")
+    return True
 
 def handle_help():
     #Show help message with available commands.
@@ -36,6 +54,7 @@ def handle_help():
     print("- go <room>           : Go to the entered room.")
     print("- go back             : Return to the room you came from.")
     print("- ?                   : Show this help message.")
+    print("- pause               : Pause the game")
     print("- quit                : Quit the game.")
 
 def handle_pause():

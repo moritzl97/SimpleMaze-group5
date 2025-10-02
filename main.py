@@ -8,7 +8,7 @@
 
 import time
 from rooms import *
-from game.basic_commands import handle_basic_commands, handle_go
+from game.basic_commands import handle_basic_commands, handle_go, handle_admin_go
 from game.screens import *
 
 title_screen()
@@ -40,9 +40,9 @@ state = {
         "classroom_2015": ["e_w_corridor"],
         "project_room_3": ["study_landscape"],
         "study_landscape": ["e_w_corridor","lab_corridor","project_room_3"],
-        "e_w_corridor": ["classroom_2015","controlroom", "n_s_corridor"],
-        "lab_corridor": ["coputerlab","cloudroom"],
-        "n_s_corridor": ["e_w_corridor","cyberroom,", "riddleroom", "dragon_room"],
+        "e_w_corridor": ["classroom_2015","controlroom", "n_s_corridor","study_landscape"],
+        "lab_corridor": ["coputerlab","cloudroom", "study_landscape"],
+        "n_s_corridor": ["e_w_corridor","cyberroom", "riddleroom", "dragon_room"],
     },
     "visited": {
         "classroom_2015": False,
@@ -68,8 +68,8 @@ room_functions = {
     "cyberroom": {"enter_function": cyberroom_enter, "room_commands": cyberroom_commands},
     "dragon_room": {"enter_function": dragon_room_enter, "room_commands": dragon_room_commands},
     "riddleroom": {"enter_function": None, "room_commands": None},
-    "classroom_2015": {"enter_function": None, "room_commands": None},
-    "project_room_3": {"enter_function": None, "room_commands": None},
+    "classroom_2015": {"enter_function": classroom_2015_enter, "room_commands": classroom_2015_commands},
+    "project_room_3": {"enter_function": project_room_3_enter, "room_commands": project_room_3_commands},
     "study_landscape": {"enter_function": study_landscape_enter, "room_commands": study_landscape_commands},
     "e_w_corridor": {"enter_function": e_w_corridor_enter, "room_commands": e_w_corridor_commands},
     "lab_corridor": {"enter_function": lab_corridor_enter, "room_commands": lab_corridor_commands},
@@ -78,6 +78,8 @@ room_functions = {
 
 state["time"] = time.time()
 
+player_name = input("\nWhat is your nickname:  ")
+print(f"\nWelcome, {player_name}! Let's start!\n")
 
 # ----------------------------------------------------------------------
 # Game Loop
@@ -89,12 +91,15 @@ print("*    You may need to solve challenges to collect items and unlock rooms. 
 print("*               Once you've visited all rooms, you win!                    *")
 print("****************************************************************************")
 
-player_name = input("\nWhat is your nickname:  ")
-print(f"\nWelcome, {player_name}! Let's start!\n")
+room_functions[state["current_room"]]["enter_function"](state)
 
 while True:
     current_room = state["current_room"]
     command = input("> ")
+
+    if command.startswith("admin go "):
+        handle_admin_go(command,state, room_functions)
+        continue
 
     basic_command_executed = handle_basic_commands(command, state)
 
@@ -105,10 +110,8 @@ while True:
 
     go_executed = handle_go(command, state, room_functions)
 
-    if not (go_executed or room_command_executed, basic_command_executed):
+    if not (go_executed or room_command_executed or basic_command_executed):
         print("Please enter a valid command. Type '?' to get help.")
-
-
 
     # Show progress after each move
     show_progress(state)
