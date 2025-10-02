@@ -90,6 +90,9 @@ print("*    You may need to solve challenges to collect items and unlock rooms. 
 print("*               Once you've visited all rooms, you win!                    *")
 print("****************************************************************************")
 
+player_name = input("\nWhat is your nickname:  ")
+print(f"\nWelcome, {player_name}! Let's start!\n")
+
 while True:
     current_room = state["current_room"]
     command = input("> ")
