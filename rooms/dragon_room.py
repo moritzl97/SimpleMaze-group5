@@ -10,7 +10,7 @@ def open_dialog(npc, state):
     # Loop through all dialog nodes in the current chapter. Ends if the chapter is finished
     while True:
         #get current dialog node by looking up the current chapter and node for the npc
-        node = npc["dialog_tree"][npc["current_chapter"]][npc["current_node"]]
+        node = state["dragon_room"]["dialog"][npc["dialog_tree"]][npc["current_chapter"]][npc["current_node"]]
 
         # Print dialog text
         print(f"{node['text']}")
@@ -159,14 +159,11 @@ def add_npc(argument, state):
     if argument == "Shopkeeper":
         state["dragon_room"]["npcs"]["Shopkeeper"] = {"items_for_sale": ["Broadsword","Sneaking-Boots","Lockpick"], "wanted_items": ["Gemstone","Chalk","Pickaxe"]}
     elif argument == "Fairy":
-        from .dragon_room_dialog import dialogue_tree_fairy
-        state["dragon_room"]["npcs"]["Fairy"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":dialogue_tree_fairy}
+        state["dragon_room"]["npcs"]["Fairy"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":"dialogue_tree_fairy"}
     elif argument == "Kobold":
-        from .dragon_room_dialog import dialogue_tree_kobold
-        state["dragon_room"]["npcs"]["Kobold"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":dialogue_tree_kobold}
+        state["dragon_room"]["npcs"]["Kobold"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":"dialogue_tree_kobold"}
     elif argument == "Dragon":
-        from .dragon_room_dialog import dialogue_tree_dragon
-        state["dragon_room"]["npcs"]["Dragon"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": dialogue_tree_dragon}
+        state["dragon_room"]["npcs"]["Dragon"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_dragon"}
 
 def add_item(argument, state):
     #Adds item to the room
@@ -260,7 +257,7 @@ def handle_interact(noun, state):
             else:
                 #Print ASCII art if you talk with dragon
                 if noun == "Dragon":
-                    print(r"""                                              /(  /(
+                    print("\033[31m"+r"""                                              /(  /(
                                             /   \/   \
                               |\___/|      //||\//|| \\
                              (,\  /,)\__  // ||// || \\ \
@@ -276,7 +273,7 @@ def handle_interact(noun, state):
                      ((/ ))     .----~-.\        \-'                 .~         \  `. \^-.
                                ///.----..>    (   \             _ -~             `.  ^-`   ^-_
                                  ///-._ _ _ _ _ _ _}^ - - - - ~                    ~--_.   .-~
-                                                                                       /.-~""")
+                                                                                       /.-~"""+"\033[0m")
 
                 open_dialog(state["dragon_room"]["npcs"][noun], state)
         else:
@@ -344,17 +341,22 @@ def dragon_room_enter(state):
 
     #---setup room---#
     # initialize room state: everything what is in the room is stored here
-    state["dragon_room"] = {"items":[], "interactable_objects":{}, "npcs":{}}
+    if not state["dragon_room"]:
+        state["dragon_room"] = {"items":[], "interactable_objects":{}, "npcs":{}}
 
-    # import the dialog tree from the dragon_room_dialog.py file and create objects starting in the room
-    from .dragon_room_dialog import dialogue_tree_cracked_wall, dialogue_tree_blackboard, dialogue_tree_desk, dialogue_tree_chest, dialogue_tree_hole
-    state["dragon_room"]["interactable_objects"]["Cracked-Wall"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":dialogue_tree_cracked_wall}
-    state["dragon_room"]["interactable_objects"]["Blackboard"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": dialogue_tree_blackboard}
-    state["dragon_room"]["interactable_objects"]["Desk"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": dialogue_tree_desk}
-    state["dragon_room"]["interactable_objects"]["Chest"] = {"current_chapter": "first_chapter", "current_node": "start","dialog_tree": dialogue_tree_chest}
-    state["dragon_room"]["interactable_objects"]["Hole"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": dialogue_tree_hole}
-    state["dragon_room"]["items"].append("Pickaxe")
-    #---room setup finished---#
+        # Create objects starting in the room
+        state["dragon_room"]["interactable_objects"]["Cracked-Wall"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":"dialogue_tree_cracked_wall"}
+        state["dragon_room"]["interactable_objects"]["Blackboard"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_blackboard"}
+        state["dragon_room"]["interactable_objects"]["Desk"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_desk"}
+        state["dragon_room"]["interactable_objects"]["Chest"] = {"current_chapter": "first_chapter", "current_node": "start","dialog_tree": "dialogue_tree_chest"}
+        state["dragon_room"]["interactable_objects"]["Hole"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_hole"}
+        state["dragon_room"]["items"].append("Pickaxe")
+
+    # import the dialog tree from the dragon_room_dialog.py file and
+    if not state["dragon_room"].get("dialog", False):
+        from .dragon_room_dialog import dialog
+        state["dragon_room"]["dialog"] = dialog
+     #---room setup finished---#
 
     # start room
     print("You enter the classroom and are immediately drawn to the huge hole in the ground.You see smoke rising from the hole.\n"
