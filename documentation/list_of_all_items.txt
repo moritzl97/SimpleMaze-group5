@@ -1,0 +1,30 @@
+classromm_2015
+key
+
+cloudroom
+-
+
+computerlab
+-
+
+controlroom
+key_card (but not yet implemented, right now it is own keyword in state)
+
+cyberroom
+cyber_key
+
+dragonroom
+Lockpick
+Broadsword
+Sneaking-Boots
+Chalk
+Paper
+Invisibility-Cloak
+Milk-Carton
+Gemstone
+Pickaxe
+Trophy
+
+riddelroom
+challenge_solved (Not really a good item)
+magnet
