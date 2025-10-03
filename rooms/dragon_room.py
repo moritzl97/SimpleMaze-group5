@@ -1,3 +1,11 @@
+# =============================================================================
+# Project: Escape of the Nightmare
+# Authors: Moritz Lackner, Oskar Lukáč, Dominika Nowakiewicz,
+#          Mihail Petrov, Rodrigo Polo Lopez, Tieme van Rees
+# Course:  Application Development, Applied Computer Science 2025/26
+# School:  The Hague University of Applied Sciences (THUAS)
+# =============================================================================
+
 # This file contains all functions of the dragon room.
 # Scroll down to the main function enterDragon Room() which is called when the dragon room is entered.
 

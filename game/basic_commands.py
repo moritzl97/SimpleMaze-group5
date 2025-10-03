@@ -1,5 +1,12 @@
-# All commands that are available in all rooms are stored here
+# =============================================================================
+# Project: Escape of the Nightmare
+# Authors: Moritz Lackner, Oskar Lukáč, Dominika Nowakiewicz,
+#          Mihail Petrov, Rodrigo Polo Lopez, Tieme van Rees
+# Course:  Application Development, Applied Computer Science 2025/26
+# School:  The Hague University of Applied Sciences (THUAS)
+# =============================================================================
 
+# All commands that are available in all rooms are stored here
 import sys
 import time
 import math

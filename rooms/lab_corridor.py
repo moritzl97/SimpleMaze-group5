@@ -1,10 +1,10 @@
-# -----------------------------------------------------------------------------
-# File: corridor.py
-# ACS School Project - Simple Maze Example
-# Organization: THUAS (The Hague University of Applied Sciences)
-# Location: Delft
-# Date: July 2025
-# -----------------------------------------------------------------------------
+# =============================================================================
+# Project: Escape of the Nightmare
+# Authors: Moritz Lackner, Oskar Lukáč, Dominika Nowakiewicz,
+#          Mihail Petrov, Rodrigo Polo Lopez, Tieme van Rees
+# Course:  Application Development, Applied Computer Science 2025/26
+# School:  The Hague University of Applied Sciences (THUAS)
+# =============================================================================
 
 def lab_corridor_enter(state):
     print("\n🚶 You are standing in the school's main corridor.")
