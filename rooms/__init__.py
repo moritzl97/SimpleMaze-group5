@@ -6,7 +6,7 @@
 # School:  The Hague University of Applied Sciences (THUAS)
 # =============================================================================
 
-from .cloudroom import enterCloudRoom
+from .cloudroom import cloudroom_enter, cloudroom_commands
 from .computerlab import enterComputerlab
 from .controlroom import control_room
 from .Cyberroom import cyberroom_enter, cyberroom_commands

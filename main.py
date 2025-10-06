@@ -89,7 +89,7 @@ else:
 # Collection of the two important functions from each room
 #TODO enter all functions of the rooms
 room_functions = {
-    "cloudroom": {"enter_function": None, "room_commands": None},
+    "cloudroom": {"enter_function": cloudroom_enter, "room_commands": cloudroom_commands},
     "computerlab": {"enter_function": None, "room_commands": None},
     "controlroom": {"enter_function": None, "room_commands": None},
     "cyberroom": {"enter_function": cyberroom_enter, "room_commands": cyberroom_commands},
