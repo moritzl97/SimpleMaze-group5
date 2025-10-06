@@ -23,12 +23,7 @@ save_state = title_screen()
 # ----------------------------------------------------------------------
 # Progress Helper
 # ----------------------------------------------------------------------
-def show_progress(state):
-    visited_rooms = sum(1 for v in state["visited"].values() if v)
-    total_rooms = len(state["visited"])
-    percentage = (visited_rooms / total_rooms) * 100
-    print(f"\n📊 Progress: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%)")
-    print("-" * 70)
+
 
 
 # ----------------------------------------------------------------------

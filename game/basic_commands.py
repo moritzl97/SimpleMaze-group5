@@ -81,7 +81,7 @@ def handle_help():
     print("- ?                   : Show this help message.")
     print("- pause               : Pause the game")
     print("- quit                : Quit the game.")
-
+    print("- status              : Show the progress of the game")
 def handle_pause():
     pass
 
@@ -98,6 +98,13 @@ def show_inventory(state):
             print(f" - {item}")
     else:
         print("You are not carrying anything.")
+
+def show_progress(state):
+    visited_rooms = sum(1 for v in state["visited"].values() if v)
+    total_rooms = len(state["visited"])
+    percentage = (visited_rooms / total_rooms) * 100
+    print(f"\n📊 Progress: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%)")
+    print("-" * 70)
 
 def show_map(state):
     current_room = state["current_room"]
@@ -147,6 +154,9 @@ def handle_basic_commands(command, state):
         return True
     elif command == "map":
         show_map(state)
+        return True
+    elif command == "status":
+        show_progress(state)
         return True
     elif command == "help" or command == "?":
         handle_help()
