@@ -28,7 +28,7 @@ def open_dialog(npc, state):
         if "action" in node:
             #lookup the function that should be called from the dialog
             actions = node["action"]
-            if type(actions) != list:
+            if type(actions[0]) != list:
                 # Make a list of it, if it is not a list
                 actions = [actions]
             for action, argument in actions: # loop over the list
