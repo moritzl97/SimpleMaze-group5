@@ -8,14 +8,12 @@
 
 import time
 from rooms import *
-from game.basic_commands import handle_basic_commands, handle_go, handle_admin_go, handle_quit
+from game.basic_commands import handle_basic_commands, handle_go, handle_admin_go
 from game.screens import *
 
 # Set console width if possible
 cmd = 'mode 82,50'
 os.system(cmd)
-# cmd = 'color 40'
-# os.system(cmd)
 
 # Open title screen. Retrieve save file if save is loaded
 save_state = title_screen()
@@ -153,6 +151,7 @@ while True:
 
     # Win condition
     if all(state["visited"].values()):
-        print("\n🎉 Congratulations! You've visited all the rooms and completed the game! 🎉")
-        handle_quit()
-        #TODO save and quit
+        end_screen(state)
+        credits_screen()
+        sys.exit()
+

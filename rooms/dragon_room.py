@@ -11,6 +11,7 @@
 
 import random
 import time
+import json
 
 #---define open dialog---#
 # Called if player talks to an NPC or interacts with objects
@@ -349,7 +350,7 @@ def dragon_room_enter(state):
 
     #---setup room---#
     # initialize room state: everything what is in the room is stored here
-    if not state["dragon_room"]:
+    if not state.get("dragon_room", False):
         state["dragon_room"] = {"items":[], "interactable_objects":{}, "npcs":{}}
 
         # Create objects starting in the room
@@ -360,10 +361,6 @@ def dragon_room_enter(state):
         state["dragon_room"]["interactable_objects"]["Hole"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_hole"}
         state["dragon_room"]["items"].append("Pickaxe")
 
-    # import the dialog tree from the dragon_room_dialog.py file and
-    if not state["dragon_room"].get("dialog", False):
-        from .dragon_room_dialog import dialog
-        state["dragon_room"]["dialog"] = dialog
      #---room setup finished---#
 
     # start room
@@ -375,6 +372,16 @@ def dragon_room_enter(state):
 
 # Dragon room custom commands
 def dragon_room_commands(command, state):
+
+    # import the dialog tree from the dragon_room_dialog.py file and
+    if not state["dragon_room"].get("dialog", False):
+        path = "./rooms/"
+        filename = 'dragon_room_dialog.json'
+        file_path = path + filename
+        with open(file_path) as json_file:
+            dialog = json.load(json_file)
+        state["dragon_room"]["dialog"] = dialog
+
     # transforms input of the user into verb and a noun. Synonyms of verbs are converted into known commands. Removes unnecessary words like "the", "to", "with".
     verb, noun = parse(command)
 
