@@ -11,6 +11,7 @@ import sys
 import time
 import math
 from game.utils import clear_screen
+from main import scoreboard
 
 
 def display_time(state):
@@ -90,6 +91,7 @@ def handle_quit():
           "You turn around and leave the building.")
     sys.exit()
 
+
 def show_inventory(state):
     #list items in inventory
     if state["inventory"]:
@@ -99,12 +101,25 @@ def show_inventory(state):
     else:
         print("You are not carrying anything.")
 
-def show_progress(state):
+def show_progress(state, scoreboard):
     visited_rooms = sum(1 for v in state["visited"].values() if v)
     total_rooms = len(state["visited"])
     percentage = (visited_rooms / total_rooms) * 100
-    print(f"\n📊 Progress: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%)")
+    nickname = state.get("player_name", "Player")
+
+    print(f"\nProgress for {nickname}: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%)")
     print("-" * 70)
+
+    # 🏆 Update scoreboard
+    scoreboard[nickname] = percentage
+
+    # 📝 Display sorted scoreboard
+    print("🏆 Scoreboard:")
+    sorted_scores = sorted(scoreboard.items(), key=lambda x: x[1], reverse=True)
+    for rank, (name, score) in enumerate(sorted_scores, start=1):
+        print(f"{rank}. {name:<15} {score:.1f}%")
+    print("-" * 70)
+
 
 def show_map(state):
     current_room = state["current_room"]
@@ -160,7 +175,7 @@ def handle_basic_commands(command, state):
         show_map(state)
         return True
     elif command == "status":
-        show_progress(state)
+        show_progress(state, scoreboard)
         return True
     elif command == "help" or command == "?":
         handle_help()

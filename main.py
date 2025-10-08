@@ -28,6 +28,7 @@ save_state = title_screen()
 # Game State
 # ----------------------------------------------------------------------
 # Check if there is a save state given or create a new state, if it is a new game
+scoreboard = {}
 if save_state:
     state = save_state
 else:
