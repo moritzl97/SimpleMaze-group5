@@ -7,14 +7,14 @@
 # =============================================================================
 
 def n_s_corridor_enter(state):
-    print("\n🚶 You are standing in the school's main corridor.")
-    print("You see a long corridor with many doors and glass walls on both side. Behind these door are rooms, waiting to be explored.")
+    print("\n🚶 The north south corridor is much more quiet.")
+    print("Only a few classrooms are located here.")
     return True
 
 def handle_look():
     """Describe the corridor and show where the player can go."""
     print("\nYou take a look around.")
-    print("Students and teachers are walking in both directions along the corridor. You see several labeled doors.")
+    print("The corridor is empty. What will await you behind the classroom doors?")
 
 def n_s_corridor_commands(command, state):
     if command == "look around":

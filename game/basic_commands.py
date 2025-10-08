@@ -139,10 +139,14 @@ def show_map(state):
         "n_s_corridor": 441,
     }
 
-    current_position = player_positions.get(current_room)
+    current_position = player_positions.get(current_room, False)
 
     # Insert X in the map for the player position the other stuff \033[93m is just to print the X in a specific color
-    current_map = floor_map[:current_position] + "\033[93mX\033[00m" + floor_map[current_position + 1:]
+    if current_position:
+        current_map = floor_map[:current_position] + "\033[93mX\033[00m" + floor_map[current_position + 1:]
+    else:
+        current_map = floor_map
+
     print(current_map)
     print(f"Possible exits: {', '.join(state['exits'][current_room]).replace("_"," ").title()}")
 

@@ -58,7 +58,7 @@ def title_screen():
             # call status command
             pass
         elif command == "credits":
-            end_screen()
+            credits_screen()
         elif command == "exit game" or command == "exit":
             # call exit function
             sys.exit()
@@ -66,19 +66,37 @@ def title_screen():
 def pause_screen():
     clear_screen()
     print(r"""
-_______  _______           _______  _______ 
-(  ____ )(  ___  )|\     /|(  ____ \(  ____ \
-| (    )|| (   ) || )   ( || (    \/| (    \/
-| (____)|| (___) || |   | || (_____ | (__    
-|  _____)|  ___  || |   | |(_____  )|  __)   
-| (      | (   ) || |   | |      ) || (      
-| )      | )   ( || (___) |/\____) || (____/\
-|/       |/     \|(_______)\_______)(_______/
+            _______  _______           _______  _______ 
+            (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
+            | (    )|| (   ) || )   ( || (    \/| (    \/
+            | (____)|| (___) || |   | || (_____ | (__    
+            |  _____)|  ___  || |   | |(_____  )|  __)   
+            | (      | (   ) || |   | |      ) || (      
+            | )      | )   ( || (___) |/\____) || (____/\
+            |/       |/     \|(_______)\_______)(_______/
 """)
-    print("       Resume    Exit game")
+    print("                 Resume    Exit game")
     return
 
-def end_screen():
+def end_screen(state):
+    # end
+    clear_screen()
+    print(r"""
+                    _______  _        ______  
+                    (  ____ \( (    /|(  __  \ 
+                    | (    \/|  \  ( || (  \  )
+                    | (__    |   \ | || |   ) |
+                    |  __)   | (\ \) || |   | |
+                    | (      | | \   || |   ) |
+                    | (____/\| )  \  || (__/  )
+                    (_______/|/    )_)(______/ 
+    """)
+    print("\n Congratulations! You escaped the nightmare!")
+    print(f"You completed the game in {state["elapsed_time"]}")
+    input("").strip().lower()
+    return
+
+def credits_screen():
     # credits
     clear_screen()
     print("""\n\n\n\n

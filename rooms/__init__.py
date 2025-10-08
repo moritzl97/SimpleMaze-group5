@@ -7,7 +7,7 @@
 # =============================================================================
 
 from .cloudroom import cloudroom_enter, cloudroom_commands
-from .computerlab import enterComputerlab
+from .computerlab import computerlab_enter, computerlab_commands
 from .controlroom import control_room
 from .Cyberroom import cyberroom_enter, cyberroom_commands
 from .dragon_room import dragon_room_enter, dragon_room_commands
