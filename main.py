@@ -142,8 +142,6 @@ while True:
     if not (go_executed or room_command_executed or basic_command_executed):
         print("Please enter a valid command. Type '?' to get help.")
 
-    # Show progress after each move
-    #show_progress(state)
 
     # Win condition
     if all(state["visited"].values()):
