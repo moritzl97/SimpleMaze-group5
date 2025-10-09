@@ -74,7 +74,6 @@ else:
         "player_name": player_name,
         "dragon_room": {},
         "riddleroom": {},
-        "scoreboard": {}
     }
     # Message when you first start a new game
     print("You cross the bridge on the second floor to the Applied Computer Science department.", end="")
