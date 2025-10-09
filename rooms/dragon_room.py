@@ -291,7 +291,7 @@ def handle_interact(noun, state):
 
 def handle_help(noun, state):
     # list commands
-    print("Type in a verb and a noun to interact with the things in the room.\nType 'look around' to see what is in the room. \nUse verbs lik: 'look', 'talk', 'inspect', 'trade'")
+    print("Type in a verb and a noun to interact with the things in the room.\nType 'look around' to see what is in the room. \nUse verbs lik: 'look', 'talk', 'inspect', 'trade' and 'take'")
 
 # ---Parser---#
 def parse(user_input):
