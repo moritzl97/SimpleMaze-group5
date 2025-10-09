@@ -36,7 +36,7 @@ def handle_help(state):
 
 def handle_take(item, state):
     if item == "key":
-        if not state["visited"]["classroom2015"]:
+        if not state["visited"]["classroom_2015"]:
             print("❌ There's no key visible yet. Maybe solving the puzzle will reveal more.")
         elif "key" in state["inventory"]:
             print("You already have the key in your backpack.")
@@ -48,7 +48,7 @@ def handle_take(item, state):
         print(f"There is no '{item}' here to take.")
 
 def handle_answer(answer, state):
-    if state["visited"]["classroom2015"]:
+    if state["visited"]["classroom_2015"]:
         print("✅ You've already solved this challenge.")
     elif answer == "42":
         print("✅ Correct! The teacher invites you to the desk.")

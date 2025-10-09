@@ -28,7 +28,7 @@ save_state = title_screen()
 # Game State
 # ----------------------------------------------------------------------
 # Check if there is a save state given or create a new state, if it is a new game
-scoreboard = {}
+
 if save_state:
     state = save_state
 else:
@@ -70,7 +70,8 @@ else:
         "start_time": time.time(),
         "elapsed_time": 0,
         "player_name": player_name,
-        "dragon_room": {}
+        "dragon_room": {},
+        "scoreboard": {}
     }
     # Message when you first start a new game
     print("You cross the bridge on the second floor to the Applied Computer Science department.", end="")
