@@ -92,7 +92,7 @@ def end_screen(state):
                     (_______/|/    )_)(______/ 
     """)
     print("\n Congratulations! You escaped the nightmare!")
-    print(f"You completed the game in {state["elapsed_time"]}")
+    print(f"You completed the game in {state['elapsed_time']}")
     input("").strip().lower()
     return
 

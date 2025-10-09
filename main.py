@@ -71,6 +71,7 @@ else:
         "elapsed_time": 0,
         "player_name": player_name,
         "dragon_room": {},
+        "riddleroom": {},
         "scoreboard": {}
     }
     # Message when you first start a new game
@@ -89,7 +90,7 @@ room_functions = {
     "controlroom": {"enter_function": None, "room_commands": None},
     "cyberroom": {"enter_function": cyberroom_enter, "room_commands": cyberroom_commands},
     "dragon_room": {"enter_function": dragon_room_enter, "room_commands": dragon_room_commands},
-    "riddleroom": {"enter_function": None, "room_commands": None},
+    "riddleroom": {"enter_function": riddleroom_enter, "room_commands": riddleroom_commands},
     "classroom_2015": {"enter_function": classroom_2015_enter, "room_commands": classroom_2015_commands},
     "project_room_3": {"enter_function": project_room_3_enter, "room_commands": project_room_3_commands},
     "study_landscape": {"enter_function": study_landscape_enter, "room_commands": study_landscape_commands},

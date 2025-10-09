@@ -161,7 +161,7 @@ def show_map(state):
         current_map = floor_map
 
     print(current_map)
-    print(f"Possible exits: {', '.join(state['exits'][current_room]).replace("_"," ").title()}")
+    print(f"Possible exits: {', '.join(state['exits'][current_room]).replace('_',' ').title()}")
 
 def handle_basic_commands(command, state):
     if command == "quit":

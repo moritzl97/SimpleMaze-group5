@@ -11,7 +11,7 @@ from .computerlab import computerlab_enter, computerlab_commands
 from .controlroom import control_room
 from .Cyberroom import cyberroom_enter, cyberroom_commands
 from .dragon_room import dragon_room_enter, dragon_room_commands
-from .riddleroom import enterRiddleroom
+from .riddleroom import riddleroom_enter, riddleroom_commands
 
 from .classroom_2015 import classroom_2015_enter, classroom_2015_commands
 from .project_room_3 import project_room_3_enter, project_room_3_commands
