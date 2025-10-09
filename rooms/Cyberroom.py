@@ -87,25 +87,8 @@ def cyberroom_commands(command, state):
         else:
             print("There is no key yet.")
 
-    elif command == "time":
-        display_time(state)
 
-    elif command == "pause":
-        if not state["paused"]:
-            state["paused"] = True
-            state["elapsed_time"] = time.time() - state["start_time"]
-            print("Game paused. Type 'resume' to continue.")
-        else:
-            print("Game is already paused.")
 
-    elif command == "resume":
-        if state["paused"]:
-            state["paused"] = False
 
-            state["start_time"] = time.time() - state["elapsed_time"]
-            print("Game resumed.")
-        else:
-            print("Game is not paused.")
 
-    else:
-        print("Unknown command. Try: look, panel <>, code <123>, take key, leave, quit.")
+
