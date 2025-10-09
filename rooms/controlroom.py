@@ -1,9 +1,19 @@
-def control_room(state):
+# -----------------------------------------------------------------------------
+# File: rooms/controlroom.py
+# Room: Control Room (keycard + cable puzzle)
+# -----------------------------------------------------------------------------
+
+def controlroom_enter(state):
+
+    state["current_room"] = "controlroom"
+
     print("You enter the control room.")
     print("You see a keycard on the floor.")
     print("The door you just came through is now closed.")
+    return True
 
-    # Step 1: Pick up the keycard
+def controlroom_commands(command, state):
+    #Pickup keycard
     while True:
         action = input("What do you do? (e.g. 'take card'): ").lower().strip()
         if action in ["take card", "take keycard", "pick up card"]:
@@ -13,7 +23,6 @@ def control_room(state):
         else:
             print("You need to take the keycard to continue.")
 
-    # Step 2: Puzzle with cables (simple questions)
     print("\nNow you must solve the cable puzzle by answering the color mixes:")
 
     solved_order = []
@@ -65,3 +74,5 @@ def control_room(state):
         state["has_usb"] = True
         state["visited"]["controlroom"] = True
         return "corridor"
+
+    return True
