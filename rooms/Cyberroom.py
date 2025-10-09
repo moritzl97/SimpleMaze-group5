@@ -13,13 +13,6 @@ def cyberroom_enter(state):
     print("The walls are tall screens filled with cascading green code, but most of it is glitching, stuttering, and breaking apart")
     print("Next to it, three panels flicker with mathematical problems")
 
-    print("\ncommands:")
-    print("look          = Look around the room")
-    print("panel <...>   = Try solving panel 1, 2, or 3")
-    print("code <123>    = Enter the terminal code (after solving all panels)")
-    print("take key      = Take the cyber key if unlocked")
-    print("leave         = Exit back to the corridor")
-    print("quit          = Quit the game")
 
     state["cyberroom"] = {
     "solved_panels" : {"1": False, "2": False, "3": False},
@@ -30,7 +23,7 @@ def cyberroom_enter(state):
 
 def cyberroom_commands(command, state):
 
-    if command == "look":
+    if command == "look around":
         print("You see three panels: panel 1, panel 2, panel 3.")
         if all(state["cyberroom"]["solved_panels"].values()) and not state["cyberroom"]["code_unlocked"]:
             print("The terminal waits for a 3-digit code.")
@@ -86,6 +79,19 @@ def cyberroom_commands(command, state):
             print("You already have the key.")
         else:
             print("There is no key yet.")
+
+    elif command == "?" or command == "help":
+        print("\ncommands:")
+        print("look around   = Have a look around")
+        print("panel <...>   = Try solving panel 1, 2, or 3")
+        print("code <123>    = Enter the terminal code (after solving all panels)")
+        print("take key      = Take the cyber key if unlocked")
+
+
+
+
+
+
 
 
 

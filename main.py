@@ -32,6 +32,7 @@ save_state = title_screen(conn)
 
 if save_state:
     state = save_state
+    state["start_time"] = time.time() - state["elapsed_time"]
 else:
     # Ask player name
     player_name = input("\nWhat is your nickname:  ")
@@ -102,7 +103,8 @@ room_functions = {
 
 leaderboard = {}
 # Start timer
-state["time"] = time.time()
+
+state["start_ftime"] = time.time()
 
 # ----------------------------------------------------------------------
 # Game Loop

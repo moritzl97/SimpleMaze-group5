@@ -14,59 +14,54 @@ from game.utils import clear_screen
 from game.db import save_state
 
 
-def handle_pause(state):
-    if not state["paused"]:
-        state["paused"] = True
-        state["elapsed_time"] = time.time() - state["start_time"]
-        print(r"""
-                    _______  _______           _______  _______ 
-                    (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
-                    | (    )|| (   ) || )   ( || (    \/| (    \/
-                    | (____)|| (___) || |   | || (_____ | (__    
-                    |  _____)|  ___  || |   | |(_____  )|  __)   
-                    | (      | (   ) || |   | |      ) || (      
-                    | )      | )   ( || (___) |/\____) || (____/\
-                    |/       |/     \|(_______)\_______)(_______/
-        """)
-        print("You can type 'time', 'resume', or 'quit'.")
+def handle_pause(conn, state):
 
-        while state["paused"]:
-            command = input("> ").strip().lower()
+    paused = True
+    state["elapsed_time"] = time.time() - state["start_time"]
+    player_name = state["player_name"]
+    save_state(conn, player_name, state)
+    print(r"""
+                _______  _______           _______  _______ 
+                (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
+                | (    )|| (   ) || )   ( || (    \/| (    \/
+                | (____)|| (___) || |   | || (_____ | (__    
+                |  _____)|  ___  || |   | |(_____  )|  __)   
+                | (      | (   ) || |   | |      ) || (      
+                | )      | )   ( || (___) |/\____) || (____/\
+                |/       |/     \|(_______)\_______)(_______/
+    """)
+    print("You can type 'time', 'resume', or 'quit'.")
 
-            if command == "time":
-                display_time(state)
+    while True:
+        command = input("> ").strip().lower()
 
-            elif command == "resume":
-                handle_resume(state)
-                break
+        if command == "time":
+            display_time(state, paused)
 
-            elif command == "quit":
-                handle_quit()
+        elif command == "resume":
+            handle_resume(state, paused)
+            break
 
-            else:
-                print("Game is paused. Only available commands: time, resume and quit.")
-    else:
-        print("Game is already paused.")
+        elif command == "quit":
+            handle_quit()
 
+        else:
+            print("Game is paused. Only available commands: time, resume and quit.")
 
+def handle_resume(state, paused):
 
-def handle_resume(state):
-    if state["paused"]:
-        state["paused"] = False
-        state["start_time"] = time.time() - state["elapsed_time"]
-        print("Game resumed.")
-    else:
-        print("Game is not paused.")
+    state["start_time"] = time.time() - state["elapsed_time"]
+    paused = False
+    print("Game resumed.")
 
+def display_time(state, paused):
 
-def display_time(state):
-    if state["paused"]:
+    if paused:
         elapsed = state["elapsed_time"]
     else:
         elapsed = time.time() - state["start_time"]
 
     print(f"Elapsed time: {int(elapsed)} seconds")
-
 
 def handle_go(command, state, room_functions):
     if command.startswith("go "):
@@ -133,11 +128,6 @@ def handle_help():
     print("- pause               : Pause the game")
     print("- quit                : Quit the game.")
     print("- status              : Show the progress of the game")
-
-def handle_pause(conn, state):
-
-    player_name = state["player_name"]
-    save_state(conn, player_name, state)
 
 def handle_quit():
     print(f"👋 You come to the conclusion that this isn't for you."
@@ -235,14 +225,8 @@ def handle_basic_commands(conn, command, state):
     elif command == "inventory" or command == "inv":
         show_inventory(state)
         return True
-
     elif command == "time":
-        display_time(state)
+        display_time(state, paused=False)
         return True
-
-    elif command == "resume":
-        handle_resume(state)
-        return True
-
 
     return False
