@@ -172,8 +172,9 @@ def save_entry_to_scoreboard(state):
                  """, (nickname, percentage, elapsed_time))
     conn.commit()
 
-def display_scoreboard(state):
-    save_entry_to_scoreboard(state)
+def display_scoreboard(state=None):
+    if state:
+        save_entry_to_scoreboard(state)
     conn = sqlite3.connect("saves.db")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM scoreboard")
