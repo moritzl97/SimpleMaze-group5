@@ -43,7 +43,7 @@ def handle_pause(conn, state):
             break
 
         elif command == "quit":
-            handle_quit()
+            handle_quit(state)
 
         else:
             print("Game is paused. Only available commands: time, resume and quit.")
