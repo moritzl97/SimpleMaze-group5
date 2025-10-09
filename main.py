@@ -92,16 +92,6 @@ room_functions = {
 
 state["start_ftime"] = time.time()
 
-# ----------------------------------------------------------------------
-# Game Loop
-# ----------------------------------------------------------------------
-# print("****************************************************************************")
-# print("*                      Welcome to the School Maze!                         *")
-# print("*        Your goal is to explore all important rooms in the school.        *")
-# print("*    You may need to solve challenges to collect items and unlock rooms.   *")
-# print("*               Once you've visited all rooms, you win!                    *")
-# print("****************************************************************************")
-
 # Display the enter message of the first room (or the room you are in, when loading a save)
 room_functions[state["current_room"]]["enter_function"](state)
 
