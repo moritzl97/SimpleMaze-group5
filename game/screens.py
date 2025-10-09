@@ -86,7 +86,6 @@ def end_screen(state):
 
 def credits_screen():
     # credits
-    clear_screen()
     print("""\n\n\n\n
              Escape of the Nightmare was created by:
 #-------------------------------------------------------------#
