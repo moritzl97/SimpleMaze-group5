@@ -12,9 +12,60 @@ import time
 import math
 from game.utils import clear_screen
 
+
+def handle_pause(state):
+    if not state["paused"]:
+        state["paused"] = True
+        state["elapsed_time"] = time.time() - state["start_time"]
+        print(r"""
+                    _______  _______           _______  _______ 
+                    (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
+                    | (    )|| (   ) || )   ( || (    \/| (    \/
+                    | (____)|| (___) || |   | || (_____ | (__    
+                    |  _____)|  ___  || |   | |(_____  )|  __)   
+                    | (      | (   ) || |   | |      ) || (      
+                    | )      | )   ( || (___) |/\____) || (____/\
+                    |/       |/     \|(_______)\_______)(_______/
+        """)
+        print("You can type 'time', 'resume', or 'quit'.")
+
+        while state["paused"]:
+            command = input("> ").strip().lower()
+
+            if command == "time":
+                display_time(state)
+
+            elif command == "resume":
+                handle_resume(state)
+                break
+
+            elif command == "quit":
+                handle_quit()
+
+            else:
+                print("Game is paused. Only available commands: time, resume and quit.")
+    else:
+        print("Game is already paused.")
+
+
+
+def handle_resume(state):
+    if state["paused"]:
+        state["paused"] = False
+        state["start_time"] = time.time() - state["elapsed_time"]
+        print("Game resumed.")
+    else:
+        print("Game is not paused.")
+
+
 def display_time(state):
-    elapsed = int(time.time() - state["time"])
-    print(f"Elapsed time: {elapsed} seconds")
+    if state["paused"]:
+        elapsed = state["elapsed_time"]
+    else:
+        elapsed = time.time() - state["start_time"]
+
+    print(f"Elapsed time: {int(elapsed)} seconds")
+
 
 def handle_go(command, state, room_functions):
     if command.startswith("go "):
@@ -81,14 +132,12 @@ def handle_help():
     print("- pause               : Pause the game")
     print("- quit                : Quit the game.")
     print("- status              : Show the progress of the game")
-def handle_pause():
-    pass
+
 
 def handle_quit():
     print(f"👋 You come to the conclusion that this isn't for you."
           "You turn around and leave the building.")
     sys.exit()
-
 
 def show_inventory(state):
     #list items in inventory
@@ -167,7 +216,7 @@ def handle_basic_commands(command, state):
     if command == "quit":
         handle_quit()
     elif command == "pause":
-        handle_pause()
+        handle_pause(state)
         return True
     elif command == "map":
         show_map(state)
@@ -181,4 +230,14 @@ def handle_basic_commands(command, state):
     elif command == "inventory" or command == "inv":
         show_inventory(state)
         return True
+
+    elif command == "time":
+        display_time(state)
+        return True
+
+    elif command == "resume":
+        handle_resume(state)
+        return True
+
+
     return False
