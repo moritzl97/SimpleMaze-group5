@@ -19,17 +19,8 @@ os.system(cmd)
 # Open title screen. Retrieve save file if save is loaded
 conn = init_db("saves.db")
 save_state = title_screen(conn)
-# ----------------------------------------------------------------------
-# Progress Helper
-# ----------------------------------------------------------------------
 
-
-
-# ----------------------------------------------------------------------
-# Game State
-# ----------------------------------------------------------------------
 # Check if there is a save state given or create a new state, if it is a new game
-
 if save_state:
     state = save_state
     state["start_time"] = time.time() - state["elapsed_time"]
@@ -84,7 +75,6 @@ else:
     print("The bridge collapses behind you. You will have to find another way out...")
 
 # Collection of the two important functions from each room
-#TODO enter all functions of the rooms
 room_functions = {
     "cloudroom": {"enter_function": cloudroom_enter, "room_commands": cloudroom_commands},
     "computerlab": {"enter_function": computerlab_enter, "room_commands": computerlab_commands},
@@ -99,9 +89,6 @@ room_functions = {
     "lab_corridor": {"enter_function": lab_corridor_enter, "room_commands": lab_corridor_commands},
     "n_s_corridor": {"enter_function": n_s_corridor_enter, "room_commands": n_s_corridor_commands},
 }
-
-leaderboard = {}
-# Start timer
 
 state["start_ftime"] = time.time()
 
@@ -146,7 +133,6 @@ while True:
     # If neither a go command, a room command or a basic command was executed display this:
     if not (go_executed or room_command_executed or basic_command_executed):
         print("Please enter a valid command. Type '?' to get help.")
-
 
     # Win condition
     if all(state["completed"].values()):
