@@ -112,7 +112,7 @@ def load_menu(conn):
         print(row)
 
     while True:
-        choice = input("Enter player name of the save you want to load: ").strip().lower()
+        choice = input("Enter player name of the save you want to load: ").strip()
         loaded = load_state(conn, choice)
         if not loaded:
             print("Save not found. Enter a valid player name.")
