@@ -19,6 +19,21 @@ def init_db(path: str = "saves.db"):
     """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_saves_updated_at ON saves(updated_at DESC);")
     conn.commit()
+
+    conn.execute("""
+                 CREATE TABLE IF NOT EXISTS scoreboard
+                 (
+                     player_name
+                     TEXT
+                     PRIMARY
+                     KEY,
+                     percentage
+                     INTEGER,
+                     time
+                     INTEGER
+                 )""")
+    conn.commit()
+
     return conn
 
 def save_state(conn, player_name: str, state: dict):

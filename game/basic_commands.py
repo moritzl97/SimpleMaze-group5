@@ -12,7 +12,7 @@ import time
 import math
 from game.utils import clear_screen
 from game.db import save_state
-
+import sqlite3
 
 def handle_pause(conn, state):
 
@@ -129,7 +129,8 @@ def handle_help():
     print("- quit                : Quit the game.")
     print("- status              : Show the progress of the game")
 
-def handle_quit():
+def handle_quit(state):
+    save_entry_to_scoreboard(state)
     print(f"👋 You come to the conclusion that this isn't for you."
           "You turn around and leave the building.")
     sys.exit()
@@ -162,6 +163,34 @@ def show_progress(state):
         print(f"{rank}. {name:<15} {score:.1f}%")
     print("-" * 70)
 
+def save_entry_to_scoreboard(state):
+    visited_rooms = sum(1 for v in state["visited"].values() if v)
+    total_rooms = len(state["visited"])
+    percentage = int((visited_rooms / total_rooms) * 100)
+    nickname = state.get("player_name", "Player")
+    elapsed_time = int(time.time() - state["start_time"])
+    conn = sqlite3.connect("saves.db")
+    conn.execute("""
+                 INSERT INTO scoreboard (player_name, percentage, time)
+                 VALUES (?, ?, ?) ON CONFLICT(player_name) DO
+                 UPDATE SET
+                     percentage = excluded.percentage,
+                     time = excluded.time;
+                 """, (nickname, percentage, elapsed_time))
+    conn.commit()
+
+def display_scoreboard(state):
+    save_entry_to_scoreboard(state)
+    conn = sqlite3.connect("saves.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM scoreboard")
+    rows = cursor.fetchall()
+    sorted_data = sorted(rows, key=lambda x: (-x[1], x[2]))
+    print("Scoreboard")
+    for index, row in enumerate(sorted_data):
+        print(f"{row[0]}: \t {row[1]}% completed \t {row[2]}s")
+        if index == 4:
+            break
 
 def show_map(state):
     current_room = state["current_room"]
@@ -209,7 +238,7 @@ def show_map(state):
 
 def handle_basic_commands(conn, command, state):
     if command == "quit":
-        handle_quit()
+        handle_quit(state)
     elif command == "pause":
         handle_pause(conn, state)
         return True
@@ -228,5 +257,9 @@ def handle_basic_commands(conn, command, state):
     elif command == "time":
         display_time(state, paused=False)
         return True
+    elif command == "scoreboard":
+        display_scoreboard(state)
+        return True
+
 
     return False
