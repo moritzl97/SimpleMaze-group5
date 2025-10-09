@@ -128,6 +128,7 @@ def handle_help():
     print("- pause               : Pause the game")
     print("- quit                : Quit the game.")
     print("- status              : Show the progress of the game")
+    print("- scoreboard          : Show leaderboard of the best 5 players")
 
 def handle_quit(state):
     save_entry_to_scoreboard(state)
@@ -144,24 +145,16 @@ def show_inventory(state):
     else:
         print("You are not carrying anything.")
 
-def show_progress(state):
+def show_status(state):
     visited_rooms = sum(1 for v in state["visited"].values() if v)
     total_rooms = len(state["visited"])
     percentage = int((visited_rooms / total_rooms) * 100)
     nickname = state.get("player_name", "Player")
-
+    print("-" * 70)
     print(f"\nProgress for {nickname}: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%) time:{state['elapsed_time']}")
     print("-" * 70)
 
-    # 🏆 Update scoreboard
-    state["scoreboard"][nickname] = percentage
 
-    # 📝 Display sorted scoreboard
-    print("🏆 Scoreboard:")
-    sorted_scores = sorted(state["scoreboard"].items(), key=lambda x: x[1], reverse=True)
-    for rank, (name, score) in enumerate(sorted_scores, start=1):
-        print(f"{rank}. {name:<15} {score:.1f}%")
-    print("-" * 70)
 
 def save_entry_to_scoreboard(state):
     visited_rooms = sum(1 for v in state["visited"].values() if v)
@@ -186,11 +179,13 @@ def display_scoreboard(state):
     cursor.execute("SELECT * FROM scoreboard")
     rows = cursor.fetchall()
     sorted_data = sorted(rows, key=lambda x: (-x[1], x[2]))
-    print("Scoreboard")
+    print("🏆 Scoreboard:")
+    print("-" * 70)
     for index, row in enumerate(sorted_data):
         print(f"{row[0]}: \t {row[1]}% completed \t {row[2]}s")
         if index == 4:
             break
+    print("-" * 70)
 
 def show_map(state):
     current_room = state["current_room"]
@@ -246,7 +241,7 @@ def handle_basic_commands(conn, command, state):
         show_map(state)
         return True
     elif command == "status":
-        show_progress(state)
+        show_status(state)
         return True
     elif command == "help" or command == "?":
         handle_help()
