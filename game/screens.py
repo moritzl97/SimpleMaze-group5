@@ -8,6 +8,7 @@
 
 import sys
 from game.db import list_saves, load_state
+from game.basic_commands import display_scoreboard
 
 from game.utils import clear_screen
 import os
@@ -57,7 +58,7 @@ def title_screen(conn):
                 return save_state
         elif command == "highscores":
             # call status command
-            pass
+            display_scoreboard()
         elif command == "credits":
             credits_screen()
         elif command == "exit game" or command == "exit":
