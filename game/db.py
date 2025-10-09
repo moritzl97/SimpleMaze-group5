@@ -2,7 +2,7 @@
 import sqlite3, json, datetime
 
 ISO = "%Y-%m-%dT%H:%M:%S.%fZ"
-def now_iso(): return datetime.datetime.utcnow().strftime(ISO)
+def now_iso(): return datetime.datetime.now(datetime.UTC).strftime(ISO)
 
 def init_db(path: str = "saves.db"):
     conn = sqlite3.connect(path)

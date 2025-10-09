@@ -11,6 +11,7 @@ import sys
 import time
 import math
 from game.utils import clear_screen
+from game.db import save_state
 
 
 def handle_pause(state):
@@ -133,6 +134,10 @@ def handle_help():
     print("- quit                : Quit the game.")
     print("- status              : Show the progress of the game")
 
+def handle_pause(conn, state):
+
+    player_name = state["player_name"]
+    save_state(conn, player_name, state)
 
 def handle_quit():
     print(f"👋 You come to the conclusion that this isn't for you."
@@ -212,11 +217,11 @@ def show_map(state):
     print(current_map)
     print(f"Possible exits: {', '.join(state['exits'][current_room]).replace('_',' ').title()}")
 
-def handle_basic_commands(command, state):
+def handle_basic_commands(conn, command, state):
     if command == "quit":
         handle_quit()
     elif command == "pause":
-        handle_pause(state)
+        handle_pause(conn, state)
         return True
     elif command == "map":
         show_map(state)

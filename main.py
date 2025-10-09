@@ -10,14 +10,15 @@ import time
 from rooms import *
 from game.basic_commands import handle_basic_commands, handle_go, handle_admin_go
 from game.screens import *
+from game.db import init_db
 
 # Set console width if possible
 cmd = 'mode 82,50'
 os.system(cmd)
 
 # Open title screen. Retrieve save file if save is loaded
-save_state = title_screen()
-
+conn = init_db("saves.db")
+save_state = title_screen(conn)
 # ----------------------------------------------------------------------
 # Progress Helper
 # ----------------------------------------------------------------------
@@ -99,6 +100,7 @@ room_functions = {
     "n_s_corridor": {"enter_function": n_s_corridor_enter, "room_commands": n_s_corridor_commands},
 }
 
+leaderboard = {}
 # Start timer
 state["time"] = time.time()
 
@@ -124,11 +126,11 @@ while True:
 
     # execute admin go
     if command.startswith("admin go "):
-        handle_admin_go(command,state, room_functions)
+        handle_admin_go(command, state, room_functions)
         continue
 
     # Check if the user input is a basic command and execute it
-    basic_command_executed = handle_basic_commands(command, state)
+    basic_command_executed = handle_basic_commands(conn, command, state)
 
     # Check if the user input is a command specific to the current room
     room_command_executed = room_functions[current_room]["room_commands"](command, state)

@@ -7,11 +7,12 @@
 # =============================================================================
 
 import sys
+from game.db import list_saves, load_state
 
 from game.utils import clear_screen
 import os
 
-def title_screen():
+def title_screen(conn):
     # start game
     # load game
     # highscores
@@ -51,7 +52,7 @@ def title_screen():
             return None
         elif command == "load game" or command == "load":
             #load game
-            save_state = load_menu()
+            save_state = load_menu(conn)
             if save_state:
                 return save_state
         elif command == "highscores":
@@ -101,14 +102,20 @@ development course at The Hague University of Applied Sciences.\n\n\n\n
     input("").strip().lower()
     return
 
-def load_menu():
+def load_menu(conn):
+    rows = list_saves(conn) # [(player_name, current_room, updated_at), ...]
+    if not rows:
+        print("No saves found.")
+        return None
+    print("Saves:")
+    for row in rows:
+        print(row)
+
     while True:
-        print("Select a save:")
-        # TODO list save
-        save_name = input("> ")
-        # TODO load save
-        save = {}
-        if save_name:
-            return save
+        choice = input("Enter player name of the save you want to load: ").strip().lower()
+        loaded = load_state(conn, choice)
+        if not loaded:
+            print("Save not found. Enter a valid player name.")
         else:
-            return None
+            print(f"Loaded {choice}. Resuming in '{loaded.get('current_room', 'start')}'.")
+            return loaded
