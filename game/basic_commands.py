@@ -146,8 +146,8 @@ def show_inventory(state):
         print("You are not carrying anything.")
 
 def show_status(state):
-    visited_rooms = sum(1 for v in state["visited"].values() if v)
-    total_rooms = len(state["visited"])
+    visited_rooms = sum(1 for v in state["completed"].values() if v)
+    total_rooms = len(state["completed"])
     percentage = int((visited_rooms / total_rooms) * 100)
     nickname = state.get("player_name", "Player")
     print("-" * 70)
@@ -157,8 +157,8 @@ def show_status(state):
 
 
 def save_entry_to_scoreboard(state):
-    visited_rooms = sum(1 for v in state["visited"].values() if v)
-    total_rooms = len(state["visited"])
+    visited_rooms = sum(1 for v in state["completed"].values() if v)
+    total_rooms = len(state["completed"])
     percentage = int((visited_rooms / total_rooms) * 100)
     nickname = state.get("player_name", "Player")
     elapsed_time = int(time.time() - state["start_time"])

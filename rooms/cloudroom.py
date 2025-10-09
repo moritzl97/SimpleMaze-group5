@@ -14,7 +14,7 @@ def cloudroom_enter(state):
 
     print("\n☁️  You enter the Cloud Room.")
     print("Around the perimeter are techy objects. A quiet robot stands in the center, unpowered.")
-    if state["visited"]["cloudroom"]:
+    if state["completed"]["cloudroom"]:
         if state["_cloudroom"]["quiz_passed"]:
             print("You’ve already solved this room. You can look around or go back to the corridor.")
         else:
@@ -138,7 +138,7 @@ def cloudroom_commands(command, state):
         finished = run_quiz()
         if finished:
             cr["quiz_passed"] = True
-            state["visited"]["cloudroom"] = True
+            state["completed"]["cloudroom"] = True
             print("\nYou feel a subtle shift — the room acknowledges your success.")
             print("You can 'go lab corridor' to continue your journey.")
         return True

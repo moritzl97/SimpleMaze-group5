@@ -1,7 +1,7 @@
 
 
 def cyberroom_enter(state):
-    if state["visited"]["cyberroom"]:
+    if state["completed"]["cyberroom"]:
         print("There is nothing left to do here.")
         return False
 
@@ -74,7 +74,7 @@ def handle_code(command, state):
 def handle_take_key(state):
     if state["cyberroom"]["code_unlocked"] and "cyber_key" not in state["inventory"]:
         print("You take the key and put it in your backpack.")
-        state["visited"]["cyberroom"] = True
+        state["completed"]["cyberroom"] = True
         state["inventory"].append("cyber_key")
     elif "cyber_key" in state["inventory"]:
         print("You already have the key.")

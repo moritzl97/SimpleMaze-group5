@@ -8,7 +8,7 @@
 
 def project_room_3_enter(state):
     # --- Check if the player has the key to enter ---
-    if not state["visited"]["project_room_3"]:
+    if not state["completed"]["project_room_3"]:
         if "key" not in state["inventory"]:
             print("\n🚪 The door to Project Room 3 is locked.")
             print("You jiggle the handle. It's no use.")
@@ -29,7 +29,7 @@ def handle_look(state):
     """Describe the room and give clues."""
     print("\nYou scan the room.")
     print("The walls are covered in sticky notes, whiteboards are full of pseudocode and diagrams.")
-    if not state["visited"]["project_room_3"]:
+    if not state["completed"]["project_room_3"]:
         print("Near the snack table, one student holds up a fruit and says:")
         print("'You know what they say... which fruit keeps the doctor away?'")
         print("Another grins and says, 'Classic. We always bring them during hackathons.'")
@@ -38,18 +38,18 @@ def handle_look(state):
         print("The students have left. Only empty wrappers and a few notebooks remain.")
 
 def handle_help(state):
-    if not state["visited"]["project_room_3"]:
+    if not state["completed"]["project_room_3"]:
         print("- answer <fruit>      : Solve the riddle about the fruit.")
 
 def handle_answer(answer, state):
     """Handle the fruit riddle."""
-    if state["visited"]["project_room_3"]:
+    if state["completed"]["project_room_3"]:
         print("✅ You've already completed this room.")
         return True
     normalized = answer.strip().lower()
     if normalized in ["apple", "an apple", "apples"]:
         print("✅ Correct! One of the students claps. 'Of course. Apples every time.'")
-        state["visited"]["project_room_3"] = True
+        state["completed"]["project_room_3"] = True
         print("\n🎉 CONGRATULATIONS!")
         print("You've explored the project room.")
         return True

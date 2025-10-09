@@ -18,7 +18,7 @@ def handle_look(state):
     print("At the front is a whiteboard completely filled with formulas.")
     print("Desks with students are arranged in neat rows, though one chair is oddly turned toward the window.")
     print("On the teacher's desk, a calculator is lying in a strange position on the table.")
-    if not state["visited"]["classroom_2015"]:
+    if not state["completed"]["classroom_2015"]:
         print("The teacher says, you are late! And he asks you a question:")
         print("\"What is 7 * 6?\"")
     else:
@@ -29,14 +29,14 @@ def handle_look(state):
             print("The desk is empty. You've already taken the key.")
 
 def handle_help(state):
-    if not state["visited"]["classroom_2015"]:
+    if not state["completed"]["classroom_2015"]:
         print("- answer <number>     : Attempt to solve the math question.")
-    if state["visited"]["classroom_2015"] and "key" not in state["inventory"]:
+    if state["completed"]["classroom_2015"] and "key" not in state["inventory"]:
         print("- take key            : Pick up the key once it's revealed.")
 
 def handle_take(item, state):
     if item == "key":
-        if not state["visited"]["classroom_2015"]:
+        if not state["completed"]["classroom_2015"]:
             print("❌ There's no key visible yet. Maybe solving the puzzle will reveal more.")
         elif "key" in state["inventory"]:
             print("You already have the key in your backpack.")
@@ -48,11 +48,11 @@ def handle_take(item, state):
         print(f"There is no '{item}' here to take.")
 
 def handle_answer(answer, state):
-    if state["visited"]["classroom_2015"]:
+    if state["completed"]["classroom_2015"]:
         print("✅ You've already solved this challenge.")
     elif answer == "42":
         print("✅ Correct! The teacher invites you to the desk.")
-        state["visited"]["classroom2015"] = True
+        state["completed"]["classroom2015"] = True
         print("Suddenly you see something on the desk.")
     else:
         print("❌ Incorrect. The teacher opens the door of the classroom.")

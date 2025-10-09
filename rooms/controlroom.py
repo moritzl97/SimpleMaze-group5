@@ -72,7 +72,7 @@ def controlroom_commands(command, state):
         print("\nYou connected all the cables in the correct order!")
         print("You get a USB stick to move on.")
         state["has_usb"] = True
-        state["visited"]["controlroom"] = True
+        state["completed"]["controlroom"] = True
         return "corridor"
 
     return True

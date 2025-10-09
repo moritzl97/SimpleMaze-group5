@@ -33,7 +33,7 @@ def computerlab_enter(state):
     print("\n💻 You step into the computer lab.")
     print("The room is dead silent. There's only one person working on their computer.")
     print("The said person looks up to look at you, but immediately turns their gaze towards the computer again.")
-    if state ["visited"]["computerlab"]:
+    if state ["completed"]["computerlab"]:
         print("You've already finished this room.")
     return True
 
@@ -51,13 +51,13 @@ def handle_talk(target, state):
         print("\n\t The student turns around to face you. Confusion plastered on their face.")
     else:
         print(f"❌There is no {target} here to talk to.")
-    if not state["visited"]["computerlab"]:
+    if not state["completed"]["computerlab"]:
         print("\n👩'Um, is there anything I can help you with?'")
     else:
         print("\n👩'It's you again, didn't I help you already?")
 
 def handle_ask(target, state):
-    if state["visited"]["computerlab"]:
+    if state["completed"]["computerlab"]:
         print("\n\tThe student looks annoyed at you.")
         print("👩'Did you forget the password? It's crypt0.'")
         return None
@@ -70,7 +70,7 @@ def handle_ask(target, state):
         print(f"❌There is no {target} here to ask")
 
 def handle_answer(response, state):
-    if state["visited"]["computerlab"]:
+    if state["completed"]["computerlab"]:
         print(f"The student looks annoyed and decides to ignore you.")
         return None
     normalized = response.lower().strip()
@@ -81,7 +81,7 @@ def handle_answer(response, state):
         print("👩'Don't forget it!'")
         print("\n\tYou managed to successfully obtain the password.")
         print("\tIt's worth to check out that laptop out.")
-        state["visited"]["computerlab"] = True
+        state["completed"]["computerlab"] = True
     else:
         print("\n\tThe student looks amused.")
         print("\n👩'Yeah, I think you need to think it over.'")
@@ -101,7 +101,7 @@ def play_two_random_questions(seminar_name, questions_list):
 
 def handle_interact(state):
     global laptop_unlocked
-    if state["visited"]["computerlab"]:
+    if state["completed"]["computerlab"]:
         print("You're already finished with the puzzle.")
         return None
     else:

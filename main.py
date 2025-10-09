@@ -57,7 +57,7 @@ else:
             "lab_corridor": ["computerlab","cloudroom", "study_landscape"],
             "n_s_corridor": ["e_w_corridor","cyberroom", "riddleroom", "dragon_room"],
         },
-        "visited": {
+        "completed": {
             "classroom_2015": False,
             "project_room_3": False,
             "cloudroom": False,
@@ -149,7 +149,7 @@ while True:
 
 
     # Win condition
-    if all(state["visited"].values()):
+    if all(state["completed"].values()):
         end_screen(state)
         credits_screen()
         sys.exit()

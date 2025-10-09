@@ -135,7 +135,7 @@ def complex_challenge(state):
     if final_input == expected_code:
         print("🔓 The glass case clicks open. You may now take the magnet!")
         state["inventory"].append("challenge_solved")
-        state["visited"]["riddleroom"] = True
+        state["completed"]["riddleroom"] = True
         return True
     else:
         print("Incorrect code. The challenge remains unsolved.")
