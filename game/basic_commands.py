@@ -156,10 +156,10 @@ def show_inventory(state):
 def show_progress(state):
     visited_rooms = sum(1 for v in state["visited"].values() if v)
     total_rooms = len(state["visited"])
-    percentage = (visited_rooms / total_rooms) * 100
+    percentage = int((visited_rooms / total_rooms) * 100)
     nickname = state.get("player_name", "Player")
 
-    print(f"\nProgress for {nickname}: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%)")
+    print(f"\nProgress for {nickname}: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%) time:{state['elapsed_time']}")
     print("-" * 70)
 
     # 🏆 Update scoreboard
