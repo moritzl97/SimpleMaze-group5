@@ -88,7 +88,6 @@ def handle_help():
     print("panel <...>   = Try solving panel 1, 2, or 3")
     print("code <123>    = Enter the terminal code (after solving all panels)")
     print("take key      = Take the cyber key if unlocked")
-    print("leave         = Exit the room")
 
 
 def cyberroom_commands(command, state):
