@@ -3,76 +3,51 @@
 # Room: Control Room (keycard + cable puzzle)
 # -----------------------------------------------------------------------------
 
+def ask_until_correct(question, correct_answer, error_msg="Incorrect, try again."):
+    answer = ""
+    while answer != correct_answer:
+        answer = input(question).strip()
+        if answer != correct_answer:
+            print(error_msg)
+    print("Correct!")
+    return answer
+
 def controlroom_enter(state):
-
-    state["current_room"] = "controlroom"
-
     print("You enter the control room.")
     print("You see a keycard on the floor.")
-    print("The door you just came through is now closed.")
+    print("The door you just came through is now closed.\n")
+    print("Basic commands: show, look around, continue, go back")
     return True
 
-def controlroom_commands(command, state):
-    #Pickup keycard
-    while True:
-        action = input("What do you do? (e.g. 'take card'): ").lower().strip()
-        if action in ["take card", "take keycard", "pick up card"]:
-            print("You picked up the keycard.")
-            state["has_keycard"] = True
-            break
-        else:
-            print("You need to take the keycard to continue.")
+def controlroom_commands(cmd, state):
 
-    print("\nNow you must solve the cable puzzle by answering the color mixes:")
+    if cmd in ["show", "look around"]:
+        print("You see a keycard and a laptop.")
+        return True
+    elif cmd == "continue":
+        print("You move forward to the puzzle.")
+        puzzle(state)
+        return "go back"
 
-    solved_order = []
+def puzzle(state):
+    print("\nSolve these number challenges:")
+    ans1 = ask_until_correct("What number comes next in the sequence 3, 6, 12, 24, __? ", "48")
+    ans2 = ask_until_correct("Which number doesn't belong: 14, 21, 28, 35, 40? ", "40")
+    ans3 = ask_until_correct("How much is the answer to 3 x 5 + 21? ", "36")
 
-    # RED cable
-    while True:
-        answer = input("What color do you get when you mix magenta + yellow? ").lower().strip()
-        if answer == "red":
-            print("Correct! Connect the red cable.")
-            solved_order.append("red")
-            break
-        else:
-            print("Wrong, try again.")
+    password = ans1 + ans2 + ans3
+    print(f"\nThe laptop is password protected. Password = answers combined")
 
-    # BLUE cable
-    while True:
-        answer = input("What color do you get when you mix cyan + magenta? ").lower().strip()
-        if answer == "blue":
-            print("Correct! Connect the blue cable.")
-            solved_order.append("blue")
-            break
-        else:
-            print("Wrong, try again.")
+    attempt = ""
+    while attempt != password:
+        attempt = input("Enter the password to unlock the laptop: ").strip()
+        if attempt != password:
+            print("Wrong password, try again.")
+    print("Laptop unlocked! Final question:")
 
-    # GREEN cable
-    while True:
-        answer = input("What color do you get when you mix yellow + blue? ").lower().strip()
-        if answer == "green":
-            print("Correct! Connect the green cable.")
-            solved_order.append("green")
-            break
-        else:
-            print("Wrong, try again.")
+    ask_until_correct("What is the only even prime number? ", "2")
+    print("Correct! You found the keycard to continue.")
 
-    # YELLOW cable
-    while True:
-        answer = input("What color do you get when you mix red + green light? ").lower().strip()
-        if answer == "yellow":
-            print("Correct! Connect the yellow cable.")
-            solved_order.append("yellow")
-            break
-        else:
-            print("Wrong, try again.")
-
-    # Final check
-    if solved_order == ["red", "blue", "green", "yellow"]:
-        print("\nYou connected all the cables in the correct order!")
-        print("You get a USB stick to move on.")
-        state["has_usb"] = True
-        state["completed"]["controlroom"] = True
-        return "corridor"
-
-    return True
+    state["has_keycard"] = True
+    state["completed"]["controlroom"] = True
+    return
