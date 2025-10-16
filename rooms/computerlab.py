@@ -26,7 +26,7 @@ professional_questions = [
 ]
 
 password = "crypt0"
-laptop_unlocked = False
+laptop_unlocked = False #TODO save this in state
 
 
 def computerlab_enter(state):
@@ -51,13 +51,13 @@ def handle_talk(target, state):
         print("\n\t The student turns around to face you. Confusion plastered on their face.")
     else:
         print(f"❌There is no {target} here to talk to.")
-    if not state["completed"]["computerlab"]:
+    if not state["completed"]["computerlab"]: #TODO Should this only be executed if the target is student?
         print("\n👩'Um, is there anything I can help you with?'")
     else:
         print("\n👩'It's you again, didn't I help you already?")
 
 def handle_ask(target, state):
-    if state["completed"]["computerlab"]:
+    if state["completed"]["computerlab"]: #TODO Should this only be executed if the target is student?
         print("\n\tThe student looks annoyed at you.")
         print("👩'Did you forget the password? It's crypt0.'")
         return None
@@ -81,7 +81,7 @@ def handle_answer(response, state):
         print("👩'Don't forget it!'")
         print("\n\tYou managed to successfully obtain the password.")
         print("\tIt's worth to check out that laptop out.")
-        state["completed"]["computerlab"] = True
+        state["completed"]["computerlab"] = True #TODO remove this here. The room is not yet completed
     else:
         print("\n\tThe student looks amused.")
         print("\n👩'Yeah, I think you need to think it over.'")
@@ -115,7 +115,7 @@ def handle_interact(state):
 
     while attempts > 0:
         password_input = input("\nEnter the password: ").strip()
-        if password_input == password:
+        if password_input == password: #TODO move password from line 28 to here. if it is not used outside a function, it should be only inside this function
             print("\n✅ Correct! You've gained access to the laptop.")
             laptop_unlocked = True
             break
@@ -128,7 +128,7 @@ def handle_interact(state):
         print("\n🚫 The laptop locks you out after too many failed attempts.")
         return None
 
-    completed_seminars = {
+    completed_seminars = { #TODO maybe also but this in the state
         "intercultural collaboration": False,
         "python programming": False,
         "database & data structures": False,
@@ -139,9 +139,9 @@ def handle_interact(state):
     print("There also appears to be a fifth folder, which is locked behind a password.")
     print("Below the folders you see txt labelled 'README'")
     while True:
-        player_choice = input("\nWhat do you want to open first? (Intercultural Collaboration / Database & Data Structures / Professional Skills / Python Programming / README / Locked Folder): ").strip().lower()
+        player_choice = input("\nWhat do you want to open first? (Intercultural Collaboration / Database & Data Structures / Professional Skills / Python Programming / README / Locked Folder): ").strip().lower() #TODO tell the user that they can also exit
 
-        if player_choice in ["Intercultural Collaboration", "1"]:
+        if player_choice in ["Intercultural Collaboration", "1"]: #TODO if you lower the input you have to check for the lowered input (eg intercultural collaboration)
             if not completed_seminars["intercultural collaboration"]:
                 print("\n📂 You've opened the folder called Intercultural Collaboration.")
                 print("Immediately after opening the folder u get a pop up window.")
@@ -219,7 +219,7 @@ def handle_help():
     print("- look around         : Examine the room and its contents.")
     print("- talk student        : Talk to the student.")
     print("- ask student         : Ask a student a question.")
-    print("- answer              : Answer the question.")
+    print("- answer              : Answer the question.") #TODO add <your answer> so that the user knows they have to input something
     print("- interact laptop     : Interact with the laptop.")
 
 def computerlab_commands(command, state):
