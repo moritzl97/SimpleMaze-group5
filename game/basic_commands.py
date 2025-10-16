@@ -78,15 +78,14 @@ def handle_go(command, state, room_functions):
             clear_screen()
             print(f"You walk toward the door to {destination_room_display_name}.")
             destination_name_len = len(destination_room_display_name)
-            banner = """
+            banner = r"""
         .-=~=-.                                                                 .-=~=-.
         (__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
         ( _ __)                                                                 ( _ __)
         (__  _)                                                                 (__  _)
         ( _ __)                                                                 ( _ __)
         (_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
-        `-._.-'                                                                 `-._.-'
-        """
+        `-._.-'                                                                 `-._.-'"""
             print(banner[:314-int(destination_name_len/2)]+destination_room_display_name+banner[314+math.ceil(destination_name_len/2):])
 
             entry_allowed = room_functions[destination_room]["enter_function"](state)
@@ -153,8 +152,6 @@ def show_status(state):
     print("-" * 70)
     print(f"\nProgress for {nickname}: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%) time:{state['elapsed_time']}")
     print("-" * 70)
-
-
 
 def save_entry_to_scoreboard(state):
     visited_rooms = sum(1 for v in state["completed"].values() if v)

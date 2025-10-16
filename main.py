@@ -11,6 +11,7 @@ from rooms import *
 from game.basic_commands import handle_basic_commands, handle_go, handle_admin_go
 from game.screens import *
 from game.db import init_db
+import math
 
 # Set console width if possible
 cmd = 'mode 82,50'
@@ -20,14 +21,19 @@ os.system(cmd)
 conn = init_db("saves.db")
 save_state = title_screen(conn)
 
+clear_screen()
+
 # Check if there is a save state given or create a new state, if it is a new game
 if save_state:
     state = save_state
-    state["start_time"] = time.time() - state["elapsed_time"]
+    state["start_time"] = time.time() - state["elapsed_time"] #TODO Why subtract the elapsed time?
 else:
     # Ask player name
-    player_name = input("\nWhat is your nickname:  ")
-    print(f"\nWelcome, {player_name}! Let's start!\n")
+    player_name = input("Please enter your name: ")
+    # TODO check if name is already in the database
+    print(f"Welcome to the Nightmare, {player_name}!\n")
+    time.sleep(2)
+    clear_screen()
 
     # Starting a new save
     starting_room = "study_landscape"
@@ -63,8 +69,12 @@ else:
         "start_time": time.time(),
         "elapsed_time": 0,
         "player_name": player_name,
+        "cloudroom": {},
+        "cyberroom": {},
         "dragon_room": {},
+        "computerlab": {},
         "riddleroom": {},
+        "controlroom": {}
     }
     # Message when you first start a new game
     print("You cross the bridge on the second floor to the Applied Computer Science department.", end="")
@@ -73,6 +83,7 @@ else:
     / /`  | |_)  / /\  ( (` | |_|     |_/ |_/ |_/
     \_\_, |_| \ /_/--\ _)_) |_| |     (_) (_) (_)""")
     print("The bridge collapses behind you. You will have to find another way out...")
+    time.sleep(6)
 
 # Collection of the two important functions from each room
 room_functions = {
@@ -90,7 +101,20 @@ room_functions = {
     "n_s_corridor": {"enter_function": n_s_corridor_enter, "room_commands": n_s_corridor_commands},
 }
 
-state["start_ftime"] = time.time()
+state["start_ftime"] = time.time() #TODO what is this? Typo?
+
+destination_room_display_name = state["current_room"].replace("_", " ").title()
+destination_name_len = len(destination_room_display_name)
+banner = r"""
+        .-=~=-.                                                                 .-=~=-.
+        (__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
+        ( _ __)                                                                 ( _ __)
+        (__  _)                                                                 (__  _)
+        ( _ __)                                                                 ( _ __)
+        (_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
+        `-._.-'                                                                 `-._.-'"""
+print(banner[:314 - int(destination_name_len / 2)] + destination_room_display_name + banner[
+    314 + math.ceil(destination_name_len / 2):])
 
 # Display the enter message of the first room (or the room you are in, when loading a save)
 room_functions[state["current_room"]]["enter_function"](state)
