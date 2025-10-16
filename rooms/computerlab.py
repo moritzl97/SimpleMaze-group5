@@ -89,7 +89,7 @@ def handle_answer(response, state):
         return "go back"
 
 def play_two_random_questions(seminar_name, questions_list):
-    selected_questions = random.sample(questions_list, 2)  # pick 2 random tuples
+    selected_questions = random.sample(questions_list, 2)
     for idx, (question, answers) in enumerate(selected_questions, 1):
         while True:
             answer = input(f"\n{seminar_name} Question {idx}:\n{question}\nYour answer: ").strip().lower()
@@ -139,7 +139,7 @@ def handle_interact(state):
     print("There also appears to be a fifth folder, which is locked behind a password.")
     print("Below the folders you see txt labelled 'README'")
     while True:
-        player_choice = input("\nWhat do you want to open first? (Intercultural Collaboration / Database & Data Structures / Professional Skills / Python Programming / README): ").strip().lower()
+        player_choice = input("\nWhat do you want to open first? (Intercultural Collaboration / Database & Data Structures / Professional Skills / Python Programming / README / Locked Folder): ").strip().lower()
 
         if player_choice in ["Intercultural Collaboration", "1"]:
             if not completed_seminars["intercultural collaboration"]:
@@ -158,25 +158,57 @@ def handle_interact(state):
                 print("\n📓 You've opened the folder called Database & Data Structures.")
                 print("Immediately after opening the folder u get a pop up window.")
                 print("'In order to obtain a fragment of the hidden key to the locked folder you have to finish 2 questions'.")
+                play_two_random_questions("Database & Data Structures", database_questions)
+                completed_seminars["database & data structures"] = True
+                print("✅ You obtained the key fragment from this folder!\n")
+                print(".")
+            else:
+                print("\n📂 You've already completed this folder and collected the key fragment.")
+
 
         elif player_choice in ["Professional Skills", "3"]:
             if not completed_seminars["professional skills"]:
                 print("\n🔒 You've opened the folder called Professional Skills.")
                 print("Immediately after opening the folder u get a pop up window.")
                 print("'In order to obtain a fragment of the hidden key to the locked folder you have to finish 2 questions'.")
+                play_two_random_questions("Professional Skills", professional_questions)
+                completed_seminars["professional skills"] = True
+                print("✅ You obtained the key fragment from this folder!\n")
+                print(".")
+            else:
+                print("\n📂 You've already completed this folder and collected the key fragment.")
+
 
         elif player_choice in ["Python Programming", "4"]:
             if not completed_seminars["python programming"]:
                 print("\n🔒 You've opened the folder called Python Programming.")
                 print("Immediately after opening the folder u get a pop up window.")
                 print("'In order to obtain a fragment of the hidden key to the locked folder you have to finish 2 questions'.")
+                play_two_random_questions("Python Programming", python_questions)
+                completed_seminars["python programming"] = True
+                print("✅ You obtained the key fragment from this folder!\n")
+                print(".")
+            else:
+                print("\n📂 You've already completed this folder and collected the key fragment.")
+
 
         elif player_choice in ["README", "readme", "5"]:
             print("\n🔒 You've opened the file README.")
-            print(".")
+            print("\n\t--------------- INSTRUCTION ---------------")
+            print("Congratulations on unlocking the laptop!")
+            print("You're halfway there :^)")
+            print("In order to progress further you have to finish the previous 4 folders.")
+            print("Each folder contains questions that you have to solve.")
+            print("If you answer correctly you'll get a key fragment that is needed to unlock the secret folder.")
+            print("The rest will be explained once you unlock the last folder.")
+            print("\t                Good luck!")
 
-        elif player_choice in ["exit", "leave", "6"]:
+        elif player_choice in ["Secret Folder", "6"]:
+            pass
+
+        elif player_choice in ["quit", "leave"]:
             print("\nYou close the laptop and take a step back.")
+            print("You can return to the laptop anytime you want.")
             break
         else:
             print("\n❌ That folder doesn't exist. Please try again.")
