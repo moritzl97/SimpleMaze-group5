@@ -22,3 +22,4 @@ def study_landscape_commands(command, state):
     if command == "look around":
         handle_look()
         return True
+    return False
