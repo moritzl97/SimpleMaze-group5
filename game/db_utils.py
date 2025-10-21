@@ -1,0 +1,119 @@
+# =============================================================================
+# Project: Escape of the Nightmare
+# Authors: Moritz Lackner, Oskar Lukáč, Dominika Nowakiewicz,
+#          Mihail Petrov, Rodrigo Polo Lopez, Tieme van Rees
+# Course:  Application Development, Applied Computer Science 2025/26
+# School:  The Hague University of Applied Sciences (THUAS)
+# =============================================================================
+
+# Functions to easily interact with the database
+
+def db_is_item_in_inventory(state, item_name):
+    save_id = state["save_id"]
+    conn = state["db_conn"]
+
+    cursor = conn.cursor()
+    cursor.execute("""
+    SELECT CASE 
+    WHEN EXISTS (
+        SELECT 1 
+        FROM inventory i
+        JOIN items it ON i.item_id = it.item_id
+        WHERE i.save_id = ? AND it.name = ?
+    ) THEN 1 ELSE 0 
+    END;
+    """, (save_id, item_name,))
+    row = cursor.fetchone()
+    return row[0]
+
+def db_add_item_to_inventory(state, item_name):
+    already_in_inventory = db_is_item_in_inventory(state, item_name)
+
+    if not already_in_inventory:
+        current_save_id = state["save_id"]
+        conn = state["db_conn"]
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        INSERT INTO inventory (save_id, item_id)
+        SELECT ?, item_id
+        FROM items
+        WHERE name = ?
+        """, (current_save_id, item_name,))
+        conn.commit()
+    return
+
+def db_remove_item_from_inventory(state, item_name):
+    is_in_inventory = db_is_item_in_inventory(state, item_name)
+
+    if is_in_inventory:
+        current_save_id = state["save_id"]
+        conn = state["db_conn"]
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        DELETE FROM inventory
+        WHERE save_id = ?
+        AND item_id IN (
+        SELECT item_id FROM items WHERE name = ?);
+                       """, (current_save_id, item_name,))
+        conn.commit()
+    return
+
+def db_get_all_items_in_inventory(state):
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT it.name
+        FROM inventory i
+        JOIN items it ON i.item_id = it.item_id
+        WHERE i.save_id = ?;
+                   """, (current_save_id,))
+    rows = cursor.fetchall()
+    item_list = [item[0] for item in rows]
+    return item_list
+
+def db_get_player_name(state):
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT p.player_name
+        FROM saves s
+        JOIN players p ON p.player_id = s.player_id
+        WHERE s.save_id = ?;
+                   """, (current_save_id,))
+    rows = cursor.fetchone()
+    return rows[0]
+
+def db_set_flag(state, flag_name, flag):
+    # TODO implement connection to correct table in database
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+                UPDATE table
+                    SET ? = ?
+                    WHERE save_id = ?
+                   """, (flag_name, flag, current_save_id,))
+    conn.commit()
+
+def db_get_flag(state, flag_name):
+    # TODO implement connection to correct table in database
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+                SELECT ? 
+                    FROM table
+                    WHERE save_id = ?
+                    """, (flag_name, current_save_id,))
+    rows = cursor.fetchone()
+    return rows
+
+

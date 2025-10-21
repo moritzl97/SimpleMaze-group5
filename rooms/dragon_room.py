@@ -11,15 +11,19 @@
 
 import random
 import time
-import json
+from game.utils import *
+from game.db_utils import *
+from rooms.dragon_room_db_utils import *
 
 #---define open dialog---#
 # Called if player talks to an NPC or interacts with objects
-def open_dialog(npc, state):
+def open_dialog(name, state):
     # Loop through all dialog nodes in the current chapter. Ends if the chapter is finished
+    dialog = db_get_dialog(state, name)
     while True:
         #get current dialog node by looking up the current chapter and node for the npc
-        node = state["dragon_room"]["dialog"][npc["dialog_tree"]][npc["current_chapter"]][npc["current_node"]]
+        (chapter_index, node_index) = db_get_chapter_node_index(state, name)
+        node = dialog[chapter_index][node_index]
 
         # Print dialog text
         print(f"{node['text']}")
@@ -52,8 +56,7 @@ def open_dialog(npc, state):
         # If there are no branching dialog options end dialog
         if "next_chapter" in node:
             #Save the next chapter to the npc
-            npc["current_chapter"] = node["next_chapter"]
-            npc["current_node"] = "start"
+            db_save_chapter_node(state, name, "start", node["next_chapter"])
             return
 
         # If there are options print all of them
@@ -63,7 +66,7 @@ def open_dialog(npc, state):
             success_rate = option_entry["base_success_rate"]
             added_modifier_list = []
             for item, modifier in option_entry.get("success_modifiers", {}).items():
-                if item in state["inventory"]:
+                if db_is_item_in_inventory(state, item):
                     success_rate += modifier
                     added_modifier_list.append(item)
 
@@ -75,7 +78,7 @@ def open_dialog(npc, state):
             print(f" {option_number}. {option_entry['text']} ({int(success_rate*100)}%) ")
             # If there are items that helped, list them
             if added_modifier_list:
-                print(f"Helping items: {', '.join(added_modifier_list)}")
+                print(f"    Helping items: {', '.join(added_modifier_list)}")
 
         leave_option = str(len(node["options"]) + 1)
         print(f" {leave_option}. Leave")
@@ -97,49 +100,47 @@ def open_dialog(npc, state):
                 option_entry = node["options"][choice]
                 success_rate = option_entry["base_success_rate"]
                 for item, modifier in option_entry.get("success_modifiers", {}).items():
-                    if item in state["inventory"]:
+                    if db_is_item_in_inventory(state, item):
                         success_rate += modifier
                 if success_rate > 1:
                     success_rate = 1
                 # Roll the dice and see if successful or failure:
                 if success_rate > random.uniform(0, 1):
-                    npc["current_node"] = option_entry["next_success"] # set the next dialog to success
-                    print("\033[32mSuccess!\033[0m") #The wired stuff \033[32m and \033[0m makes the text green
+                    db_save_chapter_node(state, name, option_entry["next_success"]) # set the next dialog to success
+                    print(f"{Color.green}Success!{Color.end}")
                 else:
-                    npc["current_node"] = option_entry["next_failure"] # set the next dialog to failure
-                    print("\033[31mFailure!\033[0m") #The wired stuff \033[31m and \033[0m makes the text red
+                    db_save_chapter_node(state, name, option_entry["next_failure"])# set the next dialog to failure
+                    print(f"{Color.red}Failure!{Color.end}")
                 break # go back to the first loop and print the next dialog node
 #---end talk definition---#
 
 #---define shop keeper---#
 def trade_with_shopkeeper(npc, state):
     #Get items that the shopkeeper wants to trade
-    items_sell = npc["items_for_sale"]
-    wanted_items = npc["wanted_items"]
+    trades = db_get_trades(state)
 
-    if not items_sell:
+    if not trades:
         print("I have nothing to trade anymore.")
         return
 
     print("I will trade the following items with you:")
     while True:
-        number_of_options = len(items_sell)+1
+        number_of_options = len(trades)+1
         for index in range(1, number_of_options):
-            print(f"{index}. {items_sell[index-1]} for {wanted_items[index-1]}")
+            print(f"{index}. Sell a {trades[index-1][2]} for a {trades[index-1][1]}")
         print(f"{number_of_options}. I don't want to trade.")
 
         choice = int(input("\n> ").strip())
 
         if choice < number_of_options:
-            # if correct input
-            item_sell = items_sell[choice-1]
-            item_wanted = wanted_items[choice-1]
+            trade_id = trades[choice-1][0]
+            item_sell = trades[choice-1][1]
+            item_wanted = trades[choice-1][2]
             # Check if the player really has the item that he want to give the shopkeeper in the inventory
-            if item_wanted in state["inventory"]:
-                state["inventory"].remove(item_wanted)
-                state["inventory"].append(item_sell)
-                items_sell.pop(choice-1)
-                wanted_items.pop(choice-1)
+            if db_is_item_in_inventory(state, item_wanted):
+                db_remove_item_from_inventory(state, item_wanted)
+                db_add_item_to_inventory(state, item_sell)
+                db_remove_trade(state, trade_id)
                 print("Thank you for the trade.")
                 return
             else:
@@ -165,81 +166,74 @@ def wait(seconds, state):
 
 def add_npc(argument, state):
     # Adds npc to the room
-    if argument == "Shopkeeper":
-        state["dragon_room"]["npcs"]["Shopkeeper"] = {"items_for_sale": ["Broadsword","Sneaking-Boots","Lockpick"], "wanted_items": ["Gemstone","Chalk","Pickaxe"]}
-    elif argument == "Fairy":
-        state["dragon_room"]["npcs"]["Fairy"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":"dialogue_tree_fairy"}
-    elif argument == "Kobold":
-        state["dragon_room"]["npcs"]["Kobold"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":"dialogue_tree_kobold"}
-    elif argument == "Dragon":
-        state["dragon_room"]["npcs"]["Dragon"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_dragon"}
+    db_add_object_to_room(state, argument, "npcs")
 
 def add_item(argument, state):
     #Adds item to the room
-    state["dragon_room"]["items"].append(argument)
+    db_add_object_to_room(state, argument, "items")
 
 def give_item(argument, state):
     #Adds item to players inventory
-    if not argument in state["inventory"]:
-        state["inventory"].append(argument)
+    db_add_item_to_inventory(state, argument)
 
 def remove_object(argument, state):
     # Remove object from room
-    state["dragon_room"]["interactable_objects"].pop(argument)
+    db_remove_object_from_room(state, argument, "objects")
 
 def remove_npc(argument, state):
     #Remove npc from room
-    state["dragon_room"]["npcs"].pop(argument)
+    db_remove_object_from_room(state, argument, "npcs")
 
 def try_remove_item_from_inv(argument, state):
     # Remove item from inventory, if it is in the inventory
-    if argument in state["inventory"]:
-        state["inventory"].pop(argument)
+    db_remove_item_from_inventory(state, argument)
 
 def make_dragon_angry(argument, state):
     # Sets the next dialog of the dragon to angry
-    if "Dragon" in state["dragon_room"]["npcs"]:
-        state["dragon_room"]["npcs"]["Dragon"]["current_chapter"] = "dragon_angry"
-        state["dragon_room"]["npcs"]["Dragon"]["current_node"] = "start"
+    db_save_chapter_node(state, "dragon", "start", "dragon_angry")
+
 #---End of action functions---#
 
 #---Command handlers---#
 def handle_look(noun, state):
     if noun:
         # States where the given noun is (if in the room)
-        if noun in state["dragon_room"]["items"]:
+        if db_check_if_in_room(state, noun, "items"):
             print(f"You look at the {noun}. It might be useful if you pick it up.")
-        elif noun in state["dragon_room"]["npcs"]:
+        elif db_check_if_in_room(state, noun, "npcs"):
             print(f"You look at the {noun}. You can talk to them if you want to.")
-        elif noun in state["dragon_room"]["interactable_objects"]:
-            open_dialog(state["dragon_room"]["interactable_objects"][noun], state)
-        elif noun in state["inventory"]:
+        elif db_check_if_in_room(state, noun, "objects"):
+            open_dialog(noun, state)
+        elif db_is_item_in_inventory(state, noun):
             print(f"You find {noun} in your inventory.")
         else:
             print(f"You don't see a {noun} here.")
     else:
         #Prints a description of the room and lists all things that are in the room
         print("You are in a classroom with a huge hole in the ground. You see smoke rising from the hole.\n"
-              "The chairs and desks of the students are scatterd through the room.\n"
-              "Only the teachers desk is still standing on its right place.\n"
+              "The chairs and desks of the students are scatterd throughout the room.\n"
+              "Only the teacher's desk is still standing on its right place.\n"
               "On the blackboard is something written, but it is to small to read from here.\n")
-        if state["dragon_room"]['items']:
-            print(f"You see the following items in the room: {', '.join(state['dragon_room']['items'])}")
-        if state["dragon_room"]['npcs']:
-            print(f"You can talk to the following NPCs in the room: {', '.join(state['dragon_room']['npcs'].keys())}")
-        if state["dragon_room"]['interactable_objects']:
-            print(f"You see these points of interest in the room: {', '.join(state['dragon_room']['interactable_objects'].keys())}")
+        items = db_get_objects_in_room(state, "items")
+        if items:
+            print(f"You see the following items in the room: {', '.join(items)}")
+        npcs = db_get_objects_in_room(state, "npcs")
+        if npcs:
+            print(f"You can talk to the following NPCs in the room: {', '.join(npcs)}")
+        objects = db_get_objects_in_room(state, "objects")
+        if objects:
+            print(f"You see these points of interest in the room: {', '.join(objects)}")
     return
 
 def handle_take(noun, state):
     #Pick up item and add it to inventory
     if not noun:
         print("Take what?")
-    elif noun in state["inventory"]:
+    elif db_is_item_in_inventory(state, noun):
         print(f"You already have the {noun} in your inventory.")
-    elif noun in state["dragon_room"]["items"]:
-        state["dragon_room"]["items"].remove(noun)
-        state["inventory"].append(noun)
+    elif db_check_if_in_room(state, noun, "items"):
+        db_remove_object_from_room(state, noun, "items")
+        db_add_item_to_inventory(state, noun)
         print(f"You take {noun}.")
     else:
         print(f"You cannot pickup {noun}.")
@@ -247,8 +241,8 @@ def handle_take(noun, state):
 
 def handle_trade(noun, state):
     # opens trade menu with the shopkeeper
-    if "Shopkeeper" in state["dragon_room"]["npcs"]:
-        trade_with_shopkeeper(state["dragon_room"]["npcs"]["Shopkeeper"], state)
+    if db_check_if_in_room(state, "shopkeeper", "npcs"):
+        trade_with_shopkeeper("shopkeeper", state)
     else:
         print("There is nobody to trade with here.")
     return
@@ -258,15 +252,15 @@ def handle_interact(noun, state):
     if not noun:
         print("Interact with what?")
     else:
-        if noun in state["dragon_room"]["interactable_objects"]:
-            open_dialog(state["dragon_room"]["interactable_objects"][noun], state)
-        elif noun in noun in state["dragon_room"]["npcs"]:
-            if noun == "Shopkeeper":
-                trade_with_shopkeeper(state["dragon_room"]["npcs"]["Shopkeeper"], state)
+        if db_check_if_in_room(state, noun, "objects"):
+            open_dialog(noun, state)
+        elif db_check_if_in_room(state, noun, "npcs"):
+            if noun == "shopkeeper":
+                trade_with_shopkeeper("shopkeeper", state)
             else:
                 #Print ASCII art if you talk with dragon
-                if noun == "Dragon":
-                    print("\033[31m"+r"""                                              /(  /(
+                if noun == "dragon":
+                    print(Color.red+r"""                                              /(  /(
                                             /   \/   \
                               |\___/|      //||\//|| \\
                              (,\  /,)\__  // ||// || \\ \
@@ -282,15 +276,16 @@ def handle_interact(noun, state):
                      ((/ ))     .----~-.\        \-'                 .~         \  `. \^-.
                                ///.----..>    (   \             _ -~             `.  ^-`   ^-_
                                  ///-._ _ _ _ _ _ _}^ - - - - ~                    ~--_.   .-~
-                                                                                       /.-~"""+"\033[0m")
+                                                                                       /.-~"""+Color.end)
 
-                open_dialog(state["dragon_room"]["npcs"][noun], state)
+                open_dialog(noun, state)
         else:
             print(f"There is no {noun} here to interact with.")
     return
 
 def handle_help(noun, state):
     # list commands
+    print("Dragon Room commands:")
     print("Type in a verb and a noun to interact with the things in the room.\nType 'look around' to see what is in the room. \nUse verbs lik: 'look', 'talk', 'inspect', 'trade' and 'take'")
 
 # ---Parser---#
@@ -335,7 +330,7 @@ def parse(user_input):
 
     # Define the noun as the second word
     if len(words) > 1:
-        noun = words[1].title()
+        noun = "_".join(words[1:])
 
     return verb, noun
 # ---Parser end---#
@@ -344,24 +339,9 @@ def parse(user_input):
 # Called when dragon room is entered
 def dragon_room_enter(state):
     # If player has finished the dragon room print this message and return them to the corridor
-    if state["completed"]["dragon_room"]:
-        print("You have already dealt with the dragon and are ready to move to another room.")
+    if state["completed"]["dragon_room"]: #TODO change completed to db
+        print("You have already dealt with the dragon and are ready to move on to another room.")
         return False
-
-    #---setup room---#
-    # initialize room state: everything what is in the room is stored here
-    if not state.get("dragon_room", False):
-        state["dragon_room"] = {"items":[], "interactable_objects":{}, "npcs":{}}
-
-        # Create objects starting in the room
-        state["dragon_room"]["interactable_objects"]["Cracked-Wall"] = {"current_chapter":"first_chapter", "current_node":"start", "dialog_tree":"dialogue_tree_cracked_wall"}
-        state["dragon_room"]["interactable_objects"]["Blackboard"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_blackboard"}
-        state["dragon_room"]["interactable_objects"]["Desk"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_desk"}
-        state["dragon_room"]["interactable_objects"]["Chest"] = {"current_chapter": "first_chapter", "current_node": "start","dialog_tree": "dialogue_tree_chest"}
-        state["dragon_room"]["interactable_objects"]["Hole"] = {"current_chapter": "first_chapter", "current_node": "start", "dialog_tree": "dialogue_tree_hole"}
-        state["dragon_room"]["items"].append("Pickaxe")
-
-     #---room setup finished---#
 
     # start room
     print("You enter the classroom and are immediately drawn to the huge hole in the ground.You see smoke rising from the hole.\n"
@@ -372,15 +352,6 @@ def dragon_room_enter(state):
 
 # Dragon room custom commands
 def dragon_room_commands(command, state):
-
-    # import the dialog tree from the dragon_room_dialog.py file and
-    if not state["dragon_room"].get("dialog", False):
-        path = "./rooms/"
-        filename = 'dragon_room_dialog.json'
-        file_path = path + filename
-        with open(file_path) as json_file:
-            dialog = json.load(json_file)
-        state["dragon_room"]["dialog"] = dialog
 
     # transforms input of the user into verb and a noun. Synonyms of verbs are converted into known commands. Removes unnecessary words like "the", "to", "with".
     verb, noun = parse(command)
@@ -401,8 +372,8 @@ def dragon_room_commands(command, state):
         handle_help(noun, state)
         return True
 
-    if "Trophy" in state["inventory"]:
+    if db_is_item_in_inventory(state, "Trophy"):
         print("You have successfully dealt with the dragon. You can now move on to another room.")
-        state["completed"]["dragon_room"] = True
+        state["completed"]["dragon_room"] = True # TODO change completed to db
 
     return False

@@ -10,7 +10,7 @@
                         "next_failure": "failed_attack",
                         "base_success_rate": 0.01,
                         "success_modifiers": {
-                            "Broadsword": 0.8
+                            "broadsword": 0.8
                         }
                     },
                     "2": {
@@ -19,7 +19,7 @@
                         "next_failure": "failed_gem",
                         "base_success_rate": 0,
                         "success_modifiers": {
-                            "Gemstone": 0.5
+                            "gemstone": 0.5
                         }
                     }
                 }
@@ -29,11 +29,11 @@
                 "action": [
                     [
                         "give_item",
-                        "Trophy"
+                        "trophy"
                     ],
                     [
                         "remove_npc",
-                        "Dragon"
+                        "dragon"
                     ]
                 ],
                 "next_chapter": "end"
@@ -51,15 +51,15 @@
                 "action": [
                     [
                         "give_item",
-                        "Trophy"
+                        "trophy"
                     ],
                     [
                         "remove_npc",
-                        "Dragon"
+                        "dragon"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Gemstone"
+                        "gemstone"
                     ]
                 ],
                 "next_chapter": "end"
@@ -83,7 +83,7 @@
                         "next_failure": "failed_attack",
                         "base_success_rate": 0.01,
                         "success_modifiers": {
-                            "Broadsword": 0.8
+                            "broadsword": 0.8
                         }
                     }
                 }
@@ -93,11 +93,11 @@
                 "action": [
                     [
                         "give_item",
-                        "Trophy"
+                        "trophy"
                     ],
                     [
                         "remove_npc",
-                        "Dragon"
+                        "dragon"
                     ]
                 ],
                 "next_chapter": "end"
@@ -151,7 +151,7 @@
                 "text": "The Fairy holds an item out to you. But she snatches it away from you in the last moment and while laughing flies out of the window.",
                 "action": [
                     "remove_npc",
-                    "Fairy"
+                    "fairy"
                 ],
                 "next_chapter": "end"
             },
@@ -160,11 +160,11 @@
                 "action": [
                     [
                         "give_item",
-                        "Gemstone"
+                        "gemstone"
                     ],
                     [
                         "remove_npc",
-                        "Fairy"
+                        "fairy"
                     ]
                 ],
                 "next_chapter": "end"
@@ -174,11 +174,11 @@
                 "action": [
                     [
                         "give_item",
-                        "Broadsword"
+                        "broadsword"
                     ],
                     [
                         "remove_npc",
-                        "Fairy"
+                        "fairy"
                     ]
                 ],
                 "next_chapter": "end"
@@ -222,7 +222,7 @@
                 "text": "Fairy:'Maybe I misjudged you. Thank you for your help, but I will leave now.'\nThe Fairy flies out the window.",
                 "action": [
                     "remove_npc",
-                    "Fairy"
+                    "fairy"
                 ],
                 "next_chapter": "end"
             },
@@ -241,9 +241,9 @@
                         "next_failure": "not_enough_items",
                         "base_success_rate": 0,
                         "success_modifiers": {
-                            "Chalk": 0.33,
-                            "Milk-Carton": 0.33,
-                            "Paper": 0.33
+                            "chalk": 0.33,
+                            "milk_carton": 0.33,
+                            "paper": 0.33
                         }
                     },
                     "2": {
@@ -252,9 +252,9 @@
                         "next_failure": "not_enough_items",
                         "base_success_rate": 0,
                         "success_modifiers": {
-                            "Chalk": 0.33,
-                            "Milk-Carton": 0.33,
-                            "Paper": 0.33
+                            "chalk": 0.33,
+                            "milk_carton": 0.33,
+                            "paper": 0.33
                         }
                     }
                 }
@@ -264,19 +264,19 @@
                 "action": [
                     [
                         "remove_npc",
-                        "Fairy"
+                        "fairy"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Chalk"
+                        "chalk"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Milk-Carton"
+                        "milk_carton"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Paper"
+                        "paper"
                     ]
                 ],
                 "next_chapter": "end"
@@ -286,19 +286,19 @@
                 "action": [
                     [
                         "give_item",
-                        "Broadsword"
+                        "broadsword"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Chalk"
+                        "chalk"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Milk-Carton"
+                        "milk_carton"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Paper"
+                        "paper"
                     ]
                 ],
                 "next_chapter": "last_chapter"
@@ -308,19 +308,19 @@
                 "action": [
                     [
                         "give_item",
-                        "Gemstone"
+                        "gemstone"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Chalk"
+                        "chalk"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Milk-Carton"
+                        "milk_carton"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Paper"
+                        "paper"
                     ]
                 ],
                 "next_chapter": "last_chapter"
@@ -344,8 +344,8 @@
                         "next_failure": "intimidate_failure",
                         "base_success_rate": 0.5,
                         "success_modifiers": {
-                            "Pickaxe": 0.1,
-                            "Broadsword": 0.5
+                            "pickaxe": 0.1,
+                            "broadsword": 0.5
                         }
                     },
                     "2": {
@@ -356,10 +356,10 @@
                 }
             },
             "intimidate_success": {
-                "text": "As a offer of peace he drops a Milk-Carton. And flees.",
+                "text": "As a offer of peace he drops a Milk Carton. And flees.",
                 "action": [
                     "add_item",
-                    "Milk-Carton"
+                    "milk_carton"
                 ],
                 "next_chapter": "fleeing"
             },
@@ -386,10 +386,10 @@
         },
         "talk3": {
             "start": {
-                "text": "The Kobold trust you now. From his hiding spot he fetches a Invisibility-Cloak and hands it to you.",
+                "text": "The Kobold trust you now. From his hiding spot he fetches a Invisibility Cloak and hands it to you.",
                 "action": [
                     "give_item",
-                    "Invisibility-Cloak"
+                    "invisibility_cloak"
                 ],
                 "next_chapter": "follow"
             }
@@ -412,7 +412,7 @@
                         "next_failure": "failed_open_wall",
                         "base_success_rate": 0.4,
                         "success_modifiers": {
-                            "Pickaxe": 0.55
+                            "pickaxe": 0.55
                         }
                     }
                 }
@@ -421,7 +421,7 @@
                 "text": "You break open the wall. A surprised dwarf with a huge backpack looks at you and comes crawling out of the hole. \nShopkeeper: 'Hi I have useful items to trade, if you want.'",
                 "action": [
                     "add_npc",
-                    "Shopkeeper"
+                    "shopkeeper"
                 ],
                 "next_chapter": "second_chapter"
             },
@@ -430,11 +430,11 @@
                 "action": [
                     [
                         "add_item",
-                        "Lockpick"
+                        "lockpick"
                     ],
                     [
                         "remove_object",
-                        "Cracked-Wall"
+                        "cracked_wall"
                     ]
                 ],
                 "next_chapter": "end"
@@ -462,27 +462,27 @@
                 "text": "You find a hidden stash of items. What do you want to take?",
                 "options": {
                     "1": {
-                        "text": "Sneaking-Boots",
+                        "text": "sneaking_boots",
                         "next_success": "get_sneaking_boots",
                         "base_success_rate": 1
                     },
                     "2": {
-                        "text": "Lockpick",
+                        "text": "lockpick",
                         "next_success": "get_lockpick",
                         "base_success_rate": 1
                     }
                 }
             },
             "get_sneaking_boots": {
-                "text": "You take the Sneaking-Boots.",
+                "text": "You take the Sneaking Boots.",
                 "action": [
                     [
                         "give_item",
-                        "Sneaking-Boots"
+                        "sneaking_boots"
                     ],
                     [
                         "remove_object",
-                        "Cracked-Wall"
+                        "cracked_wall"
                     ]
                 ],
                 "next_chapter": "end"
@@ -492,11 +492,11 @@
                 "action": [
                     [
                         "give_item",
-                        "Lockpick"
+                        "lockpick"
                     ],
                     [
                         "remove_object",
-                        "Cracked-Wall"
+                        "cracked_wall"
                     ]
                 ],
                 "next_chapter": "end"
@@ -510,7 +510,7 @@
                     ],
                     [
                         "remove_object",
-                        "Cracked-Wall"
+                        "cracked_wall"
                     ]
                 ],
                 "next_chapter": "end"
@@ -520,11 +520,11 @@
                 "action": [
                     [
                         "give_item",
-                        "Lockpick"
+                        "lockpick"
                     ],
                     [
                         "remove_object",
-                        "Cracked-Wall"
+                        "cracked_wall"
                     ]
                 ],
                 "next_chapter": "end"
@@ -538,7 +538,7 @@
                     ],
                     [
                         "remove_object",
-                        "Cracked-Wall"
+                        "cracked_wall"
                     ]
                 ],
                 "next_chapter": "end"
@@ -556,7 +556,7 @@
                         "next_failure": "failed_break_chest",
                         "base_success_rate": 0.4,
                         "success_modifiers": {
-                            "Pickaxe": 0.1
+                            "pickaxe": 0.1
                         }
                     },
                     "2": {
@@ -565,7 +565,7 @@
                         "next_failure": "failed_open_chest",
                         "base_success_rate": 0.05,
                         "success_modifiers": {
-                            "Lockpick": 0.9
+                            "lockpick": 0.9
                         }
                     }
                 }
@@ -575,11 +575,11 @@
                 "action": [
                     [
                         "add_npc",
-                        "Fairy"
+                        "fairy"
                     ],
                     [
                         "remove_object",
-                        "Chest"
+                        "chest"
                     ]
                 ],
                 "next_chapter": "end"
@@ -596,7 +596,7 @@
                 "text": "You destroy the chest. What ever was in there, now it is destroyed.",
                 "action": [
                     "remove_object",
-                    "Chest"
+                    "chest"
                 ],
                 "next_chapter": "end"
             }
@@ -608,7 +608,7 @@
                 "text": "The teachers desk has a locked drawer. You get closer to inspect it. However you are startled by a sleeping kobold that lies under the desk.",
                 "action": [
                     "add_npc",
-                    "Kobold"
+                    "kobold"
                 ],
                 "next_chapter": "second_chapter"
             }
@@ -623,7 +623,7 @@
                         "next_failure": "failed_break_drawer",
                         "base_success_rate": 0.2,
                         "success_modifiers": {
-                            "Pickaxe": 0.5
+                            "pickaxe": 0.5
                         }
                     },
                     "2": {
@@ -632,7 +632,7 @@
                         "next_failure": "failed_open_drawer",
                         "base_success_rate": 0.05,
                         "success_modifiers": {
-                            "Lockpick": 0.6
+                            "lockpick": 0.6
                         }
                     }
                 }
@@ -642,11 +642,11 @@
                 "action": [
                     [
                         "remove_object",
-                        "Desk"
+                        "desk"
                     ],
                     [
                         "give_item",
-                        "Paper"
+                        "paper"
                     ]
                 ],
                 "next_chapter": "end"
@@ -664,11 +664,11 @@
                 "action": [
                     [
                         "remove_object",
-                        "Desk"
+                        "desk"
                     ],
                     [
                         "add_item",
-                        "Paper"
+                        "paper"
                     ]
                 ],
                 "next_chapter": "end"
@@ -681,7 +681,7 @@
                 "text": "In the hole you see a huge dragon resting on a pile of gold. You see a Trophy shimmering between the treasurers. \nYou know you want it, but it will be not easy to convince the dragon. \nYou can also climb into the hole, but with the dragon in there it could be dangerous.",
                 "action": [
                     "add_npc",
-                    "Dragon"
+                    "dragon"
                 ],
                 "next_chapter": "second_chapter"
             }
@@ -696,8 +696,8 @@
                         "next_failure": "failed_climb",
                         "base_success_rate": 0.3,
                         "success_modifiers": {
-                            "Sneaking-Boots": 0.3,
-                            "Invisibility-Cloak": 0.5
+                            "sneaking_boots": 0.3,
+                            "invisibility_cloak": 0.5
                         }
                     }
                 }
@@ -711,8 +711,8 @@
                         "next_failure": "steal_failure",
                         "base_success_rate": 0.05,
                         "success_modifiers": {
-                            "Sneaking-Boots": 0.15,
-                            "Invisibility-Cloak": 0.6
+                            "sneaking_boots": 0.15,
+                            "invisibility_cloak": 0.6
                         }
                     }
                 }
@@ -722,19 +722,19 @@
                 "action": [
                     [
                         "give_item",
-                        "Trophy"
+                        "trophy"
                     ],
                     [
                         "remove_npc",
-                        "Dragon"
+                        "dragon"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Sneaking-Boots"
+                        "sneaking_boots"
                     ],
                     [
                         "try_remove_item_from_inv",
-                        "Invisibility-Cloak"
+                        "invisibility_cloak"
                     ]
                 ],
                 "next_chapter": "end"
@@ -778,8 +778,8 @@
                         "next_failure": "failed_climb",
                         "base_success_rate": 0.3,
                         "success_modifiers": {
-                            "Sneaking-Boots": 0.3,
-                            "Invisibility-Cloak": 0.4
+                            "sneaking_boots": 0.3,
+                            "invisibility_cloak": 0.4
                         }
                     }
                 }
@@ -834,11 +834,11 @@
                 "action": [
                     [
                         "remove_object",
-                        "Blackboard"
+                        "blackboard"
                     ],
                     [
                         "give_item",
-                        "Chalk"
+                        "chalk"
                     ]
                 ],
                 "next_chapter": "end"

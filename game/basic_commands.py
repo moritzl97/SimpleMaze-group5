@@ -7,19 +7,20 @@
 # =============================================================================
 
 # All commands that are available in all rooms are stored here
-import sys
 import time
 import math
-from game.utils import clear_screen
+from game.utils import *
 from game.db import save_state
 import sqlite3
+from game.db_utils import *
+import datetime
 
-def handle_pause(conn, state):
+def handle_pause(state):
 
     paused = True
     state["elapsed_time"] = time.time() - state["start_time"]
-    player_name = state["player_name"]
-    save_state(conn, player_name, state)
+    #player_name = state["player_name"]
+    #save_state(player_name, state)
     print(r"""
                 _______  _______           _______  _______ 
                 (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
@@ -43,7 +44,8 @@ def handle_pause(conn, state):
             break
 
         elif command == "quit":
-            handle_quit(state)
+            quit_flag = handle_quit(state)
+            return quit_flag
 
         else:
             print("Game is paused. Only available commands: time, resume and quit.")
@@ -63,43 +65,72 @@ def display_time(state, paused):
 
     print(f"Elapsed time: {int(elapsed)} seconds")
 
-def handle_go(command, state, room_functions):
+def handle_go(command, state, room_functions, room_exits):
     if command.startswith("go "):
-        destination_room = command[3:]
-        if destination_room == "back":
+        destination_room = None
+        input_destination_room = command[3:]
+        if input_destination_room == "back":
             destination_room = state["previous_room"][:]
         else:
-            destination_room = destination_room.replace(" ", "_").replace("-", "_")
-        destination_room_display_name = destination_room.replace("_", " ").title()
+            input_destination_room = input_destination_room.replace(" ", "").replace("-", "")
+            for room in room_exits.keys():
+                if room.replace("_", "") == input_destination_room:
+                    destination_room = room
+                    break
 
         current_room = state["current_room"]
 
-        if destination_room in state["exits"].get(current_room, []):
+        if destination_room in room_exits.get(current_room, []):
             clear_screen()
+            destination_room_display_name = destination_room.replace("_", " ").title()
             print(f"You walk toward the door to {destination_room_display_name}.")
-            destination_name_len = len(destination_room_display_name)
-            banner = r"""
-        .-=~=-.                                                                 .-=~=-.
-        (__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
-        ( _ __)                                                                 ( _ __)
-        (__  _)                                                                 (__  _)
-        ( _ __)                                                                 ( _ __)
-        (_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
-        `-._.-'                                                                 `-._.-'"""
-            print(banner[:314-int(destination_name_len/2)]+destination_room_display_name+banner[314+math.ceil(destination_name_len/2):])
+            print_room_entry_banner(destination_room_display_name)
 
             entry_allowed = room_functions[destination_room]["enter_function"](state)
 
             if entry_allowed:
+                state["entered"][destination_room] = True
                 state["previous_room"] = state["current_room"]
                 state["current_room"] = destination_room
+            else:
+                print_room_entry_banner(current_room)
         else:
-            print(f"❌ You can't go to '{destination_room_display_name}' from here.")
+            print(f"❌ You can't go to '{input_destination_room}' from here.")
         return True
     else:
         return False
 
-def handle_admin_go(command, state, room_functions):
+def handle_admin_go(command, state, room_functions, room_exits):
+    destination_room = None
+    input_destination_room = command[9:]
+
+    input_destination_room = input_destination_room.replace(" ", "").replace("-", "").replace("_", "")
+    for room in room_functions.keys():
+        if room.replace("_", "") == input_destination_room:
+            destination_room = room
+            break
+
+    if destination_room is None:
+        print(f"The room {input_destination_room} doesn't exist")
+        return False
+
+    current_room = state["current_room"]
+
+    clear_screen()
+
+    print_room_entry_banner(destination_room)
+
+    entry_allowed = room_functions[destination_room]["enter_function"](state)
+
+    if entry_allowed:
+        state["entered"][destination_room] = True
+        state["previous_room"] = room_exits[destination_room][0]
+        state["current_room"] = destination_room
+    else:
+        print_room_entry_banner(current_room)
+    return True
+
+
     destination_room = command[9:].replace(" ", "_").replace("-", "_")
 
     current_room = state["current_room"]
@@ -118,29 +149,33 @@ def handle_admin_go(command, state, room_functions):
 def handle_help():
     #Show help message with available commands.
     print("\nAvailable commands:")
-    print("- look around         : See what’s in the lobby.")
     print("- go <room>           : Go to the entered room.")
     print("- go back             : Return to the room you came from.")
-    print("- map                 : Shows the map and all exits.")
-    print("- inventory           : Shows all items in your inventory.")
+    print("- map                 : Show the map and all exits.")
+    print("- inventory           : Show all items in your inventory.")
     print("- ?                   : Show this help message.")
+    print("- status              : Show the progress of the game.")
+    print("- scoreboard          : Show leaderboard of the top 5 players")
     print("- pause               : Pause the game")
-    print("- quit                : Quit the game.")
-    print("- status              : Show the progress of the game")
-    print("- scoreboard          : Show leaderboard of the best 5 players")
+    print("- quit                : Save and quit to the main menu.")
 
 def handle_quit(state):
+    clear_screen()
     save_entry_to_scoreboard(state)
-    print(f"👋 You come to the conclusion that this isn't for you."
-          "You turn around and leave the building.")
-    sys.exit()
+    # TODO save time
+    print("Game Saved".center(82))
+    print("\n")
+    print("You wake up from a nightmare. Was this all a dream?".center(82))
+    time.sleep(3)
+    return "quit"
 
 def show_inventory(state):
     #list items in inventory
-    if state["inventory"]:
+    item_list = db_get_all_items_in_inventory(state)
+    if item_list:
         print("You are carrying:")
-        for item in state["inventory"]:
-            print(f" - {item}")
+        for item in item_list:
+            print(f" - {item.replace("_"," ").title()}")
     else:
         print("You are not carrying anything.")
 
@@ -148,9 +183,14 @@ def show_status(state):
     visited_rooms = sum(1 for v in state["completed"].values() if v)
     total_rooms = len(state["completed"])
     percentage = int((visited_rooms / total_rooms) * 100)
-    nickname = state.get("player_name", "Player")
+    player_name = db_get_player_name(state)
+    elapsed_seconds = int(time.time() - state["start_time"])
+    time_format = datetime.timedelta(seconds=elapsed_seconds)
+
     print("-" * 70)
-    print(f"\nProgress for {nickname}: {visited_rooms}/{total_rooms} rooms visited ({percentage:.1f}%) time:{state['elapsed_time']}")
+    print(f"Progress for {player_name}: {visited_rooms}/{total_rooms} rooms completed ({percentage}%) time: {time_format}")
+    completed_rooms = [key.replace("_"," ").title() for key, value in state["completed"].items() if value]
+    print(f"Completed rooms: {", ".join(completed_rooms)}")
     print("-" * 70)
 
 def save_entry_to_scoreboard(state):
@@ -185,58 +225,121 @@ def display_scoreboard(state=None):
             break
     print("-" * 70)
 
-def show_map(state):
-    current_room = state["current_room"]
-    floor_map = """
-+---------+------------+-------------+--------+----------+----------+---------+----------+
-|         |            |             |        |          |          |  Cyber  |          |
-|         |  Computer  |             |        |  Class   |          |  Room   |  Riddle  |
-|         |  Lab       |   Study     |        |  2015    |          +----+-##-+  Room    |
-|  Cloud  |            |   Landscape |        |          |          |    #    |          |
-|  Room   |            |             +----##--+-------##-+-------##-+----+    #          |
-|         +-------##---+             #            E-W-Corridor           #  N |          |
-|         # Lab Cor    #            +--------##-+-##-+-##-+-##-+-##-+-##-+  S +----------+
+class MapRoom:
+    def __init__(self, name, text_position, player_position, display_text):
+        self.name = name
+        self.text_position = text_position
+        self.display_text = display_text
+        self.player_position = player_position
+        self.entered = False
+        self.completed = False
+
+class Map:
+    def __init__(self):
+        self.map_str = """+---------+------------+-------------+--------+----------+----------+---------+----------+
+|         |            |             |        |          |          |         |          |
+|         |            |             |        |          |          |         |          |
+|         |            |             |        |          |          +----+-##-+          |
+|         |            |             |        |          |          |    #    |          |
+|         |            |             +----##--+-------##-+-------##-+----+    #          |
+|         +-------##---+             #                                   #    |          |
+|         #            #            +--------##-+-##-+-##-+-##-+-##-+-##-+    +----------+
 |         +------------+-#-+-#-+    |           |    |    |    |    |    |    |          |
-|         |            |   |   |    |  Control  |    |    |    |    |    |  C |  Dragon  |
-|         |            |   |PR3|    |  Room     |    |    |    |    |    |  o #  Room    |
-+---------+            +---+---+-##-+-----------+----+----+----+----+----+  r |          |
-                               |    |                                    +----+----------+
-    """
+|         |            |   |   |    |           |    |    |    |    |    |    |          |
+|         |            |   |   |    |           |    |    |    |    |    |    #          |
++---------+            +---+---+-##-+-----------+----+----+----+----+----+    |          |
+                               |    |                                    +----+----------+"""
+        self.map_line_len = 91
+        self.rooms = [
+                      MapRoom("cloudroom", 4*91+3, 733, ["Cloud","Room"]),
+                      MapRoom("computerlab", 2*91+13, 381, ["Computer","Lab"]),
+                      MapRoom("controlroom", 9*91+39, 770, ["Control","Room"]),
+                      MapRoom("cyberroom", 1*91+71, 258, ["Cyber","Room"]),
+                      MapRoom("dragon_room", 9*91+81, 1085, ["Dragon","Room"]),
+                      MapRoom("riddleroom", 2*91+81, 538, ["Riddle","Room"]),
+                      MapRoom("classroom_2015", 2*91+49, 416, ["Class","2015"]),
+                      MapRoom("project_room_3", 10*91+28, 848, ["PR3"]),
+                      MapRoom("study_landscape", 3*91+26, 576, ["Study","Landscape"]),
+                      MapRoom("e_w_corridor", 6*91+50, 590, ["E-W-Corridor"]),
+                      MapRoom("lab_corridor", 7*91+12, 658, ["Lab Cor"]),
+                      MapRoom("n_s_corridor", 6*91+76, 440, ["N","S"," ","C","o","r"]),
+                      ]
+        # Lookup dictionary
+        self.room_lookup = {room.name: room for room in self.rooms}
 
-    player_positions = {
-        "cloudroom": 734,
-        "computerlab": 382,
-        "controlroom": 771,
-        "cyberroom": 259,
-        "dragon_room": 1086,
-        "riddleroom": 539,
-        "classroom_2015": 417,
-        "project_room_3": 849,
-        "study_landscape": 577,
-        "e_w_corridor": 591,
-        "lab_corridor": 659,
-        "n_s_corridor": 441,
-    }
+    def _abs_to_line_col(self, abs_pos):
+        line = abs_pos // self.map_line_len
+        col = abs_pos % self.map_line_len
+        return line, col
 
-    current_position = player_positions.get(current_room, False)
+    def show(self, current_room, state, room_exits):
+        # Split original map into lines (keep newline endings)
+        lines = self.map_str.splitlines(keepends=True)  # preserves '\n' so indices align with abs positions
 
-    # Insert X in the map for the player position the other stuff \033[93m is just to print the X in a specific color
-    if current_position:
-        current_map = floor_map[:current_position] + "\033[93mX\033[00m" + floor_map[current_position + 1:]
-    else:
-        current_map = floor_map
+        # Collect replacements per line as (col, length_of_target, replacement_string)
+        # We'll store (col, replacement_str) but need to sort descending by col when applying.
+        replacements = {}  # line_index -> list of (col, target_len, replacement_text)
 
-    print(current_map)
-    print(f"Possible exits: {', '.join(state['exits'][current_room]).replace('_',' ').title()}")
+        # Add room name replacements (colored)
+        for room in self.rooms:
+            color = ""
+            if state["completed"].get(room.name, False):
+                color = Color.green
+            elif state["entered"][room.name]:
+                color = Color.gray
 
-def handle_basic_commands(conn, command, state):
+            base_line, base_col = self._abs_to_line_col(room.text_position)
+
+            for i, text in enumerate(room.display_text):
+                line_idx = base_line + i
+                col_idx = base_col
+                colored = color + text + Color.end
+                replacements.setdefault(line_idx, []).append((col_idx, len(text), colored))
+
+        # Add player 'X' marker
+        room_obj = self.room_lookup.get(current_room)
+        line_idx, col_idx = self._abs_to_line_col(room_obj.player_position)
+        colored_x = Color.yellow + "X" + Color.end
+        replacements.setdefault(line_idx, []).append((col_idx, 1, colored_x))
+
+        # Apply replacements per line, from right to left (descending column) so indexes remain valid
+        for line_idx, repls in replacements.items():
+            # filter valid replacements within the line length
+            orig_line = lines[line_idx]
+            # sort by column descending
+            for col, target_len, repl_text in sorted(repls, key=lambda x: x[0], reverse=True):
+                if col < 0 or col >= len(orig_line):
+                    continue
+                # split original line into three pieces and replace target slice
+                before = orig_line[:col]
+                after = orig_line[col + target_len:]
+                orig_line = before + repl_text + after
+            lines[line_idx] = orig_line
+
+        # Build final map and print
+        final_map = "".join(lines)
+        print(final_map)
+        print(f"Legend: unvisited room, {Color.gray}visited room{Color.end}, {Color.green}completed room{Color.end}, player position {Color.yellow}X{Color.end}")
+        print(f"Possible exits: {', '.join(room_exits[current_room]).replace('_', ' ').title()}")
+
+
+def show_map(state, room_exits):
+    current_room = state["current_room"]
+
+    floor_map = Map()
+    floor_map.show(current_room, state, room_exits)
+
+def handle_basic_commands(command, state, room_exits):
     if command == "quit":
-        handle_quit(state)
+        quit_flag = handle_quit(state)
+        return quit_flag
     elif command == "pause":
-        handle_pause(conn, state)
+        quit_flag = handle_pause(state)
+        if quit_flag:
+            return quit_flag
         return True
     elif command == "map":
-        show_map(state)
+        show_map(state, room_exits)
         return True
     elif command == "status":
         show_status(state)

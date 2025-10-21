@@ -9,6 +9,7 @@
 def lab_corridor_enter(state):
     print("\n🚶 You are standing in the corridor to the computer labs.")
     print("You hear the sound of servers humming from the neighboring rooms.")
+    state["completed"]["lab_corridor"] = True
     return True
 
 def handle_look():
@@ -20,3 +21,4 @@ def lab_corridor_commands(command, state):
     if command == "look around":
         handle_look()
         return True
+    return False

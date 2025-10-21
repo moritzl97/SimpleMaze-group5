@@ -9,6 +9,7 @@
 def n_s_corridor_enter(state):
     print("\n🚶 The north south corridor is much more quiet.")
     print("Only a few classrooms are located here.")
+    state["completed"]["n_s_corridor"] = True
     return True
 
 def handle_look():
@@ -20,3 +21,4 @@ def n_s_corridor_commands(command, state):
     if command == "look around":
         handle_look()
         return True
+    return False

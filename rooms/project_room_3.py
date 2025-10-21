@@ -69,3 +69,4 @@ def project_room_3_commands(command, state):
         guess = command[7:].strip()
         result = handle_answer(guess, state)
         return result
+    return False

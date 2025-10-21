@@ -4,11 +4,11 @@ import random
 def riddleroom_enter(state):
     print("Welcome to the Adventure Game!")
     print("Goal: Solve the multi-step challenge in the room to take the magnet.\n")
-    state["riddleroom"]["magnet_taken"] = False
+    state["riddleroom"]["magnet_taken"] = False #TODO only set state if it is not set yet
     return True
 
 def riddleroom_commands(command, state):
-    challenge_solved = complex_challenge(state)
+    challenge_solved = complex_challenge(state) # TODO Maybe don't just start the challenge but let the player start it by e.g. talking to the teacher
     if challenge_solved:
         print("You are inside Classroom 1.07.")
         if not state["riddleroom"]["magnet_taken"]:
@@ -16,7 +16,7 @@ def riddleroom_commands(command, state):
         else:
             print("The glass case is empty now. The teacher nods approvingly.")
 
-        if command == "look around":
+        if command == "look around": #TODO add return True to all commands
             look_around(state)
         elif command == "take magnet" and not state["riddleroom"]["magnet_taken"] and "challenge_solved" in state["inventory"]:
             take("magnet", state)
@@ -36,14 +36,14 @@ def take(item, state):
         if "challenge_solved" in state["inventory"]:
             state["inventory"].append("magnet")
             state["riddleroom"]["magnet_taken"] = True
-            print("You take the magnet and add it to your inventory.")
+            print("You take the magnet and add it to your inventory.") #TODO add the state["completed"]["riddleroom"] = True here instead of below
         else:
             print("The magnet is locked. Solve the challenge first.")
 
 
 
 def complex_challenge(state):
-    if "challenge_solved" in state["inventory"]:
+    if "challenge_solved" in state["inventory"]: # TODO challenge_solved shouldn't be an item added to the inventory, but a boolean flag in the state
         print("The teacher nods. You already solved the challenge here.")
         return True
 
@@ -94,7 +94,7 @@ def complex_challenge(state):
         print("The teacher shakes his head. Come back when you're wiser.")
         return False
 
-    # --- STEP 2: LOGIC PUZZLE ---
+    # --- STEP 2: LOGIC PUZZLE --- #TODO Maybe split the puzzles such that the player has to start each round (you can look at the cyberroom for an example, Tieme did it there with the panels)
     print("\n--- Logic Puzzle ---")
     print("Three friends (Alice, Bob, and Carol) are sitting in a row.")
     print("Bob is not at either end. Carol is not next to Alice. Who is sitting in the middle?")

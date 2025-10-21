@@ -7,42 +7,42 @@
 # =============================================================================
 
 import sys
-from game.db import list_saves, load_state
+from game.db import list_saves, load_state, delete_save
 from game.basic_commands import display_scoreboard
 from datetime import datetime
-from game.utils import clear_screen
-import os
+from game.utils import *
 import time
 
-def title_screen(conn):
+def main_menu(state):
     while True:
+        clear_screen()
         print(r"""
-                    _______  _______  _______  _______  _______  _______ 
-                   (  ____ \(  ____ \(  ____ \(  ___  )(  ____ )(  ____ \
-                   | (    \/| (    \/| (    \/| (   ) || (    )|| (    \/
-                   | (__    | (_____ | |      | (___) || (____)|| (__    
-                   |  __)   (_____  )| |      |  ___  ||  _____)|  __)   
-                   | (            ) || |      | (   ) || (      | (      
-                   | (____/\/\____) || (____/\| )   ( || )      | (____/\
-                   (_______/\_______)(_______/|/     \||/       (_______/""", end="")
+                _______  _______  _______  _______  _______  _______ 
+               (  ____ \(  ____ \(  ____ \(  ___  )(  ____ )(  ____ \
+               | (    \/| (    \/| (    \/| (   ) || (    )|| (    \/
+               | (__    | (_____ | |      | (___) || (____)|| (__    
+               |  __)   (_____  )| |      |  ___  ||  _____)|  __)   
+               | (            ) || |      | (   ) || (      | (      
+               | (____/\/\____) || (____/\| )   ( || )      | (____/\
+               (_______/\_______)(_______/|/     \||/       (_______/""", end="")
         print(r"""
-                               ____  _____   _____ _     _____
-                              /  _ \/    /  /__ __Y \ /|/  __/
-                              | / \||  __\    / \ | |_|||  \  
-                              | \_/|| |       | | | | |||  /_ 
-                              \____/\_/       \_/ \_/ \|\____\ """, end="")
-        print("\033[31m" + r"""
-         _       _________ _______          _________ _______  _______  _______  _______ 
-        ( (    /|\__   __/(  ____ \|\     /|\__   __/(       )(  ___  )(  ____ )(  ____ \
-        |  \  ( |   ) (   | (    \/| )   ( |   ) (   | |) (| || (   ) || (    )|| (    \/
-        |   \ | |   | |   | |      | (___) |   | |   | ||_|| || (___) || (____)|| (__    
-        | (\ \) |   | |   | | ____ |  ___  |   | |   | |   | ||  ___  ||     __)|  __)   
-        | | \   |   | |   | | \_  )| (   ) |   | |   | |   | || (   ) || (\ (   | (      
-        | )  \  |___) (___| (___) || )   ( |   | |   | )   ( || )   ( || ) \ \__| (____/\
-        |/    )_)\_______/(_______)|/     \|   )_(   |/     \||/     \||/   \__/(_______/""" + "\033[0m")
+                           ____  _____   _____ _     _____
+                          /  _ \/    /  /__ __Y \ /|/  __/
+                          | / \||  __\    / \ | |_|||  \  
+                          | \_/|| |       | | | | |||  /_ 
+                          \____/\_/       \_/ \_/ \|\____\ """, end="")
+        print(Color.red + r"""
+     _       _________ _______          _________ _______  _______  _______  _______ 
+    ( (    /|\__   __/(  ____ \|\     /|\__   __/(       )(  ___  )(  ____ )(  ____ \
+    |  \  ( |   ) (   | (    \/| )   ( |   ) (   | |) (| || (   ) || (    )|| (    \/
+    |   \ | |   | |   | |      | (___) |   | |   | ||_|| || (___) || (____)|| (__    
+    | (\ \) |   | |   | | ____ |  ___  |   | |   | |   | ||  ___  ||     __)|  __)   
+    | | \   |   | |   | | \_  )| (   ) |   | |   | |   | || (   ) || (\ (   | (      
+    | )  \  |___) (___| (___) || )   ( |   | |   | )   ( || )   ( || ) \ \__| (____/\
+    |/    )_)\_______/(_______)|/     \|   )_(   |/     \||/     \||/   \__/(_______/""" + Color.end)
         space = "    "
         print(
-            "                Start new game" + space + "Load game" + space + "Highscores" + space + "Credits" + space + "Exit game")
+            "            Start new game" + space + "Load game" + space + "Highscores" + space + "Credits" + space + "Exit game")
         # start game
         # load game
         # highscores
@@ -51,11 +51,11 @@ def title_screen(conn):
         command = input("").strip().lower()
 
         if command == "start new game" or command == "start" or command == "start game" or command == "new game":
-            clear_screen()
             return None
         elif command == "load game" or command == "load":
             #load game
-            save_state = load_menu(conn)
+            clear_screen()
+            save_state = load_menu(state)
             if save_state:
                 return save_state
         elif command == "highscores":
@@ -63,13 +63,19 @@ def title_screen(conn):
             clear_screen()
             display_scoreboard()
             input("")
-            clear_screen()
         elif command == "credits":
+            clear_screen()
             credits_screen()
+            input("")
         elif command == "exit game" or command == "exit":
             # call exit function
             sys.exit()
-
+        elif command.startswith("delete "):
+            # delete save
+            clear_screen()
+            save_id = int(command[7:])
+            delete_save(state, save_id)
+            time.sleep(2)
 
 def end_screen(state):
     # end screen
@@ -104,11 +110,9 @@ def credits_screen():
 This student project was created as part of the application 
 development course at The Hague University of Applied Sciences.\n\n\n\n
 """)
-    input("").strip().lower()
     return
 
 def load_menu(conn):
-    clear_screen()
     print(r"""
                      ____                       
                     / ___|  __ ___   _____  ___ 
@@ -135,7 +139,7 @@ def load_menu(conn):
     while True:
         choice = input("Enter player name of the save you want to load or 'back' to go to the main menu: ").strip()
         if choice == "back":
-            return
+            return None
 
         loaded = load_state(conn, choice)
         if not loaded:

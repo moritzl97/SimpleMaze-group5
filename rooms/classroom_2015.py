@@ -52,7 +52,7 @@ def handle_answer(answer, state):
         print("✅ You've already solved this challenge.")
     elif answer == "42":
         print("✅ Correct! The teacher invites you to the desk.")
-        state["completed"]["classroom2015"] = True
+        state["completed"]["classroom_2015"] = True
         print("Suddenly you see something on the desk.")
     else:
         print("❌ Incorrect. The teacher opens the door of the classroom.")
@@ -77,3 +77,4 @@ def classroom_2015_commands(command, state):
             return result
         else:
             return True
+    return False

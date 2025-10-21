@@ -9,6 +9,7 @@
 def e_w_corridor_enter(state):
     print("\n🚶 You are standing in the school's main corridor.")
     print("You see a long corridor with many doors and glass walls on both side. Behind these door are rooms, waiting to be explored.")
+    state["completed"]["e_w_corridor"] = True
     return True
 
 def handle_look():
@@ -20,3 +21,4 @@ def e_w_corridor_commands(command, state):
     if command == "look around":
         handle_look()
         return True
+    return False
