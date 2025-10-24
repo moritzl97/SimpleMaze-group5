@@ -112,7 +112,8 @@ development course at The Hague University of Applied Sciences.\n\n\n\n
 """)
     return
 
-def load_menu(conn):
+def load_menu(state):
+    conn = state["db_conn"]
     print(r"""
                      ____                       
                     / ___|  __ ___   _____  ___ 

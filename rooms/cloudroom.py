@@ -3,7 +3,97 @@
 # Room: Cloud Room (puzzle + MCQ robot)
 # -----------------------------------------------------------------------------
 
-import sys
+def generate_cloud_quiz(n_questions: int=3):
+    import os
+    from dotenv import load_dotenv
+    from openai import OpenAI
+    import json
+
+    """
+        Ask gpt-4o-mini to create simple cloud-related multiple-choice questions.
+        Returns a list of dicts: [{q, opts, ans, hint}, ...]
+        """
+    backup_quiz = [
+        {
+            "q": "What does AWS stand for?",
+            "opts": {"a": "Amazon Web Services", "b": "Advanced Web Systems", "c": "Automated Workload Suite"},
+            "ans": "a"
+        },
+        {
+            "q": "Which is an AWS object storage service?",
+            "opts": {"a": "EBS", "b": "S3", "c": "EFS"},
+            "ans": "b"
+        },
+        {
+            "q": "What best describes an EC2 instance?",
+            "opts": {"a": "A managed SQL database", "b": "A serverless function",
+                     "c": "A virtual machine in the cloud"},
+            "ans": "c"
+        }
+    ]
+
+    prompt = f"""
+    Create {n_questions} beginner to intermediate multiple-choice quiz questions
+    related to cloud computing. Include a balanced mix of topics such as:
+
+    - AWS services (EC2, S3, Lambda, IAM, RDS, CloudFront)
+    - Cloud computing fundamentals (IaaS, PaaS, SaaS, scalability, elasticity)
+    - Virtualization and containers (hypervisors, VMs, Docker, Kubernetes)
+    - Networking concepts (load balancers, regions, availability zones, VPCs)
+    - Security and identity management (encryption, IAM roles, shared responsibility)
+    - DevOps and automation in the cloud (CI/CD, infrastructure as code)
+    - Cost optimization and monitoring (billing, budgets, CloudWatch)
+
+    Each question should have exactly 3 answer options labeled a, b, and c.
+    Include a 'hint' that helps the player remember the correct answer.
+
+    Format the output strictly as JSON, like this example:
+
+    [
+      {{
+        "q": "What does AWS stand for?",
+        "opts": {{"a": "Amazon Web Services", "b": "Advanced Web Systems", "c": "Automated Workload Suite"}},
+        "ans": "a",
+        "hint": "It's the largest cloud provider by market share."
+      }},
+      ...
+    ]
+
+    Output only valid JSON, no explanations or commentary.
+    """
+
+    load_dotenv()
+
+    key = os.getenv("OPENAI_KEY")
+    if not key:
+        print("⚠️ No OpenAI key found in environment. Using fallback questions.")
+        return backup_quiz
+
+    client = OpenAI(api_key=key)
+    model = "gpt-4o-mini"
+
+    response = client.responses.create(
+        model="gpt-4o-mini",
+        input=prompt,
+        temperature=0.7,
+    )
+    # Extract text
+    text = response.output_text.strip()
+
+    if text.startswith("```"):
+        # remove ```json or ``` marks
+        text = text.strip("`")
+        if text.lower().startswith("json"):
+            text = text[4:].strip()
+
+    # Parse JSON safely
+    try:
+        quiz = json.loads(text)
+    except json.JSONDecodeError as e:
+        # Fallback to an empty list or a default static question
+        return backup_quiz
+    return quiz
+
 def cloudroom_enter(state):
 
     state.setdefault("_cloudroom", {
@@ -43,24 +133,6 @@ def cloudroom_commands(command, state):
         "whiteboard": "A network diagram and 'IAM -> Least Privilege'. In the corner: 'U'.",
         "plant":      "A thirsty office plant guarding… the letter 'D' on its pot."
     }
-
-    quiz = [
-        {
-            "q": "What does AWS stand for?",
-            "opts": {"a": "Amazon Web Services", "b": "Advanced Web Systems", "c": "Automated Workload Suite"},
-            "ans": "a"
-        },
-        {
-            "q": "Which is an AWS object storage service?",
-            "opts": {"a": "EBS", "b": "S3", "c": "EFS"},
-            "ans": "b"
-        },
-        {
-            "q": "What best describes an EC2 instance?",
-            "opts": {"a": "A managed SQL database", "b": "A serverless function", "c": "A virtual machine in the cloud"},
-            "ans": "c"
-        }
-    ]
 
     # ---- helpers ----
     def show_help():
@@ -104,23 +176,34 @@ def cloudroom_commands(command, state):
         return True
 
     def run_quiz():
+
+        print("Generating questions....")
+        quiz = generate_cloud_quiz(3)
+
         print("\n🤖 Robot: 'Answer three questions. Type a, b, or c.'")
         correct = 0
+
         for i, item in enumerate(quiz, start=1):
             print(f"\nQ{i}. {item['q']}")
             print(f"   a) {item['opts']['a']}")
             print(f"   b) {item['opts']['b']}")
             print(f"   c) {item['opts']['c']}")
+
             while True:
                 ans = input("Your answer (a/b/c): ").strip().lower()
-                if ans in ("a", "b", "c"):
+                if ans not in ("a", "b", "c"):
+                    print("Please type a, b, or c.")
+                    continue
+
+                if ans == item["ans"]:
+                    print("✅ Correct!")
+                    correct += 1
                     break
-                print("Please type a, b, or c.")
-            if ans == item["ans"]:
-                print("✅ Correct.")
-                correct += 1
-            else:
-                print("❌ Incorrect.")
+                else:
+                    print("❌ Incorrect.")
+                    print("Hint:", item.get("hint", "No hint available. Try again."))
+                    print("Try again!")
+
         if correct == len(quiz):
             print("\n🎉 Robot: 'Well done! You passed.'")
             return True
