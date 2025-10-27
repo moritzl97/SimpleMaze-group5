@@ -251,12 +251,12 @@ class Map:
                                |    |                                    +----+----------+"""
         self.map_line_len = 91
         self.rooms = [
-                      MapRoom("cloudroom", 4*91+3, 733, ["Cloud","Room"]),
-                      MapRoom("computerlab", 2*91+13, 381, ["Computer","Lab"]),
-                      MapRoom("controlroom", 9*91+39, 770, ["Control","Room"]),
-                      MapRoom("cyberroom", 1*91+71, 258, ["Cyber","Room"]),
+                      MapRoom("cloud_room", 4*91+3, 733, ["Cloud","Room"]),
+                      MapRoom("computer_lab", 2*91+13, 381, ["Computer","Lab"]),
+                      MapRoom("control_room", 9*91+39, 770, ["Control","Room"]),
+                      MapRoom("cyber_room", 1*91+71, 258, ["Cyber","Room"]),
                       MapRoom("dragon_room", 9*91+81, 1085, ["Dragon","Room"]),
-                      MapRoom("riddleroom", 2*91+81, 538, ["Riddle","Room"]),
+                      MapRoom("riddle_room", 2*91+81, 538, ["Riddle","Room"]),
                       MapRoom("classroom_2015", 2*91+49, 416, ["Class","2015"]),
                       MapRoom("project_room_3", 10*91+28, 848, ["PR3"]),
                       MapRoom("study_landscape", 3*91+26, 576, ["Study","Landscape"]),

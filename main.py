@@ -140,8 +140,8 @@ def game_loop(save_id):
 
 #--------------Definition or variables on start up-------------#
 # Set console width if possible
-cmd = 'mode 82,50'
-os.system(cmd)
+#cmd = 'mode 82,50'
+#os.system(cmd)
 
 # create database and connection to it
 path = "saves.db"
