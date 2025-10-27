@@ -156,12 +156,12 @@ state = {
     "completed": {
         "classroom_2015": False,
         "project_room_3": False,
-        "cloudroom": False,
-        "cyberroom": False,
+        "cloud_room": False,
+        "cyber_room": False,
         "dragon_room": False,
-        "computerlab": False,
-        "riddleroom": False,
-        "controlroom": False,
+        "computer_lab": False,
+        "riddle_room": False,
+        "control_room": False,
         "e_w_corridor": False,
         "lab_corridor": False,
         "n_s_corridor": False,
@@ -169,12 +169,12 @@ state = {
     "entered": {
         "classroom_2015": False,
         "project_room_3": False,
-        "cloudroom": False,
-        "cyberroom": False,
+        "cloud_room": False,
+        "cyber_room": False,
         "dragon_room": False,
-        "computerlab": False,
-        "riddleroom": False,
-        "controlroom": False,
+        "computer_lab": False,
+        "riddle_room": False,
+        "control_room": False,
         "study_landscape": True,
         "e_w_corridor": False,
         "lab_corridor": False,
@@ -184,11 +184,11 @@ state = {
     "paused": False,
     "elapsed_time": 0,
     "player_name": None,
-    "cloudroom": {},
-    "cyberroom": {},
-    "computerlab": {},
-    "riddleroom": {},
-    "controlroom": {}
+    "cloud_room": {},
+    "cyber_room": {},
+    "computer_lab": {},
+    "riddle_room": {},
+    "control_room": {}
 }
 # Basic parameters for the database
 state["db_conn"].execute("PRAGMA foreign_keys = ON;")

@@ -60,7 +60,7 @@ def open_dialog(name, state):
             return
 
         # If there are options print all of them
-        print("\nChoices:")
+        print("\nChoose a number:")
         for option_number, option_entry in node["options"].items():
             # Calculate success rate and see if helpful items are in the players inventory
             success_rate = option_entry["base_success_rate"]
@@ -75,10 +75,15 @@ def open_dialog(name, state):
                 success_rate = 1
 
             # Print option number, the text and the success rate if you choose this option
-            print(f" {option_number}. {option_entry['text']} ({int(success_rate*100)}%) ")
+            probability_color = Color.end
+            if added_modifier_list:
+                probability_color = Color.blue
+
+            print(f" {option_number}. {option_entry['text']} ({probability_color + str(int(success_rate*100)) + '%' + Color.end}) ")
             # If there are items that helped, list them
             if added_modifier_list:
-                print(f"    Helping items: {', '.join(added_modifier_list)}")
+                modifier_list_display_name = [item.replace("_", " ").title() for item in added_modifier_list]
+                print(f"    This option has a boosted success rate due to: { Color.blue + ', '.join(modifier_list_display_name) + Color.end}")
 
         leave_option = str(len(node["options"]) + 1)
         print(f" {leave_option}. Leave")
@@ -86,14 +91,14 @@ def open_dialog(name, state):
         # Input loop
         # Checks if the player entered a valid option
         while True:
-            choice = input("\n> ").strip()
+            choice = input("\n> ").strip().lower()
             # Check if player selected leave option
-            if choice == leave_option:
+            if choice == leave_option or choice == "leave":
                 print("You back of to do something else.")
                 return
             # If choice is in options check for success, else ask again for an input
             elif choice not in node["options"]:
-                print("Please choose a valid option.")
+                print("Please type in a number to choose an option.")
                 continue
             else:
                 # If valid choice, calculate the success rate again
@@ -127,10 +132,15 @@ def trade_with_shopkeeper(npc, state):
     while True:
         number_of_options = len(trades)+1
         for index in range(1, number_of_options):
-            print(f"{index}. Sell a {trades[index-1][2]} for a {trades[index-1][1]}")
+            print(f"{index}. Sell a {trades[index-1][2].replace("_"," ").title()} for a {trades[index-1][1].replace("_"," ").title()}")
         print(f"{number_of_options}. I don't want to trade.")
 
-        choice = int(input("\n> ").strip())
+        choice = input("\n> ").strip()
+        try:
+            choice = int(choice)
+        except ValueError:
+            print("Please type in a number to choose a trade.")
+            continue
 
         if choice < number_of_options:
             trade_id = trades[choice-1][0]
@@ -151,7 +161,7 @@ def trade_with_shopkeeper(npc, state):
             print("Maybe next time we can make a deal.")
             return
         else:
-            print("Please choose a valid option.")
+            print("Please type in a number to choose a trade.")
 #---end of shopkeeper---#
 
 #---Action functions---#
@@ -216,13 +226,16 @@ def handle_look(noun, state):
               "On the blackboard is something written, but it is to small to read from here.\n")
         items = db_get_objects_in_room(state, "items")
         if items:
-            print(f"You see the following items in the room: {', '.join(items)}")
+            items_display_names = [item.replace("_", " ").title() for item in items]
+            print(f"You see the following items in the room: {', '.join(items_display_names)}")
         npcs = db_get_objects_in_room(state, "npcs")
         if npcs:
-            print(f"You can talk to the following NPCs in the room: {', '.join(npcs)}")
+            npcs_display_names = [npc.replace("_", " ").title() for npc in npcs]
+            print(f"You can talk to the following NPCs in the room: {', '.join(npcs_display_names)}")
         objects = db_get_objects_in_room(state, "objects")
         if objects:
-            print(f"You see these points of interest in the room: {', '.join(objects)}")
+            objects_display_names = [i_object.replace("_", " ").title() for i_object in objects]
+            print(f"You see these points of interest in the room: {', '.join(objects_display_names)}")
     return
 
 def handle_take(noun, state):
@@ -230,11 +243,13 @@ def handle_take(noun, state):
     if not noun:
         print("Take what?")
     elif db_is_item_in_inventory(state, noun):
-        print(f"You already have the {noun} in your inventory.")
+        item_display_name = noun.replace("_", " ").title()
+        print(f"You already have the {item_display_name} in your inventory.")
     elif db_check_if_in_room(state, noun, "items"):
         db_remove_object_from_room(state, noun, "items")
         db_add_item_to_inventory(state, noun)
-        print(f"You take {noun}.")
+        item_display_name = noun.replace("_", " ").title()
+        print(f"You take {item_display_name}.")
     else:
         print(f"You cannot pickup {noun}.")
     return

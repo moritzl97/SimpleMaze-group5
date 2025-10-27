@@ -812,7 +812,7 @@
                 }
             },
             "decipher_success": {
-                "text": "Written in small letters you read: 'Fairies like to color white.'",
+                "text": "Written in small letters you read: 'Fairies like the color white.'",
                 "action": [
                     "wait",
                     10

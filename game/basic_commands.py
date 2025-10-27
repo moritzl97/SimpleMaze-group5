@@ -72,7 +72,22 @@ def handle_go(command, state, room_functions, room_exits):
         if input_destination_room == "back":
             destination_room = state["previous_room"][:]
         else:
-            input_destination_room = input_destination_room.replace(" ", "").replace("-", "")
+            input_destination_room = input_destination_room.replace(" ", "").replace("-", "").replace("_", "")
+            room_aliases = {"nscor":"nscorridor",
+                            "northsouthcorridor":"nscorridor",
+                            "northsouthcor": "nscorridor",
+                            "ewcor":"ewcorridor",
+                            "eastwestcorridor": "ewcorridor",
+                            "eastwestcor": "ewcorridor",
+                            "labcor":"labcorridor",
+                            "pr3":"projectroom3",
+                            "projectroom": "projectroom3",
+                            "class2015":"classroom2015",
+                            "class":"classroom2015",
+                            "classroom":"classroom2015"}
+
+            input_destination_room = room_aliases.get(input_destination_room, input_destination_room)
+
             for room in room_exits.keys():
                 if room.replace("_", "") == input_destination_room:
                     destination_room = room
