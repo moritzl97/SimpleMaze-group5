@@ -134,6 +134,16 @@ def init_db(state):
         );
     """)
 
+    #Cloud room table for state saving
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS cloud_room_state (
+            save_id       INTEGER PRIMARY KEY,
+            robot_locked  INTEGER DEFAULT 1,
+            quiz_passed   INTEGER DEFAULT 0,
+            FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE
+        );
+    """)
+
     #dragon room create tables
     cursor.execute("""
                  CREATE TABLE IF NOT EXISTS dragon_room_objects (
@@ -333,6 +343,12 @@ def create_new_save(state, current_player_name):
             SELECT ?, flag_id, FALSE
             FROM flags;
             """, (save_id,))
+
+    # intiliase cloud_room table
+    cursor.execute("""
+        INSERT INTO cloud_room_state (save_id, robot_locked, quiz_passed)
+        VALUES (?, 1, 0);
+    """, (save_id,))
 
     #dragon room
     current_object_names = ('cracked_wall', 'blackboard', 'desk', 'chest', 'hole',)

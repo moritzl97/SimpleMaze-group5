@@ -159,6 +159,7 @@ def load_menu(state):
             choice = int(choice)
         except ValueError:
             print("Please enter a valid number or 'back'.")
+            continue
 
         if choice <= len(rows):
             save_id = rows[choice-1][0]

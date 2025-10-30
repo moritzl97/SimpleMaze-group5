@@ -2,7 +2,16 @@
 # File: cloudroom.py
 # Room: Cloud Room (puzzle + MCQ robot)
 # -----------------------------------------------------------------------------
-from game.db_utils import *
+from rooms.cloud_room_db_utils import *
+
+def check_cloud_access(state):
+    #Check if "cloud_key" exists
+
+    if not db_is_item_in_inventory(state, "cloud_key"):
+        print("\nACCESS DENIED! You need the Cloud Key to enter this room.")
+        print("Perhaps you should explore other rooms first.")
+        return False
+    return True
 
 def generate_cloud_quiz(n_questions: int=3):
     import os
@@ -90,23 +99,23 @@ def generate_cloud_quiz(n_questions: int=3):
     # Parse JSON safely
     try:
         quiz = json.loads(text)
-    except json.JSONDecodeError as e:
+    except json.JSONDecodeError:
         # Fallback to a default static question
         return backup_quiz
     return quiz
 
 def cloudroom_enter(state):
 
-    state.setdefault("_cloudroom", {
-        "robot_locked": True,
-        "password": "CLOUD",
-        "quiz_passed": False
-    })
+    #Return to the corridor in case the "cloud_key" is missing
+    if not check_cloud_access(state):
+        return "go lab corridor"
+
+    cr = cloud_db_get_state(state)
 
     print("\n☁️  You enter the Cloud Room.")
     print("Around the perimeter are techy objects. A quiet robot stands in the center, unpowered.")
     if db_get_room_completed(state, "cloud_room"):
-        if state["_cloudroom"]["quiz_passed"]:
+        if cr["quiz_passed"]:
             print("You’ve already solved this room. You can look around or go back to the corridor.")
         else:
             print("You have been here before, but the robot still awaits the correct answers.")
@@ -121,11 +130,7 @@ def cloudroom_commands(command, state):
       - False -> not known; main.py will try basic commands
       - "go lab corridor or go back" -> if you want to return and continue the journey
     """
-    cr = state.setdefault("_cloudroom", {
-        "robot_locked": True,
-        "password": "CLOUD",
-        "quiz_passed": False
-    })
+    cr = cloud_db_get_state(state)
 
     objects = {
         "desk":       "A tidy desk with scattered AWS notes. A sticky note shows the letter 'C'.",
@@ -166,14 +171,14 @@ def cloudroom_commands(command, state):
 
     def unlock(attempt):
         attempt = (attempt or "").strip().upper()
-        if attempt == cr["password"]:
+        if attempt == "CLOUD":
             if cr["robot_locked"]:
-                cr["robot_locked"] = False
+                cloud_db_set_robot_locked(state, False)
                 print("\n🔓 The robot whirs to life. It's ready to talk.")
             else:
                 print("\nThe robot is already unlocked.")
         else:
-            print("\n❌ Wrong password. The letters you found might help.")
+            print("\nWrong password. The letters you found might help.")
         return True
 
     def run_quiz():
@@ -216,13 +221,25 @@ def cloudroom_commands(command, state):
         if cr["robot_locked"]:
             print("\nThe robot is locked. Maybe the letters around the room form a password…")
             return True
-        if state["_cloudroom"]["quiz_passed"]:
+        if cr["quiz_passed"]:
             print("You've already talked to the robot. You can continue on your journey to the next rooms!")
             return True
+
         finished = run_quiz()
         if finished:
-            cr["quiz_passed"] = True
+            cloud_db_set_quiz_passed(state, True)
             db_mark_room_completed(state, "cloud_room")
+
+            print("\n🤖 Robot: 'Computation complete... oh... oh no... what's happening?!'")
+            time.sleep(1)
+            print("⚡ Sparks burst from its circuits as the robot begins to shake violently! ⚡")
+            time.sleep(1)
+            print("💥 *BOOM!* The robot's head explodes in a puff of smoke and falls at your feet.")
+            print("You pick it up — it's surprisingly intact.")
+            print("You obtained: 🧠 *Robot Head*")
+
+            db_add_item_to_inventory(state, "robot_head")
+
             print("\nYou feel a subtle shift — the room acknowledges your success.")
             print("You can 'go lab corridor' to continue your journey.")
         return True
@@ -245,5 +262,4 @@ def cloudroom_commands(command, state):
     if command in ("talk robot", "talk to robot"):
         return talk_robot()
 
-    # Not handled here — let basic commands or GO handle it
     return False
