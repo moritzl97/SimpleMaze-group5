@@ -47,6 +47,35 @@ def init_db(state):
                     FOREIGN KEY (item_id) REFERENCES items(item_id)
                     );""")
 
+    # === Rooms and Save State Tables ===
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS rooms (
+            room_id INTEGER PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            description TEXT
+        );
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS save_rooms (
+            save_id INTEGER NOT NULL,
+            room_id INTEGER NOT NULL,
+            entered BOOLEAN DEFAULT 0,
+            completed BOOLEAN DEFAULT 0,
+            PRIMARY KEY (save_id, room_id),
+            FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
+            FOREIGN KEY (room_id) REFERENCES rooms(room_id) ON DELETE CASCADE
+        );
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS save_state (
+            save_id INTEGER PRIMARY KEY,
+            current_room TEXT,
+            previous_room TEXT,
+            elapsed_time REAL DEFAULT 0,
+            FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE
+        );
+    """)
+
     cursor.execute("""
                  CREATE TABLE IF NOT EXISTS scoreboard (
                      player_name TEXT PRIMARY KEY,
@@ -113,6 +142,16 @@ def init_db(state):
                        );""")
     conn.commit()
     # Insert into common tables
+    all_rooms = [
+        "cloud_room", "computer_lab", "control_room", "cyber_room", "dragon_room",
+        "riddle_room", "classroom_2015", "project_room_3", "study_landscape",
+        "e_w_corridor", "lab_corridor", "n_s_corridor"
+    ]
+    cursor.executemany(
+        "INSERT OR IGNORE INTO rooms (name, description) VALUES (?, ?);",
+        [(room, "") for room in all_rooms]
+    )
+
     insert_query = "INSERT OR IGNORE INTO items (name) VALUES (?);"
     rows_to_insert = [
         #dragon room
@@ -182,6 +221,22 @@ def create_new_save(state, current_player_name):
     save_id = cursor.lastrowid
     state["save_id"] = save_id
 
+    # --- Initialize new save state ---
+    cursor.execute("""
+        INSERT INTO save_state (save_id, current_room, previous_room, elapsed_time)
+        VALUES (?, ?, ?, 0);
+    """, (save_id, "study_landscape", "study_landscape"))
+
+    # --- Initialize per-room flags ---
+    cursor.execute("SELECT room_id FROM rooms;")
+    all_room_ids = [r[0] for r in cursor.fetchall()]
+    for room_id in all_room_ids:
+        entered = 1 if room_id == 9 else 0  # assuming 'study_landscape' inserted 9th
+        cursor.execute("""
+            INSERT INTO save_rooms (save_id, room_id, entered, completed)
+            VALUES (?, ?, ?, 0);
+        """, (save_id, room_id, entered))
+
     #dragon room
     current_object_names = ('cracked_wall', 'blackboard', 'desk', 'chest', 'hole',)
     placeholders = ','.join(['?'] * len(current_object_names))
@@ -212,31 +267,45 @@ def create_new_save(state, current_player_name):
     conn.commit()
     return
 
-def save_state(player_name: str, state: dict):
-    conn = state["db_conn"]
-    payload = json.dumps(state, ensure_ascii=False, separators=(",", ":"))
-    current_room = state.get("current_room") or "start"
-    now = now_iso()
-    conn.execute("""
-      INSERT INTO saves (player_name, state_json, current_room, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?)
-      ON CONFLICT(player_name) DO UPDATE SET
-        state_json   = excluded.state_json,
-        current_room = excluded.current_room,
-        updated_at   = excluded.updated_at;
-    """, (player_name, payload, current_room, now, now))
-    conn.commit()
-
 def load_state(conn, player_name: str):
-    row = conn.execute("SELECT state_json FROM saves WHERE player_name = ?;", (player_name,)).fetchone()
-    return json.loads(row[0]) if row else None
+    cursor = conn.cursor()
+    cursor.execute("SELECT player_id FROM players WHERE player_name = ?;", (player_name,))
+    row = cursor.fetchone()
+
+    if not row:
+        print(f"No player found with name '{player_name}'.")
+        return None
+    player_id = row[0]
+
+    cursor.execute("""
+        SELECT s.save_id
+        FROM saves s
+        WHERE s.player_id = ?
+        ORDER BY s.saved_at DESC
+        LIMIT 1;
+    """, (player_id,))
+    save_row = cursor.fetchone()
+    if not save_row:
+        print(f"No saves found for player '{player_name}'.")
+        return None
+    save_id = save_row[0]
+
+    state = {
+        "db_conn": conn,
+        "save_id": save_id,
+        "player_name": player_name
+    }
+    print(f"Loaded save #{save_id} for player '{player_name}'.")
+    return state
 
 def list_saves(conn):
     return conn.execute("""
-      SELECT player_name, current_room, updated_at
-      FROM saves
-      ORDER BY updated_at DESC;
-    """).fetchall()
+            SELECT p.player_name, ss.current_room, s.saved_at
+            FROM saves s
+            JOIN players p ON s.player_id = p.player_id
+            LEFT JOIN save_state ss ON s.save_id = ss.save_id
+            ORDER BY s.saved_at DESC;
+        """).fetchall()
 
 def delete_save(state, save_id):
     conn = state["db_conn"]

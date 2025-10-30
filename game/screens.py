@@ -55,9 +55,9 @@ def main_menu(state):
         elif command == "load game" or command == "load":
             #load game
             clear_screen()
-            save_state = load_menu(state)
-            if save_state:
-                return save_state
+            save_id = load_menu(state)
+            if save_id:
+                return save_id
         elif command == "highscores":
             # call status command
             clear_screen()
@@ -121,31 +121,44 @@ def load_menu(state):
                      ___) | (_| |\ V /  __/\__ \
                     |____/ \__,_| \_/ \___||___/""")
     print("\n")
-    rows = list_saves(conn) # [(player_name, current_room, updated_at), ...]
+
+    rows = list_saves(conn)  # [(player_name, current_room, saved_at), ...]
+
     if not rows:
         print("There are no saves yet.")
         time.sleep(2)
         return None
 
-    for row in rows:
-        name = row[0]
-        last_room = row[1]
-        timestamp = datetime.strptime(row[2], '%Y-%m-%dT%H:%M:%S.%fZ')
-        #timestamp = row[2].strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    # Print save list
+    print("Available saves:\n")
+    for name, last_room, saved_at in rows:
+        # SQLite timestamps look like: "2025-02-12 10:33:11"
+        try:
+            timestamp = datetime.strptime(saved_at, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            # fallback for ISO8601 if the first doesn't work
+            try:
+                timestamp = datetime.fromisoformat(saved_at)
+            except Exception:
+                timestamp = datetime.now()
+
         date_only = timestamp.strftime("%d-%m-%Y")
         time_only = timestamp.strftime("%H:%M:%S")
-        print(f"{name}: In {last_room}, saved at {date_only} {time_only}")
+        print(f"{name}: In {last_room or 'unknown room'}, saved at {date_only} {time_only}")
     print("")
 
+    # Input loop
     while True:
         choice = input("Enter player name of the save you want to load or 'back' to go to the main menu: ").strip()
-        if choice == "back":
+        if choice.lower() == "back":
             return None
 
         loaded = load_state(conn, choice)
         if not loaded:
             print("Save not found. Enter a valid player name or 'back' to go to the main menu.")
         else:
-            print(f"Loading {choice}. Resuming in '{loaded.get('current_room', 'start')}'.")
-            time.sleep(2)
-            return loaded
+            # The new load_state() returns a state dict with db_conn, save_id, and player_name
+            save_id = loaded["save_id"]
+            print(f"Loading {choice}. (Save ID #{save_id})")
+            time.sleep(1.5)
+            return save_id

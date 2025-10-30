@@ -10,7 +10,6 @@
 import time
 import math
 from game.utils import *
-from game.db import save_state
 import sqlite3
 from game.db_utils import *
 import datetime

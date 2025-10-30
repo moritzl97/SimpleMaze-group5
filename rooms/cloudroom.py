@@ -2,6 +2,7 @@
 # File: cloudroom.py
 # Room: Cloud Room (puzzle + MCQ robot)
 # -----------------------------------------------------------------------------
+from game.db_utils import *
 
 def generate_cloud_quiz(n_questions: int=3):
     import os
@@ -90,7 +91,7 @@ def generate_cloud_quiz(n_questions: int=3):
     try:
         quiz = json.loads(text)
     except json.JSONDecodeError as e:
-        # Fallback to an empty list or a default static question
+        # Fallback to a default static question
         return backup_quiz
     return quiz
 
@@ -104,7 +105,7 @@ def cloudroom_enter(state):
 
     print("\n☁️  You enter the Cloud Room.")
     print("Around the perimeter are techy objects. A quiet robot stands in the center, unpowered.")
-    if state["completed"]["cloudroom"]:
+    if db_get_room_completed(state, "cloud_room"):
         if state["_cloudroom"]["quiz_passed"]:
             print("You’ve already solved this room. You can look around or go back to the corridor.")
         else:
@@ -221,7 +222,7 @@ def cloudroom_commands(command, state):
         finished = run_quiz()
         if finished:
             cr["quiz_passed"] = True
-            state["completed"]["cloudroom"] = True
+            db_mark_room_completed(state, "cloud_room")
             print("\nYou feel a subtle shift — the room acknowledges your success.")
             print("You can 'go lab corridor' to continue your journey.")
         return True

@@ -5,6 +5,8 @@
 # Course:  Application Development, Applied Computer Science 2025/26
 # School:  The Hague University of Applied Sciences (THUAS)
 # =============================================================================
+import time
+
 
 # Functions to easily interact with the database
 
@@ -116,4 +118,106 @@ def db_get_flag(state, flag_name):
     rows = cursor.fetchone()
     return rows
 
+def db_mark_room_entered(state, room_name):
+    #Mark room as entered for current save
 
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT room_id FROM rooms WHERE name = ?;", (room_name,))
+    row = cursor.fetchone()
+    if not row:
+        print(f"Room '{room_name}' not found in rooms table.")
+        return
+    room_id = row[0]
+
+    cursor.execute("""
+        UPDATE save_rooms
+        SET entered = 1
+        WHERE save_id = ? AND room_id = ?;
+    """, (save_id, room_id))
+    conn.commit()
+
+def db_mark_room_completed(state, room_name):
+    #Mark a room as completed for given save
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT room_id FROM rooms WHERE name = ?;", (room_name,))
+    row = cursor.fetchone()
+    if not row:
+        print(f"Room '{room_name}' not found in rooms table.")
+        return
+    room_id = row[0]
+
+    cursor.execute("""
+        UPDATE save_rooms
+        SET completed = 1
+        WHERE save_id = ? AND room_id = ?;
+    """, (save_id, room_id))
+    conn.commit()
+
+
+def db_get_room_completed(state, room_name):
+    #Return status of completion for given room name, TRUE/FALSE
+
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+    print(save_id)
+    print(conn)
+    print(state)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT sr.completed
+        FROM save_rooms sr
+        JOIN rooms r ON sr.room_id = r.room_id
+        WHERE sr.save_id = ? AND r.name = ?;
+    """, (save_id, room_name))
+    row = cursor.fetchone()
+    return bool(row and row[0])
+
+
+def db_set_current_room(state, new_room_name):
+    #Update the current room and the previous room
+
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT current_room FROM save_state WHERE save_id = ?;", (save_id,))
+    row = cursor.fetchone()
+    previous_room = row[0] if row and row[0] else None
+
+    cursor.execute("""
+        UPDATE save_state
+        SET previous_room = ?, current_room = ?
+        WHERE save_id = ?;
+    """, (previous_room, new_room_name, save_id))
+    conn.commit()
+
+def db_get_current_room(state):
+    #Return the current room name
+
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT current_room FROM save_state WHERE save_id = ?;", (save_id,))
+    row = cursor.fetchone()
+    return row[0] if row else None
+
+def db_update_elapsed_time(state):
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+    elapsed = time.time() - state["start_time"]
+
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE save_state
+        SET elapsed_time = ?
+        WHERE save_id = ?;
+    """, (elapsed, save_id))
+    conn.commit()
