@@ -240,6 +240,16 @@ def cloudroom_commands(command, state):
 
             db_add_item_to_inventory(state, "robot_head")
 
+            time.sleep(1.2)
+            print("\nAmid the smoke, a faint blue glow catches your eye...")
+            time.sleep(1)
+            print("Resting inside the robot’s remains is an unopened can, perfectly chilled.")
+            print("You lift it carefully — 'Cloud Lager', the brand says, though no such drink exists anymore.")
+            print("You obtained: 🍺 *Cloud Lager*")
+
+            db_add_item_to_inventory(state, "beer")
+
+            print("\nThe hum of the machines fades. For a moment, you feel oddly refreshed.")
             print("\nYou feel a subtle shift — the room acknowledges your success.")
             print("You can 'go lab corridor' to continue your journey.")
         return True
