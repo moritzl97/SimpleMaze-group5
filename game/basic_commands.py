@@ -51,7 +51,6 @@ def handle_pause(state):
 def handle_resume(state, paused):
 
     state["start_time"] = time.time() - state["elapsed_time"]
-    paused = False
     print("Game resumed.")
 
 def display_time(state, paused):
