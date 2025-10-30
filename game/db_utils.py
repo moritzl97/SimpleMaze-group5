@@ -7,9 +7,7 @@
 # =============================================================================
 import time
 
-
 # Functions to easily interact with the database
-
 def db_is_item_in_inventory(state, item_name):
     save_id = state["save_id"]
     conn = state["db_conn"]
@@ -90,11 +88,11 @@ def db_set_flag(state, flag_name, flag):
     conn = state["db_conn"]
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(f"""
                 UPDATE flag_status
-                    SET ? = ?
-                    WHERE save_id = ?
-                   """, (flag_name, flag, current_save_id,))
+                    SET status = ?
+                    WHERE save_id = ? AND flag_id = ?
+                   """, (flag, current_save_id,flag_name,))
     conn.commit()
 
 def db_get_flag(state, flag_name):
@@ -103,32 +101,27 @@ def db_get_flag(state, flag_name):
     cursor = conn.cursor()
 
     cursor.execute("""
-                SELECT ? 
+                SELECT status 
                     FROM flag_status
-                    WHERE save_id = ?
-                    """, (flag_name, current_save_id,))
+                    WHERE save_id = ? AND flag_id = ?
+                    """, (current_save_id,flag_name,))
     rows = cursor.fetchone()
-    return rows
+    return rows[0]
 
 def db_mark_room_entered(state, room_name):
     #Mark room as entered for current save
-
     conn = state["db_conn"]
     save_id = state["save_id"]
     cursor = conn.cursor()
 
-    cursor.execute("SELECT room_id FROM rooms WHERE name = ?;", (room_name,))
-    row = cursor.fetchone()
-    if not row:
-        print(f"Room '{room_name}' not found in rooms table.")
-        return
-    room_id = row[0]
-
     cursor.execute("""
         UPDATE save_rooms
-        SET entered = 1
-        WHERE save_id = ? AND room_id = ?;
-    """, (save_id, room_id))
+            SET entered = 1
+            WHERE save_id = ?
+            AND room_id = (SELECT room_id
+            FROM rooms
+            WHERE name = ?);
+                   """, (save_id, room_name))
     conn.commit()
 
 def db_mark_room_completed(state, room_name):
@@ -137,18 +130,14 @@ def db_mark_room_completed(state, room_name):
     save_id = state["save_id"]
     cursor = conn.cursor()
 
-    cursor.execute("SELECT room_id FROM rooms WHERE name = ?;", (room_name,))
-    row = cursor.fetchone()
-    if not row:
-        print(f"Room '{room_name}' not found in rooms table.")
-        return
-    room_id = row[0]
-
     cursor.execute("""
         UPDATE save_rooms
-        SET completed = 1
-        WHERE save_id = ? AND room_id = ?;
-    """, (save_id, room_id))
+            SET completed = 1
+            WHERE save_id = ?
+            AND room_id = (SELECT room_id
+            FROM rooms
+            WHERE name = ?);
+                   """, (save_id, room_name))
     conn.commit()
 
 def db_get_completed_status_of_all_rooms(state):
@@ -157,7 +146,7 @@ def db_get_completed_status_of_all_rooms(state):
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT entered
+    SELECT completed
         FROM save_rooms
         WHERE save_id = ?;
                    """, (current_save_id,))
@@ -166,10 +155,14 @@ def db_get_completed_status_of_all_rooms(state):
     return item_list
 
 def db_award_achievement(state, achievement_name):
-    print("You got an achievement!")
     current_save_id = state["save_id"]
     conn = state["db_conn"]
     cursor = conn.cursor()
+
+    cursor.execute("SELECT icon, name FROM achievements WHERE achievement_id = ?", (achievement_name,))
+    rows = cursor.fetchone()
+    print("You got an achievement!")
+    print(f"{rows[0]} {rows[1]}")
 
     cursor.execute("""
     INSERT OR IGNORE INTO savefile_to_achievement (save_id, achievement_id)
@@ -250,12 +243,12 @@ def db_set_current_room(state, new_room_name):
     save_id = state["save_id"]
     cursor = conn.cursor()
 
-    cursor.execute("SELECT current_room FROM save_state WHERE save_id = ?;", (save_id,))
+    cursor.execute("SELECT current_room FROM saves WHERE save_id = ?;", (save_id,))
     row = cursor.fetchone()
     previous_room = row[0] if row and row[0] else None
 
     cursor.execute("""
-        UPDATE save_state
+        UPDATE saves
         SET previous_room = ?, current_room = ?
         WHERE save_id = ?;
     """, (previous_room, new_room_name, save_id))
@@ -268,7 +261,7 @@ def db_get_current_room(state):
     save_id = state["save_id"]
     cursor = conn.cursor()
 
-    cursor.execute("SELECT current_room FROM save_state WHERE save_id = ?;", (save_id,))
+    cursor.execute("SELECT current_room FROM saves WHERE save_id = ?;", (save_id,))
     row = cursor.fetchone()
     return row[0] if row else None
 
@@ -279,7 +272,7 @@ def db_get_previous_room(state):
     save_id = state["save_id"]
     cursor = conn.cursor()
 
-    cursor.execute("SELECT previous_room FROM save_state WHERE save_id = ?;", (save_id,))
+    cursor.execute("SELECT previous_room FROM saves WHERE save_id = ?;", (save_id,))
     row = cursor.fetchone()
     return row[0] if row else None
 
@@ -290,7 +283,7 @@ def db_update_elapsed_time(state):
 
     cursor = conn.cursor()
     cursor.execute("""
-        UPDATE save_state
+        UPDATE saves
         SET elapsed_time = ?
         WHERE save_id = ?;
     """, (elapsed, save_id))
@@ -303,9 +296,80 @@ def db_get_elapsed_time(state):
     cursor = conn.cursor()
     cursor.execute("""
         SELECT elapsed_time
-        FROM save_state
+        FROM saves
         WHERE save_id = ?;
     """, (save_id,))
     row = cursor.fetchone()
     return row[0] if row else None
 
+def db_set_game_finished(state):
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+                UPDATE saves
+                    SET game_finished = TRUE
+                    WHERE save_id = ?
+                   """, (current_save_id,))
+    conn.commit()
+
+def db_get_completed_rooms_list(state):
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT r.name
+        FROM save_rooms sr
+        JOIN rooms r ON r.room_id = sr.room_id
+        WHERE sr.save_id = ? AND sr.completed = TRUE;
+                   """, (current_save_id,))
+    rows = cursor.fetchall()
+    room_list = [item[0] for item in rows]
+    return room_list
+
+def db_get_all_achievements(state):
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT a.icon, a.name, (COUNT(DISTINCT s.player_id) * 100.0) / (SELECT COUNT(DISTINCT player_id) FROM saves) AS percentage_players
+        FROM achievements a
+        LEFT JOIN savefile_to_achievement sa ON sa.achievement_id = a.achievement_id
+        LEFT JOIN saves s ON sa.save_id = s.save_id
+        GROUP BY a.name
+        ORDER BY percentage_players DESC;""")
+    rows = cursor.fetchall()
+    achievement_list = rows
+    return achievement_list
+
+def db_get_scoreboard(state):
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+#
+    cursor.execute("""
+    SELECT p.player_name, ROUND(AVG(CAST(sr.completed AS FLOAT)) * 100.0, 1) AS completion_percentage, s.elapsed_time, GROUP_CONCAT(DISTINCT a.icon)
+        FROM saves s
+        LEFT JOIN save_rooms sr ON s.save_id = sr.save_id
+        JOIN players p ON p.player_id = s.player_id
+        LEFT JOIN savefile_to_achievement sa ON sa.save_id = s.save_id
+        LEFT JOIN achievements a ON a.achievement_id = sa.achievement_id
+        GROUP BY s.save_id
+        ORDER BY completion_percentage DESC, s.elapsed_time ASC;
+                   """)
+    rows = cursor.fetchall()
+    scoreboard_list = rows
+    return scoreboard_list
+
+def db_set_last_saved_time(state):
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+
+    cursor = conn.cursor()
+    cursor.execute("""
+                   UPDATE saves
+                   SET saved_at = CURRENT_TIMESTAMP
+                   WHERE save_id = ?;
+                   """, (save_id,))
+    conn.commit()

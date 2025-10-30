@@ -12,7 +12,7 @@ from game.db_utils import *
 def lab_corridor_enter(state):
     if not db_is_item_in_inventory(state, "lab_permit"):
         print("The Laboratory Safety Officer watches you closely as you approach.")
-        print("Laboratory Safety Officer: Whoa, whoa, whoa. Not so fast. Have you read the lab safety code? I am not sure you know how to behave in the labs. I will only let you through with a lab permit.")
+        print("Laboratory Safety Officer: Whoa, whoa, whoa. Not so fast. Have you read the lab safety code? \nI am not sure you know how to behave in the labs. I will only let you through with a lab permit.")
         return False
     else:
         print("The Laboratory Safety Officer inspects the permit closely.")
@@ -34,9 +34,9 @@ def lab_corridor_commands(command, state):
         return True
     if command == "press button" or command == "press":
         print("Against your better judgement you press the button...")
-        time.sleep(5)
+        time.sleep(4)
         print("You look around.")
         time.sleep(2)
-        print("But still nothing happens... Anyway better to back away before somebody catches you.")
+        print("But still nothing happens... Anyway. Better to move along before somebody catches you.")
         return True
     return False

@@ -1,68 +1,63 @@
 # db.py
-import sqlite3, json, datetime
+import json
+import datetime
 
 ISO = "%Y-%m-%dT%H:%M:%S.%fZ"
 def now_iso(): return datetime.datetime.now(datetime.UTC).strftime(ISO)
 
 def init_db(state):
     conn = state["db_conn"]
-
-    # conn.execute("""
-    #   CREATE TABLE IF NOT EXISTS saves (
-    #     player_name   TEXT PRIMARY KEY,
-    #     state_json    TEXT NOT NULL,
-    #     current_room  TEXT NOT NULL,
-    #     created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
-    #     updated_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
-    #   );
-    # """)
-    # conn.execute("CREATE INDEX IF NOT EXISTS idx_saves_updated_at ON saves(updated_at DESC);")
-    # conn.commit()
-
-
-
     cursor = conn.cursor()
-    # Create common tables
+    #--------------Create common tables----------------#
+    # create table that stores player name
     conn.execute("""
                 CREATE TABLE IF NOT EXISTS players (
                     player_id INTEGER PRIMARY KEY,
                     player_name TEXT UNIQUE NOT NULL
                     );""")
+    # create table containing all items
     conn.execute("""
                 CREATE TABLE IF NOT EXISTS items (
                     item_id INTEGER PRIMARY KEY,
                     name TEXT UNIQUE NOT NULL
                     );""")
+    # create table that the save_id that identifies a save file and all relevant values
     conn.execute("""
                 CREATE TABLE IF NOT EXISTS saves (
                     save_id INTEGER PRIMARY KEY,
                     player_id INTEGER NOT NULL,
+                    current_room TEXT,
+                    previous_room TEXT,
+                    elapsed_time REAL DEFAULT 0,
                     saved_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    game_finished BOOLEAN DEFAULT FALSE,
                     FOREIGN KEY (player_id) REFERENCES players(player_id)
                     );""")
+    # create table to store inventory
     conn.execute("""
                 CREATE TABLE IF NOT EXISTS inventory (
                     save_id INTEGER NOT NULL,
                     item_id INTEGER NOT NULL,
                     PRIMARY KEY (save_id, item_id),
-                    FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                    FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
                     FOREIGN KEY (item_id) REFERENCES items(item_id)
                     );""")
+    # create table that store miscellaneous flags
     conn.execute("""
                 CREATE TABLE IF NOT EXISTS flags (
                     flag_id TEXT PRIMARY KEY
                     );""")
+    # create table to connect miscellaneous flags to save id
     conn.execute("""
                 CREATE TABLE IF NOT EXISTS flag_status (
                     save_id INTEGER NOT NULL,
                     flag_id TEXT NOT NULL,
                     status BOOLEAN DEFAULT FALSE,
                     PRIMARY KEY (save_id, flag_id),
-                    FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                    FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
                     FOREIGN KEY (flag_id) REFERENCES flags(flag_id)
                     );""")
-
-    # === Rooms and Save State Tables ===
+    # create table to store all room names
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS rooms (
             room_id INTEGER PRIMARY KEY,
@@ -70,6 +65,7 @@ def init_db(state):
             description TEXT
         );
     """)
+    # create table that store room entered and completed status
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS save_rooms (
             save_id INTEGER NOT NULL,
@@ -78,59 +74,44 @@ def init_db(state):
             completed BOOLEAN DEFAULT 0,
             PRIMARY KEY (save_id, room_id),
             FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
-            FOREIGN KEY (room_id) REFERENCES rooms(room_id) ON DELETE CASCADE
+            FOREIGN KEY (room_id) REFERENCES rooms(room_id)
         );
     """)
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS save_state (
-            save_id INTEGER PRIMARY KEY,
-            current_room TEXT,
-            previous_room TEXT,
-            elapsed_time REAL DEFAULT 0,
-            FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE
-        );
-    """)
-
+    # create table that stores all achievement names and icons
     cursor.execute("""
                 CREATE TABLE IF NOT EXISTS achievements (
                     achievement_id TEXT PRIMARY KEY,
                     name TEXT UNIQUE,
                     icon TEXT
                    );""")
-
+    # create table that relates the gained achievements to a save id
     cursor.execute("""
                 CREATE TABLE IF NOT EXISTS savefile_to_achievement (
                     save_id INTEGER NOT NULL,
                     achievement_id TEXT NOT NULL,
                     PRIMARY KEY (save_id, achievement_id),
-                    FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                    FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
                     FOREIGN KEY (achievement_id) REFERENCES achievements(achievement_id)
                    );""")
+    #--------------end create common tables----------------#
 
-    cursor.execute("""
-                 CREATE TABLE IF NOT EXISTS scoreboard (
-                     player_name TEXT PRIMARY KEY,
-                     percentage INTEGER,
-                     time INTEGER
-                 );""")
-
+    # --------------Create room specific tables------------#
     # CyberRoom tables
     conn.execute("""
         CREATE TABLE IF NOT EXISTS cyber_room_state (
             save_id        INTEGER PRIMARY KEY,
             code_unlocked  INTEGER DEFAULT 0,
             completed      INTEGER DEFAULT 0,
-            FOREIGN KEY (save_id) REFERENCES saves(save_id)
+            FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE
         );
     """)
-
     conn.execute("""
         CREATE TABLE IF NOT EXISTS cyber_room_panels (
             save_id   INTEGER NOT NULL,
             panel_id  TEXT    NOT NULL,
             solved    INTEGER DEFAULT 0,
             PRIMARY KEY (save_id, panel_id),
-            FOREIGN KEY (save_id) REFERENCES saves(save_id)
+            FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE
         );
     """)
 
@@ -144,7 +125,7 @@ def init_db(state):
         );
     """)
 
-    #dragon room create tables
+    #dragon room tables
     cursor.execute("""
                  CREATE TABLE IF NOT EXISTS dragon_room_objects (
                      object_id INTEGER PRIMARY KEY,
@@ -172,7 +153,7 @@ def init_db(state):
                      current_chapter TEXT DEFAULT 'first_chapter',
                      current_node TEXT DEFAULT 'start',
                      PRIMARY KEY (save_id, object_id),
-                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
                      CONSTRAINT fk_object FOREIGN KEY (object_id) REFERENCES dragon_room_objects(object_id)
                  );""")
     cursor.execute("""
@@ -182,7 +163,7 @@ def init_db(state):
                      current_chapter TEXT DEFAULT 'first_chapter',
                      current_node TEXT DEFAULT 'start',
                      PRIMARY KEY (save_id, npc_id),
-                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
                      CONSTRAINT fk_npc FOREIGN KEY (npc_id) REFERENCES dragon_room_npcs(npc_id)
                  );""")
     cursor.execute("""
@@ -190,7 +171,7 @@ def init_db(state):
                      save_id INTEGER,
                      item_id INTEGER,
                      PRIMARY KEY (save_id, item_id),
-                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
                      CONSTRAINT fk_item FOREIGN KEY (item_id) REFERENCES items(item_id)
                    );""")
     cursor.execute("""
@@ -198,11 +179,14 @@ def init_db(state):
                      save_id INTEGER,
                      trade_id INTEGER,
                      PRIMARY KEY (save_id, trade_id),
-                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
                      CONSTRAINT fk_trade FOREIGN KEY (trade_id) REFERENCES dragon_room_trades(trade_id)
                        );""")
+    #--------------Create room specific tables end------------#
     conn.commit()
-    # Insert into common tables
+
+    #--------------Insert values into common tables-----------#
+    # insert room names
     all_rooms = [
         "cloud_room", "computer_lab", "control_room", "cyber_room", "dragon_room",
         "riddle_room", "roof_garden", "library", "study_landscape",
@@ -212,22 +196,13 @@ def init_db(state):
         "INSERT OR IGNORE INTO rooms (name, description) VALUES (?, ?);",
         [(room, "") for room in all_rooms]
     )
-
+    # insert all possible items
     insert_query = "INSERT OR IGNORE INTO items (name) VALUES (?);"
     rows_to_insert = [
         #dragon room
-        ('lockpick',),
-        ('broadsword',),
-        ('sneaking_boots',),
-        ('chalk',),
-        ('paper',),
-        ('invisibility_cloak',),
-        ('milk_carton',),
-        ('gemstone',),
-        ('pickaxe',),
-        ('cursed_trophy',),
+        ('lockpick',),('broadsword',),('sneaking_boots',),('chalk',),('paper',),('invisibility_cloak',),('milk_carton',),('gemstone',),('pickaxe',),('cursed_trophy',),
         #cloud_room
-        ('robot_head',),
+        ('cursed_robot_head',),
         #cyberroom
         ('?_key',),
         #riddleroom
@@ -235,27 +210,27 @@ def init_db(state):
         #computerlab
         ('lab_key',),
         #study landscape
-        ('rusty_key',),
-        ('lab_permit',),
+        ('rusty_key',),('lab_permit',),
         # library
         ('python_tutorial',),
         # roof garden
         ('cursed_rose',),
         # tbd
         ('beer',),
+        #computerlab
         ('bootle_opener',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
-
+    # insert miscellaneous flags
     insert_query = "INSERT OR IGNORE INTO flags (flag_id) VALUES (?);"
     rows_to_insert = [
         # dragon room
         ('n_s_unlocked',),
-        ('finished_tutorial',),
+        ('tutorial_finished',),
         ('skip_tutorial',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
-
+    # insert all possible achievements
     insert_query = "INSERT OR IGNORE INTO achievements (achievement_id, name, icon) VALUES (?, ?, ?);"
     rows_to_insert = [
         # general
@@ -269,15 +244,17 @@ def init_db(state):
         ('pet_cat', 'Pet a black cat','🐈‍⬛',),
         #study landscape
         ('coffee_adict', 'Being addicted to coffee', '☕️',),
-        ('schoolnerd', 'go back to school', '📓',),
-        ('einstein', 'too may attempts', '🤓')
+        ('schoolnerd', 'Go back to school', '📓',),
+        ('einstein', 'Too many wrong attempts', '🤓')
     ]
     cursor.executemany(insert_query, rows_to_insert)
+    #--------------End insert values into common tables-----------#
 
+    #--------------Insert values into room specific tables--------#
     #dragon room insert data in tables
     with open("rooms/dragon_room_dialog.json", "r", encoding="utf-8") as file:
         dialog_tree = json.load(file)
-
+    # dragon room insert all possible objects
     insert_query = "INSERT OR IGNORE INTO dragon_room_objects (name, dialog_tree) VALUES (?, ?);"
     rows_to_insert = [
         ('cracked_wall', json.dumps(dialog_tree['dialogue_tree_cracked_wall'])),
@@ -287,7 +264,7 @@ def init_db(state):
         ('hole', json.dumps(dialog_tree['dialogue_tree_hole'])),
     ]
     cursor.executemany(insert_query, rows_to_insert)
-
+    # dragon room insert all possible npcs
     insert_query = "INSERT OR IGNORE INTO dragon_room_npcs (name, dialog_tree) VALUES (?, ?);"
     rows_to_insert = [
         ('fairy', json.dumps(dialog_tree['dialogue_tree_fairy'])),
@@ -296,7 +273,7 @@ def init_db(state):
         ('shopkeeper', '')
     ]
     cursor.executemany(insert_query, rows_to_insert)
-
+    # dragon room insert all possible trades
     cursor.execute("""
         INSERT OR IGNORE INTO dragon_room_trades (sale_item, wanted_item)
         SELECT sale.item_id, wanted.item_id
@@ -306,28 +283,27 @@ def init_db(state):
             OR sale.name = 'chalk' AND wanted.name = 'sneaking_boots'
             OR sale.name = 'pickaxe' AND wanted.name = 'lockpick';
                     """)
-    conn.commit()
+    #--------------End of Insert values into room specific tables------#
 
+    # db setup finished
+    conn.commit()
     return
 
 def create_new_save(state, current_player_name):
+    # create a new save file
     conn = state["db_conn"]
     cursor = conn.cursor()
 
+    # Try insert the player into players if they have not played the game yet
     cursor.execute("INSERT OR IGNORE INTO players (player_name) VALUES (?)", (current_player_name,))
-
+    # Fetch the player id
     cursor.execute("SELECT player_id FROM players WHERE player_name = ?", (current_player_name,))
     player_id = cursor.fetchone()[0]
 
-    cursor.execute("INSERT INTO saves (player_id) VALUES (?)", (player_id,))
+    # Create a new entry in the saves table (representing a save file) with a unique save id
+    cursor.execute("INSERT INTO saves (player_id, current_room, previous_room) VALUES (?,?,?)", (player_id,"study_landscape","study_landscape"))
     save_id = cursor.lastrowid
     state["save_id"] = save_id
-
-    # --- Initialize new save state ---
-    cursor.execute("""
-        INSERT INTO save_state (save_id, current_room, previous_room, elapsed_time)
-        VALUES (?, ?, ?, 0);
-    """, (save_id, "study_landscape", "study_landscape"))
 
     # --- Initialize per-room flags ---
     cursor.execute("SELECT room_id FROM rooms;")
@@ -346,13 +322,14 @@ def create_new_save(state, current_player_name):
             FROM flags;
             """, (save_id,))
 
-    # intiliase cloud_room table
+    # initialise cloud_room table
     cursor.execute("""
         INSERT INTO cloud_room_state (save_id, robot_locked, quiz_passed)
         VALUES (?, 1, 0);
     """, (save_id,))
 
     #dragon room
+    # insert starting objects in the room
     current_object_names = ('cracked_wall', 'blackboard', 'desk', 'chest', 'hole',)
     placeholders = ','.join(['?'] * len(current_object_names))
     insert_query = f"""
@@ -362,7 +339,7 @@ def create_new_save(state, current_player_name):
             WHERE name IN ({placeholders});
     """
     cursor.execute(insert_query, (save_id, *current_object_names))
-
+    # insert starting items in the room
     current_item_names = ('pickaxe',)
     placeholders = ','.join(['?'] * len(current_item_names))
     insert_query = f"""
@@ -372,7 +349,7 @@ def create_new_save(state, current_player_name):
             WHERE name IN ({placeholders});
         """
     cursor.execute(insert_query, (save_id, *current_item_names))
-
+    # insert starting trades
     cursor.execute("""
             INSERT INTO dragon_room_current_trades (save_id, trade_id)
             SELECT ?, trade_id
@@ -383,35 +360,19 @@ def create_new_save(state, current_player_name):
     return
 
 def list_saves(conn):
+    # list all saves that are not finished
     return conn.execute("""
-            SELECT s.save_id, p.player_name, ss.current_room, s.saved_at
+            SELECT s.save_id, p.player_name, s.current_room, s.saved_at
             FROM saves s
             JOIN players p ON s.player_id = p.player_id
-            LEFT JOIN save_state ss ON s.save_id = ss.save_id
+            WHERE s.game_finished = False
             ORDER BY s.saved_at DESC;
         """).fetchall()
 
 def delete_save(state, save_id):
+    #delete a save file for a given save id
     conn = state["db_conn"]
     cursor = conn.cursor()
-    cursor.execute("""
-        SELECT CASE
-        WHEN EXISTS (SELECT 1
-        FROM saves
-        WHERE save_id = ?)
-        THEN 1
-        ELSE 0
-        END;""", (save_id,))
-    row = cursor.fetchone()
-
-    if row[0]:
-        cursor.execute("DELETE FROM dragon_room_current_npcs WHERE save_id = ?;", (save_id,))
-        cursor.execute("DELETE FROM dragon_room_current_items WHERE save_id = ?;", (save_id,))
-        cursor.execute("DELETE FROM dragon_room_current_objects WHERE save_id = ?;", (save_id,))
-        cursor.execute("DELETE FROM dragon_room_current_trades WHERE save_id = ?;", (save_id,))
-        cursor.execute("DELETE FROM inventory WHERE save_id = ?;", (save_id,))
-        cursor.execute("DELETE FROM saves WHERE save_id = ?;", (save_id,))
-        conn.commit()
-        print("Save deleted.")
-    else:
-        print("Save not found.")
+    cursor.execute("DELETE FROM saves WHERE save_id = ?;", (save_id,))
+    conn.commit()
+    print("Save deleted.")

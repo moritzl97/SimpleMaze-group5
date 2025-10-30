@@ -8,19 +8,22 @@
 from game.db_utils import *
 from game.utils import *
 
-coffee_drank = 0
-
 def study_landscape_enter(state):
     print("\nYou step into the study landscape.")
-    print("Soft chairs and tables to work and chat with fellow students and a quiet hum of a coffee machine.")
+    print("You see soft chairs and tables to work and chat with fellow students. You hear the quiet hum of a coffee machine.")
     print("It feels like a place to work but also to pause and catch your breath.")
     print("However, you feel a ominous presence in one corner.")
-    if not db_get_flag(state, "tutorial_finished"):
-        print("You knew that in the library is a roof window. Maybe you could try that to escape? Type 'go library' to enter the library.")
+    if not db_get_flag(state, "tutorial_finished") and not db_is_item_in_inventory(state, "python_tutorial"):
+        print("You know there is a roof window in the library. Maybe you could try escape from there? Type 'go library' to enter the library.")
+    elif db_is_item_in_inventory(state, "python_tutorial"):
+        print("The librarian waits for you delivery. Type 'talk librarian' to talk to her.")
+
+
+    state["coffee_drank"] = 0
     return True
 
 def handle_look(state):
-    print("\nYou take a slow look around.")
+    print("You take a slow look around.")
     print("In the corner of the room you see something ominous. You see a pentagram inside a Summoning Circle, carefully drawn with chalk, on the floor.")
     print("Weirdly nobody else seams to notice the Summoning Circle.")
     print("On one desk you see a librarian frantically searching through a pile of books.")
@@ -30,7 +33,7 @@ def handle_look(state):
 def handle_look_summoning_circle(state):
     print("You feel drawn to the ominous circle. Black smoke seams to be emitted from it.")
     all_items_in_inventory = db_get_all_items_in_inventory(state)
-    required_items  = ["cursed_trophy", "cursed_rose"]
+    required_items  = ["cursed_trophy", "cursed_rose", "cursed_robot_head", "cursed_magnet"]
     found_all_items = all(item in all_items_in_inventory for item in required_items)
     if found_all_items:
         print("You arrange the items around the circle.")
@@ -74,7 +77,7 @@ def handle_talk(state):
         db_add_item_to_inventory(state, "rusty_key")
         print("With the key now you can enter the library with 'go library'.")
     else:
-        print("The librarian is engrossed in reading his books. Better not to disturb her.")
+        print("The librarian is engrossed in reading her books. Better not to disturb her.")
 
 def handle_take(state, item):
     if item == "python tutorial" and db_get_flag(state, "skip_tutorial"):
@@ -107,11 +110,10 @@ def study_landscape_commands(command, state):
     elif command == "?" or command == "help":
         handle_help(state)
         return True
-    elif command in ["look coffee machine", "take coffee", "use coffee machine", "make coffee", "drink coffee"]:
+    elif command in ["look coffee machine", "take coffee", "use coffee machine", "make coffee", "drink coffee", "get coffee"]:
         print("You approach the coffee machine and get some coffee. You take a sip of the steaming coffee. The rich aroma fuels your mind and warms your soul.")
-        global coffee_drank
-        coffee_drank = coffee_drank + 1
-        if coffee_drank >= 3:
+        state["coffee_drank"] += 1
+        if state["coffee_drank"] >= 3:
             print("You feel the caffeine pulsing through your veins. You will not sleep tonight...")
             db_award_achievement(state, "coffee_adict")
         return True

@@ -238,7 +238,7 @@ def cloudroom_commands(command, state):
             print("You pick it up — it's surprisingly intact.")
             print("You obtained: 🧠 *Robot Head*")
 
-            db_add_item_to_inventory(state, "robot_head")
+            db_add_item_to_inventory(state, "cursed_robot_head")
 
             time.sleep(1.2)
             print("\nAmid the smoke, a faint blue glow catches your eye...")

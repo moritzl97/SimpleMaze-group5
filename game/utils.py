@@ -23,7 +23,9 @@ class Color:
     blue = "\033[94m"
     gray = "\033[90m"
     orange = "\033[38;2;255;165;0m"
-    purple = "\033[0;35m	"
+    purple = "\033[0;35m"
+    silver = "\033[38;5;146m"
+    bronze = "\033[38;5;166m"
     bold = "\033[1m"
     underline = "\033[4m"
     framed = "\033[51m"
@@ -34,12 +36,12 @@ def print_room_entry_banner(room):
     room_display_name = room.replace("_", " ").title()
     room_name_len = len(room_display_name)
     banner = r"""
-        .-=~=-.                                                                 .-=~=-.
-        (__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
-        ( _ __)                                                                 ( _ __)
-        (__  _)                                                                 (__  _)
-        ( _ __)                                                                 ( _ __)
-        (_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
-        `-._.-'                                                                 `-._.-'"""
-    print(banner[:314 - int(room_name_len / 2)] + Color.bold + room_display_name + Color.end + banner[
-        314 + math.ceil(room_name_len / 2):])
+    .-=~=-.                                                                 .-=~=-.
+    (__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
+    ( _ __)                                                                 ( _ __)
+    (__  _)                                                                 (__  _)
+    ( _ __)                                                                 ( _ __)
+    (_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
+    `-._.-'                                                                 `-._.-'"""
+    print(banner[:296 - int(room_name_len / 2)] + Color.bold + room_display_name + Color.end + banner[
+        296 + math.ceil(room_name_len / 2):])

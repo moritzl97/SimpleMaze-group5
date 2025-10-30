@@ -13,7 +13,7 @@ def library_enter(state):
     if not db_is_item_in_inventory(state, "rusty_key"):
         print("You try to open the door to the library. However it is locked.")
         if not db_get_flag(state, "tutorial_finished"):
-            print("You should try to explore the Study Landscape more closely to find the key. Type 'look around' to get more information about you surroundings.")
+            print("You should try to explore the Study Landscape more closely to find the key. \nType 'look around' to get more information about you surroundings.")
         return False
     else:
         print("\nYou step into the library. You smell old paper and dust.")
@@ -22,7 +22,7 @@ def library_enter(state):
         return True
 
 def handle_look(state):
-    print("\nDim skylight falls through the roof window. However the window is barred behind steel bars. This is definitely not the right way out.")
+    print("Dim skylight falls through the roof window. However the window is barred behind steel bars. This is definitely not the right way out.")
     if book_order:
         print("On the top shelf of a bookshelf you see three books stacked ontop of each other. From top to bottom the titles are: ",end="")
         print(f"{', '.join(book_order[::-1])}.")
@@ -36,7 +36,7 @@ def handle_take(state, item):
             print("You add the Python Tutorial to your inventory.")
             if not db_get_flag(state, "tutorial_finished"):
                 print("You can check your inventory by typing 'inventory'.")
-                print("Now you can return to the librarian by typing 'go study landscape' and thereafter 'talk librarian'.")
+                print("Now you can return to the librarian by typing 'go study landscape' or 'go back'.")
             db_add_item_to_inventory(state, "python_tutorial")
             db_mark_room_completed(state, "library")
             return

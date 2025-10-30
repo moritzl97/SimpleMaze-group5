@@ -158,7 +158,7 @@ def lay_hammock(state):
 
 #---handler functions---#
 def handle_talk_gardener(state):
-    if state["completed"]["roof_garden"]:
+    if db_get_room_completed(state, "roof_garden"):
         print("Gardener: You inspired me. I will make the whole garden bloom again.")
         return
     if not state["roof_garden"]["dice"]:
@@ -177,7 +177,7 @@ def handle_talk_gardener(state):
     print("If you have spend your dice on the wrong things, leave the room and come back later to start again.")
 
 def handle_look_greenhouse(state):
-    if state["completed"]["roof_garden"]:
+    if db_get_room_completed(state, "roof_garden"):
         print("The orchid in the greenhouse is blooming magnificently.")
     else:
         print("In the greenhouse you see a orchid. However, looks a bit neglected.")
@@ -191,9 +191,11 @@ def handle_help(state):
 #---end handler functions---#
 
 def roof_garden_enter(state):
-    if state["completed"]["roof_garden"]: # If already completed dont let player enter
+    if db_get_room_completed(state, "roof_garden"): # If already completed dont let player enter
         print("You have already successfully tended to the garden.")
         return False
+
+    state["roof_garden"] = {"weather": None, "actions": None, "talked_to_gardener": False, "dice": [], "orchid": {"water": False, "fertilizer": False, "robot": False}}
 
     temperature, rain, cloud_cover, is_day, wind_speed, weather_code = get_weather() # get current weather
     temperature_adjective = {1:"freezing", 2:"cold", 3:"mild",  4:"hot"}
@@ -249,8 +251,6 @@ def roof_garden_enter(state):
 
     print("\nThe classroom is filled with plants, it is like a jungle in here. You push some leaves to the side to get to the center of the room.")
     print("You see a gardener beside a small greenhouse with a plant inside it.")
-
-    state["roof_garden"]["orchid"] = {"water": False, "fertilizer": False, "robot": False}
     # Available actions at the beginning
     actions = {
         "search_garden": {"text": "Search garden", "dice": [1 ,2 ,3 , 4, 5, 6], "action":search_garden},
@@ -310,13 +310,13 @@ def roof_garden_commands(command, state):
         # If the player fulfilled all necessary tasks, print the end message and complete roof garden
         print("The orchid starts to bloom.")
         print("Gardener: Thank you for helping me out!")
-        state["completed"]["roof_garden"] = True
+        db_mark_room_completed(state, "roof_garden")
         print("Gardener: I don't have much to give, but I have this beautiful rose I can give you.")
         print("The gardener doesn't seam to notice the dark aura coming from the rose. You still take it and put it in your inventory.")
         db_add_item_to_inventory(state, "cursed_rose")
 
     if not state["roof_garden"]["dice"]: #Remind the player to come back later if they have no more dice, or if they finished that they should move on
-        if state["completed"]["roof_garden"]:
+        if db_get_room_completed(state, "roof_garden"):
             print("You spent all your energy. With the task completed you are ready to move on to another room.")
         else:
             print("You spent all your energy. You have to come back later to start over.")

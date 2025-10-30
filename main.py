@@ -35,6 +35,11 @@ def game_loop(save_id):
         clear_screen()
         print("\n\n\n")
         print(f"Welcome to the Nightmare, {player_name}!".center(82))
+        player_achievements = db_get_all_achievements_of_a_player(state, player_name)
+        if player_achievements:
+            print("")
+            print("You have already got the following achievements in previous games:".center(82))
+            print(f"{' '.join(player_achievements)}".center(82))
 
         # Create new save in database
         create_new_save(state, player_name)
@@ -74,7 +79,7 @@ def game_loop(save_id):
         "cyber_room": ["n_s_corridor"],
         "dragon_room": ["n_s_corridor"],
         "riddle_room": ["n_s_corridor"],
-        "study_landscape": ["e_w_corridor", "lab_corridor", "project_room_3", "library"],
+        "study_landscape": ["e_w_corridor", "lab_corridor", "library"],
         "e_w_corridor": ["roof_garden", "control_room", "n_s_corridor", "study_landscape"],
         "lab_corridor": ["computer_lab", "cloud_room", "study_landscape"],
         "n_s_corridor": ["e_w_corridor", "cyber_room", "riddle_room", "dragon_room"],
@@ -119,6 +124,7 @@ def game_loop(save_id):
         # Check for win condition
         if command == "WIN":
             db_update_elapsed_time(state)
+            db_set_game_finished(state)
             time.sleep(12)
             db_award_achievement(state, "finish_a_game")
             end_screen(state)
@@ -147,48 +153,7 @@ state = {
     "db_conn": sqlite3.connect(path),
     "save_id": None,
     "start_time": None,
-    #TODO remove all the following values from state variable and add them in the db
-    "current_room": starting_room,
-    "previous_room": starting_room,
-    "completed": {
-        "roof_garden": False,
-        "cloud_room": False,
-        "cyber_room": False,
-        "dragon_room": False,
-        "computer_lab": False,
-        "riddle_room": False,
-        "control_room": False,
-        "e_w_corridor": False,
-        "lab_corridor": False,
-        "n_s_corridor": False,
-        "library": False,
-    },
-    "entered": {
-        "roof_garden": False,
-        "cloud_room": False,
-        "cyber_room": False,
-        "dragon_room": False,
-        "computer_lab": False,
-        "riddle_room": False,
-        "control_room": False,
-        "study_landscape": True,
-        "e_w_corridor": False,
-        "lab_corridor": False,
-        "n_s_corridor": False,
-        "library": False,
-    },
-    "inventory": [],
-    "paused": False,
-    "elapsed_time": 0,
-    "player_name": None,
-    "skip_tutorial":False,
-    "cloud_room": {},
-    "cyber_room": {},
-    "computer_lab": {},
-    "riddle_room": {},
-    "control_room": {},
     "roof_garden": {"weather": None, "talked_to_gardener":False, "dice": [], "orchid":{"water": False, "fertilizer": False, "robot": False}},
-    "study_landscape": {"coffee_drank":0}
 }
 # Basic parameters for the database
 state["db_conn"].execute("PRAGMA foreign_keys = ON;")

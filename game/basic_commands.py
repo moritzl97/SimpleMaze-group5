@@ -9,7 +9,6 @@
 # All commands that are available in all rooms are stored here
 import time
 from game.utils import *
-import sqlite3
 from game.db_utils import *
 import datetime
 
@@ -20,16 +19,16 @@ def handle_pause(state):
     #player_name = state["player_name"]
     #save_state(player_name, state)
     print(r"""
-                _______  _______           _______  _______ 
-                (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
-                | (    )|| (   ) || )   ( || (    \/| (    \/
-                | (____)|| (___) || |   | || (_____ | (__    
-                |  _____)|  ___  || |   | |(_____  )|  __)   
-                | (      | (   ) || |   | |      ) || (      
-                | )      | )   ( || (___) |/\____) || (____/\
-                |/       |/     \|(_______)\_______)(_______/
+                  _______  _______           _______  _______ 
+                  (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
+                  | (    )|| (   ) || )   ( || (    \/| (    \/
+                  | (____)|| (___) || |   | || (_____ | (__    
+                  |  _____)|  ___  || |   | |(_____  )|  __)   
+                  | (      | (   ) || |   | |      ) || (      
+                  | )      | )   ( || (___) |/\____) || (____/\
+                  |/       |/     \|(_______)\_______)(_______/
     """)
-    print("You can type 'time', 'resume', or 'quit'.")
+    print("Type 'time', 'resume', or 'quit'.".center(82))
 
     while True:
         command = input("> ").strip().lower()
@@ -148,9 +147,9 @@ def handle_help():
 
 def handle_quit(state):
     clear_screen()
-    save_entry_to_scoreboard(state)
 
     db_update_elapsed_time(state)
+    db_set_last_saved_time(state)
     print("Game Saved".center(82))
     print("\n")
     print("You wake up from a nightmare. Was this all a dream?".center(82))
@@ -174,50 +173,56 @@ def show_status(state):
     percentage = int((visited_rooms / total_rooms) * 100)
     player_name = db_get_player_name(state)
     elapsed_seconds = int(time.time() - state["start_time"])
-    time_format = datetime.timedelta(seconds=elapsed_seconds)
 
-    print("-" * 70)
+    time_delta = datetime.timedelta(seconds=elapsed_seconds)
+    total_seconds = int(time_delta.total_seconds())
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    time_formatted = f"{hours}:{minutes:02}:{seconds:02}"
+
+    print("#" + "-"* 80 + "#")
     all_items = db_get_all_items_in_inventory(state)
     cursed_items = [item.replace("_"," ").title() for item in all_items if item.startswith("cursed")]
-    print(f"Progress for {player_name}: {visited_rooms}/{total_rooms} rooms completed ({percentage}%) {len(cursed_items)}/4 cursed items time: {time_format}")
-    completed_rooms = [key.replace("_"," ").title() for key, value in state["completed"].items() if value]
-    print(f"Completed rooms: {", ".join(completed_rooms)}")
+    print(f"Progress of {player_name}".center(82))
+    print(f"{visited_rooms}/{total_rooms} Rooms completed ({percentage}%), {len(cursed_items)}/4 Cursed items, Time: {time_formatted}".center(82))
+    completed_rooms = db_get_completed_rooms_list(state)
+    completed_rooms = [item.replace("_"," ").title() for item in completed_rooms]
+    achievements = db_get_all_achievements_of_a_save(state, state["save_id"])
+    if completed_rooms:
+        print(f"Completed Rooms: {Color.green + ', '.join(completed_rooms) + Color.end}")
     if cursed_items:
-        print(f"Cursed items: {Color.purple + ", ".join(cursed_items) + Color.end}")
-    print("-" * 70)
+        print(f"Cursed Items: {Color.purple + ', '.join(cursed_items) + Color.end}")
+    if achievements:
+        print(f"Earned Achievements: {' '.join(achievements)}")
+    print("#" + "-"* 80 + "#")
 
-def save_entry_to_scoreboard(state):
-    completed_rooms = db_get_completed_status_of_all_rooms(state)
-    visited_rooms = sum(1 for v in completed_rooms if v)
-    total_rooms = len(completed_rooms)
-    percentage = int((visited_rooms / total_rooms) * 100)
-    nickname = state.get("player_name", "Player")
-    elapsed_time = int(time.time() - state["start_time"])
-    conn = sqlite3.connect("saves.db")
-    conn.execute("""
-                 INSERT INTO scoreboard (player_name, percentage, time)
-                 VALUES (?, ?, ?) ON CONFLICT(player_name) DO
-                 UPDATE SET
-                     percentage = excluded.percentage,
-                     time = excluded.time;
-                 """, (nickname, percentage, elapsed_time))
-    conn.commit()
-
-def display_scoreboard(state=None):
-    if state:
-        save_entry_to_scoreboard(state)
-    conn = sqlite3.connect("saves.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM scoreboard")
-    rows = cursor.fetchall()
-    sorted_data = sorted(rows, key=lambda x: (-x[1], x[2]))
-    print("🏆 Scoreboard:")
-    print("-" * 70)
-    for index, row in enumerate(sorted_data):
-        print(f"{row[0]}: \t {row[1]}% completed \t {row[2]}s")
-        if index == 4:
-            break
-    print("-" * 70)
+def display_scoreboard(state, length=None):
+    scoreboard_entries = db_get_scoreboard(state)
+    print(f"🏆 Scoreboard".center(82))
+    if length:
+        print(f"Top {length}".center(82))
+    print("#" + "-"* 80 + "#")
+    for placement, item in enumerate(scoreboard_entries, 1):
+        time_delta = datetime.timedelta(seconds=item[2])
+        total_seconds = int(time_delta.total_seconds())
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        time_formatted = f"{hours}:{minutes:02}:{seconds:02}"
+        if placement == 1:
+            color = Color.yellow
+        elif placement == 2:
+            color = Color.silver
+        elif placement == 3:
+            color = Color.bronze
+        else:
+            color = Color.end
+        print(f"     {color}{placement:>3}. {item[0]:<12} {item[1]:>5}% completed     {time_formatted}{Color.end} {item[3].replace(',',' ') if item[3] is not None else ''}")
+        if placement == 3:
+            print("#" + "-"* 80 + "#")
+        if length:
+            if placement == length:
+                break
+    print("#" + "-"* 80 + "#")
 
 class MapRoom:
     def __init__(self, name, text_position, player_position, display_text):
@@ -252,7 +257,7 @@ class Map:
                       MapRoom("dragon_room", 9*91+81, 1085, ["Dragon","Room"]),
                       MapRoom("riddle_room", 2*91+81, 538, ["Riddle","Room"]),
                       MapRoom("study_landscape", 3*91+26, 576, ["Study","Landscape"]),
-                      MapRoom("e_w_corridor", 6*91+50, 590, ["E-W-Corridor"]),
+                      MapRoom("e_w_corridor", 6*91+50, 590, ["E W Corridor"]),
                       MapRoom("lab_corridor", 7*91+12, 658, ["Lab Cor"]),
                       MapRoom("n_s_corridor", 6*91+76, 440, ["N","S"," ","C","o","r"]),
                       MapRoom("library",2*91+39,3*91+42,["Library"]),
@@ -347,6 +352,6 @@ def handle_basic_commands(command, state, room_exits):
         display_time(state, paused=False)
         return True
     elif command == "scoreboard":
-        display_scoreboard(state)
+        display_scoreboard(state, 5)
         return True
     return False
