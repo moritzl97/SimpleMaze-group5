@@ -19,6 +19,8 @@ def init_db(state):
     # conn.execute("CREATE INDEX IF NOT EXISTS idx_saves_updated_at ON saves(updated_at DESC);")
     # conn.commit()
 
+
+
     cursor = conn.cursor()
     # Create common tables
     conn.execute("""
@@ -98,6 +100,26 @@ def init_db(state):
                      percentage INTEGER,
                      time INTEGER
                  );""")
+
+    # CyberRoom tables
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS cyber_room_state (
+            save_id        INTEGER PRIMARY KEY,
+            code_unlocked  INTEGER DEFAULT 0,
+            completed      INTEGER DEFAULT 0,
+            FOREIGN KEY (save_id) REFERENCES saves(save_id)
+        );
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS cyber_room_panels (
+            save_id   INTEGER NOT NULL,
+            panel_id  TEXT    NOT NULL,
+            solved    INTEGER DEFAULT 0,
+            PRIMARY KEY (save_id, panel_id),
+            FOREIGN KEY (save_id) REFERENCES saves(save_id)
+        );
+    """)
 
     #dragon room create tables
     cursor.execute("""
@@ -182,7 +204,7 @@ def init_db(state):
         ('pickaxe',),
         ('cursed_trophy',),
         #cyberroom
-        ('cyber_key',),
+        ('?_key',),
         #riddleroom
         ('magnet',),
         #computerlab
@@ -213,6 +235,7 @@ def init_db(state):
         ('pet_cat', 'Pet a black cat','🐈‍⬛',),
         #study landscape
         ('coffee_adict', 'Being addicted to coffee', '☕️',),
+        ('schoolnerd', 'go back to school', '📓',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
 
