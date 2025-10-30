@@ -236,6 +236,7 @@ def init_db(state):
         #study landscape
         ('coffee_adict', 'Being addicted to coffee', '☕️',),
         ('schoolnerd', 'go back to school', '📓',),
+        ('einstein', 'too may attempts', '🤓')
     ]
     cursor.executemany(insert_query, rows_to_insert)
 
