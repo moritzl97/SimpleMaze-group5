@@ -19,7 +19,7 @@ def lab_corridor_enter(state):
         print("Laboratory Safety Officer: You have the right paper work. However I will still watch you closely.")
         print("\nYou are standing in the corridor to the computer labs.")
         print("You hear the sound of servers humming from the neighboring rooms.")
-        state["completed"]["lab_corridor"] = True
+        db_mark_room_completed(state, "lab_corridor")
         return True
 
 def handle_look():

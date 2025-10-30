@@ -48,6 +48,19 @@ def init_db(state):
                     FOREIGN KEY (save_id) REFERENCES saves(save_id),
                     FOREIGN KEY (item_id) REFERENCES items(item_id)
                     );""")
+    conn.execute("""
+                CREATE TABLE IF NOT EXISTS flags (
+                    flag_id TEXT PRIMARY KEY
+                    );""")
+    conn.execute("""
+                CREATE TABLE IF NOT EXISTS flag_status (
+                    save_id INTEGER NOT NULL,
+                    flag_id TEXT NOT NULL,
+                    status BOOLEAN DEFAULT FALSE,
+                    PRIMARY KEY (save_id, flag_id),
+                    FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                    FOREIGN KEY (flag_id) REFERENCES flags(flag_id)
+                    );""")
 
     # === Rooms and Save State Tables ===
     cursor.execute("""
@@ -182,7 +195,7 @@ def init_db(state):
     # Insert into common tables
     all_rooms = [
         "cloud_room", "computer_lab", "control_room", "cyber_room", "dragon_room",
-        "riddle_room", "classroom_2015", "project_room_3", "study_landscape",
+        "riddle_room", "roof_garden", "library", "study_landscape",
         "e_w_corridor", "lab_corridor", "n_s_corridor"
     ]
     cursor.executemany(
@@ -222,6 +235,15 @@ def init_db(state):
     ]
     cursor.executemany(insert_query, rows_to_insert)
 
+    insert_query = "INSERT OR IGNORE INTO flags (flag_id) VALUES (?);"
+    rows_to_insert = [
+        # dragon room
+        ('n_s_unlocked',),
+        ('finished_tutorial',),
+        ('skip_tutorial',),
+    ]
+    cursor.executemany(insert_query, rows_to_insert)
+
     insert_query = "INSERT OR IGNORE INTO achievements (achievement_id, name, icon) VALUES (?, ?, ?);"
     rows_to_insert = [
         # general
@@ -236,6 +258,7 @@ def init_db(state):
         #study landscape
         ('coffee_adict', 'Being addicted to coffee', '☕️',),
         ('schoolnerd', 'go back to school', '📓',),
+        ('einstein', 'too may attempts', '🤓')
     ]
     cursor.executemany(insert_query, rows_to_insert)
 
@@ -303,6 +326,13 @@ def create_new_save(state, current_player_name):
             INSERT INTO save_rooms (save_id, room_id, entered, completed)
             VALUES (?, ?, ?, 0);
         """, (save_id, room_id, entered))
+        
+    # miscellaneous flags
+    cursor.execute("""
+            INSERT INTO flag_status (save_id, flag_id, status)
+            SELECT ?, flag_id, FALSE
+            FROM flags;
+            """, (save_id,))
 
     #dragon room
     current_object_names = ('cracked_wall', 'blackboard', 'desk', 'chest', 'hole',)

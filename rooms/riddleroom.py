@@ -1,31 +1,35 @@
 # --- Adventure Game: Riddle Room ---
 import random
+from game.db_utils import *
 
 def riddleroom_enter(state):
-    print("Welcome to the Adventure Game!")
-    print("Goal: Solve the multi-step challenge in the room to take the magnet.\n")
-    state["riddleroom"]["magnet_taken"] = False #TODO only set state if it is not set yet
-    return True
+    if not db_is_item_in_inventory(state, '?_key'):
+        print("You first have to get question mark key to enter the room")
+        return False
+    else:
+        print("Welcome to the Adventure Game!")
+        print("Goal: Solve the multi-step challenge in the room to take the magnet.\n")
+        return True
 
 def riddleroom_commands(command, state):
     challenge_solved = complex_challenge(state) # TODO Maybe don't just start the challenge but let the player start it by e.g. talking to the teacher
     if challenge_solved:
         print("You are inside Classroom 1.07.")
-        if not state["riddleroom"]["magnet_taken"]:
+        if not db_is_item_in_inventory(state, 'cursed_magnet'):
             print("A shiny magnet is in a locked glass case. The teacher is watching you.")
         else:
             print("The glass case is empty now. The teacher nods approvingly.")
 
         if command == "look around": #TODO add return True to all commands
             look_around(state)
-        elif command == "take magnet" and not state["riddleroom"]["magnet_taken"] and "challenge_solved" in state["inventory"]:
+        elif command == "take magnet" and not db_is_item_in_inventory(state, 'cursed_magnet') and db_is_item_in_inventory(state, 'challenge_solved'):
             take("magnet", state)
     else:
         print(f"you failed the challenge, you can come back later")
         return "go back"
 
 def look_around(state):
-    if not state["riddleroom"]["magnet_taken"]:
+    if not db_is_item_in_inventory(state, 'magnet_taken'):
         print("The magnet is in a locked glass case. The chalkboard reads: 'Solve the challenge to unlock it.'")
     else:
         print("The classroom is empty except for the usual lab equipment.")
@@ -33,9 +37,10 @@ def look_around(state):
 def take(item, state):
 
     if item == "magnet":
-        if "challenge_solved" in state["inventory"]:
-            state["inventory"].append("magnet")
-            state["riddleroom"]["magnet_taken"] = True
+        if db_is_item_in_inventory(state, 'challenge_solved'):
+            db_add_item_to_inventory(state, 'cursed_magnet')
+            # state["riddleroom"]["magnet_taken"] = True
+            db_is_item_in_inventory(state, 'cursed_magnet')
             print("You take the magnet and add it to your inventory.") #TODO add the state["completed"]["riddleroom"] = True here instead of below
         else:
             print("The magnet is locked. Solve the challenge first.")
@@ -43,11 +48,13 @@ def take(item, state):
 
 
 def complex_challenge(state):
-    if "challenge_solved" in state["inventory"]: # TODO challenge_solved shouldn't be an item added to the inventory, but a boolean flag in the state
+    if db_is_item_in_inventory(state, 'challenge_solved'): # TODO challenge_solved shouldn't be an item added to the inventory, but a boolean flag in the state
         print("The teacher nods. You already solved the challenge here.")
         return True
 
     print("\n--- Complex Challenge ---")
+
+
 
     # --- STEP 1: RIDDLE WITH OPTIONS ---
     riddles = [
@@ -77,7 +84,8 @@ def complex_challenge(state):
     for i, option in enumerate(selected_riddle["options"], start=1):
         print(f"{i}. {option.capitalize()}")
 
-    attempts = 2
+    attempts = 3
+
     riddle_answer = ""
     while attempts > 0:
         riddle_answer = input("Your answer (or type 'hint'): ").strip().lower()
@@ -94,6 +102,9 @@ def complex_challenge(state):
         print("The teacher shakes his head. Come back when you're wiser.")
         return False
 
+    if attempts > 2:
+        db_award_achievement(state, 'einstein')
+
     # --- STEP 2: LOGIC PUZZLE --- #TODO Maybe split the puzzles such that the player has to start each round (you can look at the cyberroom for an example, Tieme did it there with the panels)
     print("\n--- Logic Puzzle ---")
     print("Three friends (Alice, Bob, and Carol) are sitting in a row.")
@@ -104,7 +115,7 @@ def complex_challenge(state):
         print("Incorrect. The puzzle resets.")
         return False
     else:
-        print("✅ Correct! You're sharp.")
+        print("Correct! You're sharp.")
 
     # --- STEP 3: MATH PROBLEM ---
     print("\n--- Math Challenge ---")
@@ -134,7 +145,6 @@ def complex_challenge(state):
 
     if final_input == expected_code:
         print("🔓 The glass case clicks open. You may now take the magnet!")
-        state["inventory"].append("challenge_solved")
         state["completed"]["riddleroom"] = True
         return True
     else:

@@ -360,7 +360,7 @@ def parse(user_input):
 # Called when dragon room is entered
 def dragon_room_enter(state):
     # If player has finished the dragon room print this message and return them to the corridor
-    if state["completed"]["dragon_room"]: #TODO change completed to db
+    if db_get_room_completed(state, "dragon_room"):
         print("You have already dealt with the dragon and are ready to move on to another room.")
         return False
 
@@ -395,6 +395,6 @@ def dragon_room_commands(command, state):
 
     if db_is_item_in_inventory(state, "cursed_trophy"):
         print("You have successfully dealt with the dragon. You can now move on to another room.")
-        state["completed"]["dragon_room"] = True # TODO change completed to db
+        db_mark_room_completed(state, "dragon_room")
 
     return False

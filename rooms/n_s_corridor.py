@@ -8,7 +8,7 @@
 from game.db_utils import *
 
 def n_s_corridor_enter(state):
-    if state["n_s_locked"]:
+    if not db_get_flag(state, "n_s_unlocked"):
         print("You try to reach the door to the North-South Corridor. However the janitor blocks the way with his mob.")
         print("He grumbles something about you not respecting his work.")
         print("You will have to find something to appease him, so that he will let you through.")
@@ -16,7 +16,7 @@ def n_s_corridor_enter(state):
 
     print("The north south corridor is much more quiet. You see nobody around.")
     print("Only a few classrooms are located here.")
-    state["completed"]["n_s_corridor"] = True
+    db_mark_room_completed(state, "n_s_corridor")
     return True
 
 def handle_look(state):

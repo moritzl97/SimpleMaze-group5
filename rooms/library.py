@@ -12,12 +12,12 @@ book_order = ["intercultural sensitivity", "beginner sql", "python tutorial"]
 def library_enter(state):
     if not db_is_item_in_inventory(state, "rusty_key"):
         print("You try to open the door to the library. However it is locked.")
-        if state["tutorial"]:
+        if not db_get_flag(state, "tutorial_finished"):
             print("You should try to explore the Study Landscape more closely to find the key. Type 'look around' to get more information about you surroundings.")
         return False
     else:
         print("\nYou step into the library. You smell old paper and dust.")
-        if state["tutorial"]:
+        if not db_get_flag(state, "tutorial_finished"):
             print("Type 'look around' to get more information about you surroundings.")
         return True
 
@@ -27,18 +27,18 @@ def handle_look(state):
         print("On the top shelf of a bookshelf you see three books stacked ontop of each other. From top to bottom the titles are: ",end="")
         print(f"{', '.join(book_order[::-1])}.")
         print("However you are to small and can only reach the book at the bottom.")
-    if state["tutorial"]:
+    if not db_get_flag(state, "tutorial_finished"):
         print("Try 'take <something>' to pick it up.")
 
 def handle_take(state, item):
     if item == book_order[0]:
         if item == "python tutorial":
             print("You add the Python Tutorial to your inventory.")
-            if state["tutorial"]:
+            if not db_get_flag(state, "tutorial_finished"):
                 print("You can check your inventory by typing 'inventory'.")
                 print("Now you can return to the librarian by typing 'go study landscape' and thereafter 'talk librarian'.")
             db_add_item_to_inventory(state, "python_tutorial")
-            state["completed"]["library"] = True
+            db_mark_room_completed(state, "library")
             return
         print("You take the bottom bock and lay it to the side. The outer books shift down.")
         book_order.pop(0)

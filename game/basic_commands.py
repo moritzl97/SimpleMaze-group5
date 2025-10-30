@@ -67,7 +67,7 @@ def handle_go(command, state, room_functions, room_exits):
         destination_room = None
         input_destination_room = command[3:]
         if input_destination_room == "back":
-            destination_room = state["previous_room"][:]
+            destination_room = db_get_previous_room(state)
         else:
             input_destination_room = input_destination_room.replace(" ", "").replace("-", "").replace("_", "")
             room_aliases = {"nscor":"nscorridor",
@@ -86,7 +86,7 @@ def handle_go(command, state, room_functions, room_exits):
                     destination_room = room
                     break
 
-        current_room = state["current_room"]
+        current_room = db_get_current_room(state)
 
         if destination_room in room_exits.get(current_room, []):
             clear_screen()
@@ -97,9 +97,8 @@ def handle_go(command, state, room_functions, room_exits):
             entry_allowed = room_functions[destination_room]["enter_function"](state)
 
             if entry_allowed:
-                state["entered"][destination_room] = True
-                state["previous_room"] = state["current_room"]
-                state["current_room"] = destination_room
+                db_mark_room_entered(state, destination_room)
+                db_set_current_room(state, destination_room)
             else:
                 print_room_entry_banner(current_room)
         else:
@@ -130,10 +129,8 @@ def handle_admin_go(command, state, room_functions, room_exits):
 
     if not entry_allowed:
         print("WARNING: This room would currently not be accessible to the player. This command still lets you enter. However this could break things down the line.")
-    state["entered"][destination_room] = True
-    state["previous_room"] = room_exits[destination_room][0]
-    state["current_room"] = destination_room
-
+    db_mark_room_entered(state, destination_room)
+    db_set_current_room(state, destination_room)
     return True
 
 def handle_help():
@@ -170,8 +167,9 @@ def show_inventory(state):
         print("You are not carrying anything.")
 
 def show_status(state):
-    visited_rooms = sum(1 for v in state["completed"].values() if v)
-    total_rooms = len(state["completed"])
+    completed_list = db_get_completed_status_of_all_rooms(state)
+    visited_rooms = sum(1 for v in completed_list if v)
+    total_rooms = len(completed_list)
     percentage = int((visited_rooms / total_rooms) * 100)
     player_name = db_get_player_name(state)
     elapsed_seconds = int(time.time() - state["start_time"])
@@ -188,8 +186,9 @@ def show_status(state):
     print("-" * 70)
 
 def save_entry_to_scoreboard(state):
-    visited_rooms = sum(1 for v in state["completed"].values() if v)
-    total_rooms = len(state["completed"])
+    completed_rooms = db_get_completed_status_of_all_rooms(state)
+    visited_rooms = sum(1 for v in completed_rooms if v)
+    total_rooms = len(completed_rooms)
     percentage = int((visited_rooms / total_rooms) * 100)
     nickname = state.get("player_name", "Player")
     elapsed_time = int(time.time() - state["start_time"])
@@ -277,9 +276,9 @@ class Map:
         # Add room name replacements (colored)
         for room in self.rooms:
             color = ""
-            if state["completed"].get(room.name, False):
+            if db_get_room_completed(state, room.name):
                 color = Color.green
-            elif state["entered"][room.name]:
+            elif db_get_room_entered(state, room.name):
                 color = Color.gray
 
             base_line, base_col = self._abs_to_line_col(room.text_position)
@@ -317,7 +316,7 @@ class Map:
         print(f"Possible exits: {', '.join(room_exits[current_room]).replace('_', ' ').title()}")
 
 def show_map(state, room_exits):
-    current_room = state["current_room"]
+    current_room = db_get_current_room(state)
 
     floor_map = Map()
     floor_map.show(current_room, state, room_exits)
