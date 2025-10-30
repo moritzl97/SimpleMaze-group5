@@ -226,6 +226,8 @@ def init_db(state):
         ('gemstone',),
         ('pickaxe',),
         ('cursed_trophy',),
+        #cloud_room
+        ('robot_head',),
         #cyberroom
         ('?_key',),
         #riddleroom
