@@ -86,27 +86,25 @@ def db_get_player_name(state):
     return rows[0]
 
 def db_set_flag(state, flag_name, flag):
-    # TODO implement connection to correct table in database
     current_save_id = state["save_id"]
     conn = state["db_conn"]
     cursor = conn.cursor()
 
     cursor.execute("""
-                UPDATE table
+                UPDATE flag_status
                     SET ? = ?
                     WHERE save_id = ?
                    """, (flag_name, flag, current_save_id,))
     conn.commit()
 
 def db_get_flag(state, flag_name):
-    # TODO implement connection to correct table in database
     current_save_id = state["save_id"]
     conn = state["db_conn"]
     cursor = conn.cursor()
 
     cursor.execute("""
                 SELECT ? 
-                    FROM table
+                    FROM flag_status
                     WHERE save_id = ?
                     """, (flag_name, current_save_id,))
     rows = cursor.fetchone()
@@ -152,6 +150,20 @@ def db_mark_room_completed(state, room_name):
         WHERE save_id = ? AND room_id = ?;
     """, (save_id, room_id))
     conn.commit()
+
+def db_get_completed_status_of_all_rooms(state):
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT entered
+        FROM save_rooms
+        WHERE save_id = ?;
+                   """, (current_save_id,))
+    rows = cursor.fetchall()
+    item_list = [item[0] for item in rows]
+    return item_list
 
 def db_award_achievement(state, achievement_name):
     print("You got an achievement!")
@@ -203,13 +215,26 @@ def db_get_room_completed(state, room_name):
 
     conn = state["db_conn"]
     save_id = state["save_id"]
-    print(save_id)
-    print(conn)
-    print(state)
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT sr.completed
+        FROM save_rooms sr
+        JOIN rooms r ON sr.room_id = r.room_id
+        WHERE sr.save_id = ? AND r.name = ?;
+    """, (save_id, room_name))
+    row = cursor.fetchone()
+    return bool(row and row[0])
+
+def db_get_room_entered(state, room_name):
+    #Return status of completion for given room name, TRUE/FALSE
+
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT sr.entered
         FROM save_rooms sr
         JOIN rooms r ON sr.room_id = r.room_id
         WHERE sr.save_id = ? AND r.name = ?;
@@ -244,6 +269,17 @@ def db_get_current_room(state):
     cursor = conn.cursor()
 
     cursor.execute("SELECT current_room FROM save_state WHERE save_id = ?;", (save_id,))
+    row = cursor.fetchone()
+    return row[0] if row else None
+
+def db_get_previous_room(state):
+    #Return the current room name
+
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT previous_room FROM save_state WHERE save_id = ?;", (save_id,))
     row = cursor.fetchone()
     return row[0] if row else None
 

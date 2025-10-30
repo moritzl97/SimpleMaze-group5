@@ -83,17 +83,17 @@ def game_loop(save_id):
     }
 
     # print entry banner for the first room
-    print_room_entry_banner(state["current_room"])
+    print_room_entry_banner(db_get_current_room(state))
 
     # Display the enter message of the first room (or the room you are in, when loading a save)
-    room_functions[state["current_room"]]["enter_function"](state)
+    room_functions[db_get_current_room(state)]["enter_function"](state)
 
     ###################################################
     # Main game loop
     ###################################################
     while True:
 
-        current_room = state["current_room"]
+        current_room = db_get_current_room(state)
         # Get command from user
         command = input(Color.blue+"> ").strip().lower()
         print(Color.end)
@@ -180,8 +180,6 @@ state = {
     "paused": False,
     "elapsed_time": 0,
     "player_name": None,
-    "n_s_locked": True,
-    "tutorial":True,
     "skip_tutorial":False,
     "cloud_room": {},
     "cyber_room": {},
