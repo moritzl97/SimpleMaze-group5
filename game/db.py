@@ -169,6 +169,8 @@ def init_db(state):
         ('cyber_key',),
         #riddleroom
         ('magnet',),
+        #computerlab
+        ('lab_key',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
 

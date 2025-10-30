@@ -55,7 +55,7 @@ def game_loop(save_id):
 
     room_functions = { # Collection of the two important functions from each room
         "cloud_room": {"enter_function": cloudroom_enter, "room_commands": cloudroom_commands},
-        "computer_lab": {"enter_function": computerlab_enter, "room_commands": computerlab_commands},
+        "computer_lab": {"enter_function": computer_lab_enter, "room_commands": computer_lab_commands},
         "control_room": {"enter_function": controlroom_enter, "room_commands": controlroom_commands},
         "cyber_room": {"enter_function": cyberroom_enter, "room_commands": cyberroom_commands},
         "dragon_room": {"enter_function": dragon_room_enter, "room_commands": dragon_room_commands},
