@@ -24,7 +24,7 @@ def game_loop(save_id):
     # Check if there is a save id given or create a new state, if it is a new game
     if save_id:
         state["save_id"] = save_id
-        state["start_time"] = time.time() - state["elapsed_time"]
+        state["start_time"] = time.time() - db_get_elapsed_time(state)
     else:
         # Ask player name
         print("\n\n\n")
@@ -118,6 +118,7 @@ def game_loop(save_id):
 
         # Check for win condition
         if command == "WIN":
+            db_update_elapsed_time(state)
             time.sleep(12)
             db_award_achievement(state, "finish_a_game")
             end_screen(state)

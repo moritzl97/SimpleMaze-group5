@@ -364,37 +364,6 @@ def create_new_save(state, current_player_name):
     conn.commit()
     return
 
-def load_state(conn, player_name: str):
-    cursor = conn.cursor()
-    cursor.execute("SELECT player_id FROM players WHERE player_name = ?;", (player_name,))
-    row = cursor.fetchone()
-
-    if not row:
-        print(f"No player found with name '{player_name}'.")
-        return None
-    player_id = row[0]
-
-    cursor.execute("""
-        SELECT s.save_id
-        FROM saves s
-        WHERE s.player_id = ?
-        ORDER BY s.saved_at DESC
-        LIMIT 1;
-    """, (player_id,))
-    save_row = cursor.fetchone()
-    if not save_row:
-        print(f"No saves found for player '{player_name}'.")
-        return None
-    save_id = save_row[0]
-
-    state = {
-        "db_conn": conn,
-        "save_id": save_id,
-        "player_name": player_name
-    }
-    print(f"Loaded save #{save_id} for player '{player_name}'.")
-    return state
-
 def list_saves(conn):
     return conn.execute("""
             SELECT s.save_id, p.player_name, ss.current_room, s.saved_at

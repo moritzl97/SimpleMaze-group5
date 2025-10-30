@@ -16,7 +16,7 @@ import datetime
 def handle_pause(state):
 
     paused = True
-    state["elapsed_time"] = time.time() - state["start_time"]
+    db_update_elapsed_time(state)
     #player_name = state["player_name"]
     #save_state(player_name, state)
     print(r"""
@@ -50,13 +50,13 @@ def handle_pause(state):
 
 def handle_resume(state, paused):
 
-    state["start_time"] = time.time() - state["elapsed_time"]
+    state["start_time"] = time.time() - db_get_elapsed_time(state)
     print("Game resumed.")
 
 def display_time(state, paused):
 
     if paused:
-        elapsed = state["elapsed_time"]
+        elapsed = db_get_elapsed_time(state)
     else:
         elapsed = time.time() - state["start_time"]
 
@@ -149,7 +149,8 @@ def handle_help():
 def handle_quit(state):
     clear_screen()
     save_entry_to_scoreboard(state)
-    # TODO save time
+
+    db_update_elapsed_time(state)
     print("Game Saved".center(82))
     print("\n")
     print("You wake up from a nightmare. Was this all a dream?".center(82))

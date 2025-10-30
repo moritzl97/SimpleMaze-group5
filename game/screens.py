@@ -7,9 +7,11 @@
 # =============================================================================
 
 import sys
-from game.db import list_saves, load_state, delete_save
+from game.db import list_saves, delete_save
 from game.basic_commands import display_scoreboard
 import datetime
+
+from game.db_utils import db_get_elapsed_time
 from game.utils import *
 import time
 
@@ -91,7 +93,7 @@ def end_screen(state):
                     (_______/|/    )_)(______/ 
     """)
     print("\n           Congratulations! You escaped the nightmare!")
-    print(f"                You completed the game in {total_time}")
+    print(f"                You completed the game in {db_get_elapsed_time(state)}")
     input("").strip().lower()
     return
 

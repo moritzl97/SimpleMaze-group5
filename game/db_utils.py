@@ -295,3 +295,17 @@ def db_update_elapsed_time(state):
         WHERE save_id = ?;
     """, (elapsed, save_id))
     conn.commit()
+
+def db_get_elapsed_time(state):
+    conn = state["db_conn"]
+    save_id = state["save_id"]
+
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT elapsed_time
+        FROM save_state
+        WHERE save_id = ?;
+    """, (save_id,))
+    row = cursor.fetchone()
+    return row[0] if row else None
+
