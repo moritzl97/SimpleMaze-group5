@@ -23,6 +23,7 @@ class Color:
     blue = "\033[94m"
     gray = "\033[90m"
     orange = "\033[38;2;255;165;0m"
+    purple = "\033[0;35m	"
     bold = "\033[1m"
     underline = "\033[4m"
     framed = "\033[51m"

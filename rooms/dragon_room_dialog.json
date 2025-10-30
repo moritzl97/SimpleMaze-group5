@@ -29,11 +29,15 @@
                 "action": [
                     [
                         "give_item",
-                        "trophy"
+                        "cursed_trophy"
                     ],
                     [
                         "remove_npc",
                         "dragon"
+                    ],
+                    [
+                        "award_achievement",
+                        "kill_dragon"
                     ]
                 ],
                 "next_chapter": "end"
@@ -51,7 +55,7 @@
                 "action": [
                     [
                         "give_item",
-                        "trophy"
+                        "cursed_trophy"
                     ],
                     [
                         "remove_npc",
@@ -60,6 +64,10 @@
                     [
                         "try_remove_item_from_inv",
                         "gemstone"
+                    ],
+                    [
+                        "award_achievement",
+                        "bribe_dragon"
                     ]
                 ],
                 "next_chapter": "end"
@@ -93,11 +101,15 @@
                 "action": [
                     [
                         "give_item",
-                        "trophy"
+                        "cursed_trophy"
                     ],
                     [
                         "remove_npc",
                         "dragon"
+                    ],
+                    [
+                        "award_achievement",
+                        "kill_dragon"
                     ]
                 ],
                 "next_chapter": "end"
@@ -595,8 +607,14 @@
             "failed_break_chest": {
                 "text": "You destroy the chest. What ever was in there, now it is destroyed.",
                 "action": [
+                    [
                     "remove_object",
                     "chest"
+                    ],
+                    [
+                    "award_achievement",
+                    "destroy_chest"
+                    ]
                 ],
                 "next_chapter": "end"
             }
@@ -722,7 +740,7 @@
                 "action": [
                     [
                         "give_item",
-                        "trophy"
+                        "cursed_trophy"
                     ],
                     [
                         "remove_npc",
@@ -735,6 +753,10 @@
                     [
                         "try_remove_item_from_inv",
                         "invisibility_cloak"
+                    ],
+                    [
+                        "award_achievement",
+                        "steal_trophy"
                     ]
                 ],
                 "next_chapter": "end"

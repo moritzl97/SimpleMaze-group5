@@ -12,7 +12,7 @@ from game.basic_commands import handle_basic_commands, handle_go, handle_admin_g
 from game.screens import *
 from game.db import init_db, create_new_save
 from game.utils import *
-import math
+from game.db_utils import *
 import sqlite3
 
 ###################################################
@@ -60,12 +60,12 @@ def game_loop(save_id):
         "cyber_room": {"enter_function": cyberroom_enter, "room_commands": cyberroom_commands},
         "dragon_room": {"enter_function": dragon_room_enter, "room_commands": dragon_room_commands},
         "riddle_room": {"enter_function": riddleroom_enter, "room_commands": riddleroom_commands},
-        "classroom_2015": {"enter_function": classroom_2015_enter, "room_commands": classroom_2015_commands},
-        "project_room_3": {"enter_function": project_room_3_enter, "room_commands": project_room_3_commands},
         "study_landscape": {"enter_function": study_landscape_enter, "room_commands": study_landscape_commands},
         "e_w_corridor": {"enter_function": e_w_corridor_enter, "room_commands": e_w_corridor_commands},
         "lab_corridor": {"enter_function": lab_corridor_enter, "room_commands": lab_corridor_commands},
         "n_s_corridor": {"enter_function": n_s_corridor_enter, "room_commands": n_s_corridor_commands},
+        "library": {"enter_function": library_enter, "room_commands": library_commands},
+        "roof_garden": {"enter_function": roof_garden_enter, "room_commands": roof_garden_commands},
     }
     room_exits = { # Define exits of all rooms
         "cloud_room": ["lab_corridor"],
@@ -74,26 +74,16 @@ def game_loop(save_id):
         "cyber_room": ["n_s_corridor"],
         "dragon_room": ["n_s_corridor"],
         "riddle_room": ["n_s_corridor"],
-        "classroom_2015": ["e_w_corridor"],
-        "project_room_3": ["study_landscape"],
-        "study_landscape": ["e_w_corridor", "lab_corridor", "project_room_3"],
-        "e_w_corridor": ["classroom_2015", "control_room", "n_s_corridor", "study_landscape"],
+        "study_landscape": ["e_w_corridor", "lab_corridor", "project_room_3", "library"],
+        "e_w_corridor": ["roof_garden", "control_room", "n_s_corridor", "study_landscape"],
         "lab_corridor": ["computer_lab", "cloud_room", "study_landscape"],
         "n_s_corridor": ["e_w_corridor", "cyber_room", "riddle_room", "dragon_room"],
+        "library": ["study_landscape"],
+        "roof_garden": ["e_w_corridor"]
     }
 
-    destination_room_display_name = state["current_room"].replace("_", " ").title()
-    destination_name_len = len(destination_room_display_name)
-    banner = r"""
-        .-=~=-.                                                                 .-=~=-.
-        (__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
-        ( _ __)                                                                 ( _ __)
-        (__  _)                                                                 (__  _)
-        ( _ __)                                                                 ( _ __)
-        (_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
-        `-._.-'                                                                 `-._.-'"""
-    print(banner[:314 - int(destination_name_len / 2)] + Color.bold + destination_room_display_name + Color.end + banner[
-        314 + math.ceil(destination_name_len / 2):])
+    # print entry banner for the first room
+    print_room_entry_banner(state["current_room"])
 
     # Display the enter message of the first room (or the room you are in, when loading a save)
     room_functions[state["current_room"]]["enter_function"](state)
@@ -105,7 +95,8 @@ def game_loop(save_id):
 
         current_room = state["current_room"]
         # Get command from user
-        command = input("> ").strip().lower()
+        command = input(Color.blue+"> ").strip().lower()
+        print(Color.end)
 
         # execute admin go
         if command.startswith("admin go "):
@@ -125,18 +116,23 @@ def game_loop(save_id):
         if type(room_command_executed) == str:
             command = room_command_executed
 
+        # Check for win condition
+        if command == "WIN":
+            time.sleep(12)
+            db_award_achievement(state, "finish_a_game")
+            end_screen(state)
+            credits_screen()
+            return
         # Execute going to a different room
         go_executed = handle_go(command, state, room_functions, room_exits)
 
         # If neither a go command, a room command or a basic command was executed display this:
         if not (go_executed or room_command_executed or basic_command_executed):
             print("Please enter a valid command. Type '?' to get help.")
+        print("")
 
-        # Win condition
-        if all(state["completed"].values()):
-            end_screen(state)
-            credits_screen()
-            return
+
+
 
 #--------------Definition or variables on start up-------------#
 # Set console width if possible
@@ -154,8 +150,7 @@ state = {
     "current_room": starting_room,
     "previous_room": starting_room,
     "completed": {
-        "classroom_2015": False,
-        "project_room_3": False,
+        "roof_garden": False,
         "cloud_room": False,
         "cyber_room": False,
         "dragon_room": False,
@@ -165,10 +160,10 @@ state = {
         "e_w_corridor": False,
         "lab_corridor": False,
         "n_s_corridor": False,
+        "library": False,
     },
     "entered": {
-        "classroom_2015": False,
-        "project_room_3": False,
+        "roof_garden": False,
         "cloud_room": False,
         "cyber_room": False,
         "dragon_room": False,
@@ -179,16 +174,22 @@ state = {
         "e_w_corridor": False,
         "lab_corridor": False,
         "n_s_corridor": False,
+        "library": False,
     },
     "inventory": [],
     "paused": False,
     "elapsed_time": 0,
     "player_name": None,
+    "n_s_locked": True,
+    "tutorial":True,
+    "skip_tutorial":False,
     "cloud_room": {},
     "cyber_room": {},
     "computer_lab": {},
     "riddle_room": {},
-    "control_room": {}
+    "control_room": {},
+    "roof_garden": {"weather": None, "talked_to_gardener":False, "dice": [], "orchid":{"water": False, "fertilizer": False, "robot": False}},
+    "study_landscape": {"coffee_drank":0}
 }
 # Basic parameters for the database
 state["db_conn"].execute("PRAGMA foreign_keys = ON;")

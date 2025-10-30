@@ -8,7 +8,6 @@
 
 # All commands that are available in all rooms are stored here
 import time
-import math
 from game.utils import *
 import sqlite3
 from game.db_utils import *
@@ -79,11 +78,7 @@ def handle_go(command, state, room_functions, room_exits):
                             "eastwestcorridor": "ewcorridor",
                             "eastwestcor": "ewcorridor",
                             "labcor":"labcorridor",
-                            "pr3":"projectroom3",
-                            "projectroom": "projectroom3",
-                            "class2015":"classroom2015",
-                            "class":"classroom2015",
-                            "classroom":"classroom2015"}
+                            }
 
             input_destination_room = room_aliases.get(input_destination_room, input_destination_room)
 
@@ -128,36 +123,18 @@ def handle_admin_go(command, state, room_functions, room_exits):
         print(f"The room {input_destination_room} doesn't exist")
         return False
 
-    current_room = state["current_room"]
-
     clear_screen()
 
     print_room_entry_banner(destination_room)
 
     entry_allowed = room_functions[destination_room]["enter_function"](state)
 
-    if entry_allowed:
-        state["entered"][destination_room] = True
-        state["previous_room"] = room_exits[destination_room][0]
-        state["current_room"] = destination_room
-    else:
-        print_room_entry_banner(current_room)
-    return True
+    if not entry_allowed:
+        print("WARNING: This room would currently not be accessible to the player. This command still lets you enter. However this could break things down the line.")
+    state["entered"][destination_room] = True
+    state["previous_room"] = room_exits[destination_room][0]
+    state["current_room"] = destination_room
 
-
-    destination_room = command[9:].replace(" ", "_").replace("-", "_")
-
-    current_room = state["current_room"]
-
-    print(f"You walk toward the door to {destination_room}.")
-    entry_allowed = room_functions[destination_room]["enter_function"](state)
-
-    if entry_allowed:
-        state["previous_room"] = state["current_room"]
-        state["current_room"] = destination_room
-
-    else:
-        print(f"You can't enter right now.")
     return True
 
 def handle_help():
@@ -202,9 +179,13 @@ def show_status(state):
     time_format = datetime.timedelta(seconds=elapsed_seconds)
 
     print("-" * 70)
-    print(f"Progress for {player_name}: {visited_rooms}/{total_rooms} rooms completed ({percentage}%) time: {time_format}")
+    all_items = db_get_all_items_in_inventory(state)
+    cursed_items = [item.replace("_"," ").title() for item in all_items if item.startswith("cursed")]
+    print(f"Progress for {player_name}: {visited_rooms}/{total_rooms} rooms completed ({percentage}%) {len(cursed_items)}/4 cursed items time: {time_format}")
     completed_rooms = [key.replace("_"," ").title() for key, value in state["completed"].items() if value]
     print(f"Completed rooms: {", ".join(completed_rooms)}")
+    if cursed_items:
+        print(f"Cursed items: {Color.purple + ", ".join(cursed_items) + Color.end}")
     print("-" * 70)
 
 def save_entry_to_scoreboard(state):
@@ -250,12 +231,12 @@ class MapRoom:
 
 class Map:
     def __init__(self):
-        self.map_str = """+---------+------------+-------------+--------+----------+----------+---------+----------+
-|         |            |             |        |          |          |         |          |
-|         |            |             |        |          |          |         |          |
-|         |            |             |        |          |          +----+-##-+          |
-|         |            |             |        |          |          |    #    |          |
-|         |            |             +----##--+-------##-+-------##-+----+    #          |
+        self.map_str = """+---------+------------+-------------+---------+----------+---------+---------+----------+
+|         |            |             |         |          |         |         |          |
+|         |            |             |         |          |         |         |          |
+|         |            |             #         |          |         +----+-##-+          |
+|         |            |             |         |          |         |    #    |          |
+|         |            |             +---------+-------##-+------##-+----+    #          |
 |         +-------##---+             #                                   #    |          |
 |         #            #            +--------##-+-##-+-##-+-##-+-##-+-##-+    +----------+
 |         +------------+-#-+-#-+    |           |    |    |    |    |    |    |          |
@@ -271,12 +252,12 @@ class Map:
                       MapRoom("cyber_room", 1*91+71, 258, ["Cyber","Room"]),
                       MapRoom("dragon_room", 9*91+81, 1085, ["Dragon","Room"]),
                       MapRoom("riddle_room", 2*91+81, 538, ["Riddle","Room"]),
-                      MapRoom("classroom_2015", 2*91+49, 416, ["Class","2015"]),
-                      MapRoom("project_room_3", 10*91+28, 848, ["PR3"]),
                       MapRoom("study_landscape", 3*91+26, 576, ["Study","Landscape"]),
                       MapRoom("e_w_corridor", 6*91+50, 590, ["E-W-Corridor"]),
                       MapRoom("lab_corridor", 7*91+12, 658, ["Lab Cor"]),
                       MapRoom("n_s_corridor", 6*91+76, 440, ["N","S"," ","C","o","r"]),
+                      MapRoom("library",2*91+39,3*91+42,["Library"]),
+                      MapRoom("roof_garden", 2*91+50, 416, ["Roof","Garden"]),
                       ]
         # Lookup dictionary
         self.room_lookup = {room.name: room for room in self.rooms}
@@ -336,7 +317,6 @@ class Map:
         print(f"Legend: unvisited room, {Color.gray}visited room{Color.end}, {Color.green}completed room{Color.end}, player position {Color.yellow}X{Color.end}")
         print(f"Possible exits: {', '.join(room_exits[current_room]).replace('_', ' ').title()}")
 
-
 def show_map(state, room_exits):
     current_room = state["current_room"]
 
@@ -370,6 +350,4 @@ def handle_basic_commands(command, state, room_exits):
     elif command == "scoreboard":
         display_scoreboard(state)
         return True
-
-
     return False

@@ -52,6 +52,8 @@ def open_dialog(name, state):
                     try_remove_item_from_inv(argument, state)
                 elif action == "remove_npc":
                     remove_npc(argument, state)
+                elif action == "award_achievement":
+                    award_achievement(argument, state)
 
         # If there are no branching dialog options end dialog
         if "next_chapter" in node:
@@ -132,7 +134,7 @@ def trade_with_shopkeeper(npc, state):
     while True:
         number_of_options = len(trades)+1
         for index in range(1, number_of_options):
-            print(f"{index}. Sell a {trades[index-1][2].replace("_"," ").title()} for a {trades[index-1][1].replace("_"," ").title()}")
+            print(f"{index}. Sell a {trades[index-1][2].replace('_',' ').title()} for a {trades[index-1][1].replace('_',' ').title()}")
         print(f"{number_of_options}. I don't want to trade.")
 
         choice = input("\n> ").strip()
@@ -201,6 +203,10 @@ def try_remove_item_from_inv(argument, state):
 def make_dragon_angry(argument, state):
     # Sets the next dialog of the dragon to angry
     db_save_chapter_node(state, "dragon", "start", "dragon_angry")
+
+def award_achievement(argument, state):
+    # Sets the next dialog of the dragon to angry
+    db_award_achievement(state, argument)
 
 #---End of action functions---#
 
@@ -387,7 +393,7 @@ def dragon_room_commands(command, state):
         handle_help(noun, state)
         return True
 
-    if db_is_item_in_inventory(state, "Trophy"):
+    if db_is_item_in_inventory(state, "cursed_trophy"):
         print("You have successfully dealt with the dragon. You can now move on to another room.")
         state["completed"]["dragon_room"] = True # TODO change completed to db
 

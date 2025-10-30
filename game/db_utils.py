@@ -29,37 +29,31 @@ def db_is_item_in_inventory(state, item_name):
     return row[0]
 
 def db_add_item_to_inventory(state, item_name):
-    already_in_inventory = db_is_item_in_inventory(state, item_name)
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
 
-    if not already_in_inventory:
-        current_save_id = state["save_id"]
-        conn = state["db_conn"]
-        cursor = conn.cursor()
-
-        cursor.execute("""
-        INSERT INTO inventory (save_id, item_id)
-        SELECT ?, item_id
-        FROM items
-        WHERE name = ?
-        """, (current_save_id, item_name,))
-        conn.commit()
+    cursor.execute("""
+    INSERT OR IGNORE INTO inventory (save_id, item_id)
+    SELECT ?, item_id
+    FROM items
+    WHERE name = ?
+    """, (current_save_id, item_name,))
+    conn.commit()
     return
 
 def db_remove_item_from_inventory(state, item_name):
-    is_in_inventory = db_is_item_in_inventory(state, item_name)
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
 
-    if is_in_inventory:
-        current_save_id = state["save_id"]
-        conn = state["db_conn"]
-        cursor = conn.cursor()
-
-        cursor.execute("""
-        DELETE FROM inventory
-        WHERE save_id = ?
-        AND item_id IN (
-        SELECT item_id FROM items WHERE name = ?);
-                       """, (current_save_id, item_name,))
-        conn.commit()
+    cursor.execute("""
+    DELETE FROM inventory
+    WHERE save_id = ?
+    AND item_id IN (
+    SELECT item_id FROM items WHERE name = ?);
+                   """, (current_save_id, item_name,))
+    conn.commit()
     return
 
 def db_get_all_items_in_inventory(state):
@@ -159,6 +153,50 @@ def db_mark_room_completed(state, room_name):
     """, (save_id, room_id))
     conn.commit()
 
+def db_award_achievement(state, achievement_name):
+    print("You got an achievement!")
+    current_save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT OR IGNORE INTO savefile_to_achievement (save_id, achievement_id)
+    VALUES (?, ?)
+    """, (current_save_id, achievement_name,))
+    conn.commit()
+    return
+
+def db_get_all_achievements_of_a_save(state, save_id):
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT a.icon
+        FROM savefile_to_achievement sa
+        JOIN achievements a ON sa.achievement_id = a.achievement_id
+        WHERE sa.save_id = ?
+        ORDER BY a.achievement_id ASC;
+                   """, (save_id,))
+    rows = cursor.fetchall()
+    achievement_list = [item[0] for item in rows]
+    return achievement_list
+
+def db_get_all_achievements_of_a_player(state, player_name):
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT DISTINCT a.icon
+        FROM savefile_to_achievement sa
+        JOIN achievements a ON sa.achievement_id = a.achievement_id
+        JOIN saves s ON s.save_id = sa.save_id
+        JOIN players p ON p.player_id = s.player_id
+        WHERE p.player_name = ?
+        ORDER BY a.achievement_id ASC;
+                   """, (player_name,))
+    rows = cursor.fetchall()
+    achievement_list = [item[0] for item in rows]
+    return achievement_list
 
 def db_get_room_completed(state, room_name):
     #Return status of completion for given room name, TRUE/FALSE

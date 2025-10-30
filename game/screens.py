@@ -9,7 +9,7 @@
 import sys
 from game.db import list_saves, load_state, delete_save
 from game.basic_commands import display_scoreboard
-from datetime import datetime
+import datetime
 from game.utils import *
 import time
 
@@ -90,8 +90,8 @@ def end_screen(state):
                     | (____/\| )  \  || (__/  )
                     (_______/|/    )_)(______/ 
     """)
-    print("\n Congratulations! You escaped the nightmare!")
-    print(f"You completed the game in {state['elapsed_time']}")
+    print("\n           Congratulations! You escaped the nightmare!")
+    print(f"                You completed the game in {total_time}")
     input("").strip().lower()
     return
 
@@ -122,7 +122,7 @@ def load_menu(state):
                     |____/ \__,_| \_/ \___||___/""")
     print("\n")
 
-    rows = list_saves(conn)  # [(player_name, current_room, saved_at), ...]
+    rows = list_saves(conn)  # [(save_id, player_name, current_room, saved_at), ...]
 
     if not rows:
         print("There are no saves yet.")
@@ -131,34 +131,35 @@ def load_menu(state):
 
     # Print save list
     print("Available saves:\n")
-    for name, last_room, saved_at in rows:
+    for row_number, (save_id, name, last_room, saved_at) in enumerate(rows):
         # SQLite timestamps look like: "2025-02-12 10:33:11"
         try:
-            timestamp = datetime.strptime(saved_at, "%Y-%m-%d %H:%M:%S")
+            timestamp = datetime.datetime.strptime(saved_at, "%Y-%m-%d %H:%M:%S")
         except ValueError:
             # fallback for ISO8601 if the first doesn't work
             try:
-                timestamp = datetime.fromisoformat(saved_at)
+                timestamp = datetime.datetime.fromisoformat(saved_at)
             except Exception:
-                timestamp = datetime.now()
+                timestamp = datetime.datetime.now()
 
         date_only = timestamp.strftime("%d-%m-%Y")
         time_only = timestamp.strftime("%H:%M:%S")
-        print(f"{name}: In {last_room or 'unknown room'}, saved at {date_only} {time_only}")
+        print(f"{row_number+1}. {name}: In {last_room or 'unknown room'}, saved at {date_only} {time_only}")
     print("")
 
     # Input loop
     while True:
-        choice = input("Enter player name of the save you want to load or 'back' to go to the main menu: ").strip()
+        choice = input("Enter a number of the save you want to load or 'back' to go to the main menu.").strip()
         if choice.lower() == "back":
             return None
 
-        loaded = load_state(conn, choice)
-        if not loaded:
-            print("Save not found. Enter a valid player name or 'back' to go to the main menu.")
-        else:
-            # The new load_state() returns a state dict with db_conn, save_id, and player_name
-            save_id = loaded["save_id"]
-            print(f"Loading {choice}. (Save ID #{save_id})")
-            time.sleep(1.5)
+        try:
+            choice = int(choice)
+        except ValueError:
+            print("Please enter a valid number or 'back'.")
+
+        if choice <= len(rows):
+            save_id = rows[choice-1][0]
             return save_id
+        else:
+            print("Please enter a valid number or 'back'.")

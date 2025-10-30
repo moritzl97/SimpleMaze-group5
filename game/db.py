@@ -77,6 +77,22 @@ def init_db(state):
     """)
 
     cursor.execute("""
+                CREATE TABLE IF NOT EXISTS achievements (
+                    achievement_id TEXT PRIMARY KEY,
+                    name TEXT UNIQUE,
+                    icon TEXT
+                   );""")
+
+    cursor.execute("""
+                CREATE TABLE IF NOT EXISTS savefile_to_achievement (
+                    save_id INTEGER NOT NULL,
+                    achievement_id TEXT NOT NULL,
+                    PRIMARY KEY (save_id, achievement_id),
+                    FOREIGN KEY (save_id) REFERENCES saves(save_id),
+                    FOREIGN KEY (achievement_id) REFERENCES achievements(achievement_id)
+                   );""")
+
+    cursor.execute("""
                  CREATE TABLE IF NOT EXISTS scoreboard (
                      player_name TEXT PRIMARY KEY,
                      percentage INTEGER,
@@ -164,13 +180,39 @@ def init_db(state):
         ('milk_carton',),
         ('gemstone',),
         ('pickaxe',),
-        ('trophy',),
+        ('cursed_trophy',),
         #cyberroom
         ('cyber_key',),
         #riddleroom
         ('magnet',),
         #computerlab
         ('lab_key',),
+        #study landscape
+        ('rusty_key',),
+        ('lab_permit',),
+        # library
+        ('python_tutorial',),
+        # roof garden
+        ('cursed_rose',),
+        # tbd
+        ('beer',),
+        ('bootle_opener',),
+    ]
+    cursor.executemany(insert_query, rows_to_insert)
+
+    insert_query = "INSERT OR IGNORE INTO achievements (achievement_id, name, icon) VALUES (?, ?, ?);"
+    rows_to_insert = [
+        # general
+        ('finish_a_game', 'Finish a game', '🏅',),
+        # dragon room
+        ('kill_dragon', 'Kill the dragon', '🗡️🐉',),
+        ('bribe_dragon', 'Bribe the dragon', '💎',),
+        ('steal_trophy', 'Steal the trophy', '🥷🏆',),
+        ('destroy_chest', 'Hopefully nothing important was in there...', '💥📦',),
+        # roof garden
+        ('pet_cat', 'Pet a black cat','🐈‍⬛',),
+        #study landscape
+        ('coffee_adict', 'Being addicted to coffee', '☕️',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
 
@@ -302,7 +344,7 @@ def load_state(conn, player_name: str):
 
 def list_saves(conn):
     return conn.execute("""
-            SELECT p.player_name, ss.current_room, s.saved_at
+            SELECT s.save_id, p.player_name, ss.current_room, s.saved_at
             FROM saves s
             JOIN players p ON s.player_id = p.player_id
             LEFT JOIN save_state ss ON s.save_id = ss.save_id
