@@ -326,14 +326,13 @@ def handle_take_key(state):
 # Displays all commands available in the CyberRoom
 # -----------------------------------------------------------------------------
 def handle_help():
-    print("\nCyberroom commands:")
-    print("look around        = Look around the room")
-    print("panel <1/2/3>      = Try solving a math panel")
-    print("code <......>      = Enter the terminal code")
-    print("release ghost      = Free the classmate ghost (after unlock, before key)")
-    print("lock ghost         = Keep the ghost trapped (after unlock, before key)")
-    print("take key           = Take the cyber key if unlocked")
-    print("help or ?          = Show this help again")
+    print("Cyberroom commands:")
+    print("- look around         : Look around the room")
+    print("- panel <1/2/3>       : Try solving a math panel")
+    print("- code <......>       : Enter the terminal code")
+    print("- take key            : Take the key if unlocked")
+    print("- release ghost       : Free the classmate ghost (after unlock, before key)")
+    print("- lock ghost          : Keep the ghost trapped (after unlock, before key)")
 
 
 # -----------------------------------------------------------------------------
