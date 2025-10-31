@@ -14,6 +14,7 @@ from game.db import *
 from game.utils import *
 from rooms.computer_lab_db_utils import *
 
+# questions for the folders
 
 intercultural_questions = [
     ("When working with a team from different cultures, what is the best approach? (A) respect the differences and communicate openly, (B) assume everyone communicates the same way, (C) avoid discussing anything", ["a", "respect the differences and communicate openly"]),
@@ -53,11 +54,11 @@ professional_questions = [
 
 
 def computer_lab_enter(state):
-    cl_get_state(state)
-    print("\n💻 You step into the computer lab.")
-    if db_mark_room_completed(state, "computer_lab"):
+    if db_get_room_completed(state, "computer_lab"):
         print(f"\n{Color.bold}You've already finished this room!{Color.end}")
         return False
+    cl_get_state(state)
+    print("\n💻 You step into the computer lab.")
     print("The room is dead silent. There's only one person working on their computer.")
     print("The said person looks up to look at you, but immediately turns their gaze towards the computer again.")
 
@@ -123,7 +124,7 @@ def handle_ask(target, state):
 
             response = input("\nYour answer: ").strip().lower()
             normalized = response
-            if normalized in ["binary", "binary code", "bits"]:
+            if normalized in ["binary", "binary code", "bits", "bite"]:
                 print("\nThe student smiles.")
                 print(f"\n👩 {Color.orange}{Color.bold}Yeah, that's right! I was curious if you knew ")
                 print("👩 Anyway, the password to the laptop is: crypt0 ")
@@ -162,7 +163,7 @@ def handle_interact(state):
         print(f"----------------------------------------------------------------{Color.end}")
         return None
 
-    if cl_is_laptop_unlocked(state):
+    if cl_is_laptop_unlocked(state): # checks if the laptop is unlocked
         print("\nYou open the laptop again.")
         laptop_screen(state)
         return None
@@ -188,8 +189,8 @@ def handle_interact(state):
             if attempts > 0:
                 print(f"❌ {Color.red}Incorrect password! Attempts left: {attempts}{Color.end}")
             else:
-                cl_set_softlock_value(state, 30)
-                lock_time = cl_check_softlock_value(state) # the laptop gets locked after getting the password wrong 3 times
+                cl_set_softlock_value(state, 30) # the laptop gets locked after getting the password wrong 3 times
+                lock_time = cl_check_softlock_value(state)
                 print("\n🚫 The laptop has been locked for 30 seconds after too many failed attempts.")
                 remaining = lock_time - time.time()
                 print(f"{Color.red}--------------------------------------------")
@@ -209,8 +210,7 @@ def laptop_screen(state):
                 print("\n📂 You've opened the folder called Intercultural Collaboration.")
                 print("\nImmediately after opening the folder u get a pop up window.\n")
                 print(f"{Color.framed} ")
-                print("In order to obtain a fragment of the hidden key to the locked folder you have to finish 2 questions.")
-                print(f" {Color.end} ")
+                print(f"In order to obtain a fragment of the hidden key to the locked folder you have to finish 4 questions.{Color.end}")
                 play_two_random_questions("Intercultural Collaboration", intercultural_questions) # plays 4 randomized questions
                 cl_mark_seminar_completed(state, 'intercultural collaboration')
                 print(f"✅ {Color.green}You obtained the key fragment from this folder!{Color.end}\n")
@@ -223,8 +223,7 @@ def laptop_screen(state):
                 print("\n📂 You've opened the folder called Database & Data Structures.")
                 print("\nImmediately after opening the folder u get a pop up window.\n")
                 print(f"{Color.framed} ")
-                print("In order to obtain a fragment of the hidden key to the locked folder you have to finish 2 questions.")
-                print(f" {Color.end} ")
+                print(f"In order to obtain a fragment of the hidden key to the locked folder you have to finish 4 questions.{Color.end}")
                 play_two_random_questions("Database & Data Structures", database_questions) # plays 4 randomized questions
                 cl_mark_seminar_completed(state, 'database & data structures')
                 print(f"✅ {Color.green}You obtained the key fragment from this folder!{Color.end}\n")
@@ -238,8 +237,7 @@ def laptop_screen(state):
                 print("\n📂 You've opened the folder called Professional Skills.")
                 print("\nImmediately after opening the folder u get a pop up window.\n")
                 print(f"{Color.framed} ")
-                print("In order to obtain a fragment of the hidden key to the locked folder you have to finish 2 questions.")
-                print(f" {Color.end} ")
+                print(f"In order to obtain a fragment of the hidden key to the locked folder you have to finish 4 questions.{Color.end}")
                 play_two_random_questions("Professional Skills", professional_questions) # plays 4 randomized questions
                 cl_mark_seminar_completed(state, 'professional skills')
                 print(f"✅ {Color.green}You obtained the key fragment from this folder!{Color.end}\n")
@@ -253,8 +251,7 @@ def laptop_screen(state):
                 print("\n📂 You've opened the folder called Python Programming.")
                 print("\nImmediately after opening the folder u get a pop up window.\n")
                 print(f"{Color.framed} ")
-                print("In order to obtain a fragment of the hidden key to the locked folder you have to finish 2 questions.")
-                print(f" {Color.end} ")
+                print(f"In order to obtain a fragment of the hidden key to the locked folder you have to finish 4 questions.{Color.end}")
                 play_two_random_questions("Python Programming", python_questions) # plays 4 randomized questions
                 cl_mark_seminar_completed(state, 'python programming')
                 print(f"✅ {Color.green}You obtained the key fragment from this folder!{Color.end}\n")
