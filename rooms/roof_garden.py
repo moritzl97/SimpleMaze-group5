@@ -110,6 +110,7 @@ def repair_robot(state):
         dice2 = state["roof_garden"]["dice"][1]
         new_dice = min(dice1 + dice2, 6)
         state["roof_garden"]["dice"] = [new_dice]
+        print("Your last two dice where combined.")
     elif len(state["roof_garden"]["dice"]) > 2: # if more than two dice, let the player decide
         print(f"\nEnter two dice to be combined together from you dice {' '.join(convert_dice_to_faces(state['roof_garden']['dice']))}:")
         while True:
@@ -142,9 +143,9 @@ def repair_robot(state):
 def search_garden(state):
     print("You see a hammock spanned between two berry bushes. A garden robot is standing still, as if it is rusted in place.")
     print("A black shadow startles you. However it is just a cat.")
-    state["roof_garden"]["actions"]["lay_hammock"] = {"text": "Lay in hammock", "description": "+1 to all dice", "dice": [1, 2, 3, 4, 5, 6], "action": lay_hammock}
+    state["roof_garden"]["actions"]["lay_hammock"] = {"text": "Lay hammock", "description": "+1 to all dice", "dice": [1, 2, 3, 4, 5, 6], "action": lay_hammock}
     state["roof_garden"]["actions"]["pet_cat"] = {"text": "Pet cat", "dice": [5, 6], "action": pet_cat}
-    state["roof_garden"]["actions"]["repair_robot"] = {"text": "Repair garden robot", "description": "combine two dice together", "dice": [5, 6], "action": repair_robot}
+    state["roof_garden"]["actions"]["repair_robot"] = {"text": "Repair robot", "description": "combine two dice together", "dice": [5, 6], "action": repair_robot, "color":Color.green}
     state["roof_garden"]["actions"]["eat_berry"] = {"text": "Eat berry", "description": "-2 to all dice", "dice": [3, 4, 5, 6], "action": eat_berry}
 
 def pet_cat(state):
@@ -254,8 +255,8 @@ def roof_garden_enter(state):
     # Available actions at the beginning
     actions = {
         "search_garden": {"text": "Search garden", "dice": [1 ,2 ,3 , 4, 5, 6], "action":search_garden},
-        "add_fertilizer": {"text": "Add fertilizer", "dice": [6], "action": add_fertilizer},
-        "water_orchid ": {"text": "Water orchid", "dice": [1], "action": water_orchid},
+        "add_fertilizer": {"text": "Add fertilizer", "dice": [6], "action": add_fertilizer, "color":Color.green},
+        "water_orchid ": {"text": "Water orchid", "dice": [1], "action": water_orchid, "color":Color.green},
     }
     state["roof_garden"]["actions"] = actions
     return True
@@ -291,7 +292,7 @@ def roof_garden_commands(command, state):
                 if input_dice in item["dice"]:
                     state["roof_garden"]["dice"].remove(input_dice) # remove spend dice
                     item["action"](state) # call function associated with the chosen action
-                    if not command[:-2] == "lay in hammock": # Delete the action, you can only do it once. Except if it is 'lay in hammock', this can be performed multiple times
+                    if not command[:-2] == "lay hammock": # Delete the action, you can only do it once. Except if it is 'lay hammock', this can be performed multiple times
                         del state["roof_garden"]["actions"][key]
                     break
             elif item["text"].lower() == command: # If the player just entered the action, but not a die remind them to enter a die
@@ -301,7 +302,7 @@ def roof_garden_commands(command, state):
         if state["roof_garden"]["dice"]: # If there are dice left, print dice and all available action with their associated dice
             print(f"Your energy dice: {' '.join(convert_dice_to_faces(state['roof_garden']['dice']))}")
             for key, value in state["roof_garden"]["actions"].items():
-                print(f"\n{value['text']} {'/'.join(convert_dice_to_faces(value['dice']))}", end='')
+                print(f"\n{value.get('color', Color.end)}{value['text']}{Color.end} {'/'.join(convert_dice_to_faces(value['dice']))}", end='')
                 if value.get('description', False):
                     print(f": This will result in {value.get('description')}", end='')
         print("")

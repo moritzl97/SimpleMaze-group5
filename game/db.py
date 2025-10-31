@@ -244,7 +244,9 @@ def init_db(state):
         ('pet_cat', 'Pet a black cat','🐈‍⬛',),
         #study landscape
         ('coffee_adict', 'Being addicted to coffee', '☕️',),
+        #cyberroom
         ('schoolnerd', 'Go back to school', '📓',),
+        #riddleroom
         ('einstein', 'Too many wrong attempts', '🤓')
     ]
     cursor.executemany(insert_query, rows_to_insert)
