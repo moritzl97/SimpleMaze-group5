@@ -47,6 +47,8 @@ def cl_get_state(state):
         "seminars": seminars
     }
 
+# the riddle puzzle
+
 def cl_set_riddle_answer(state, solved: bool):
     conn = state["db_conn"]
     save_id = state["save_id"]
@@ -58,6 +60,7 @@ def cl_set_riddle_answer(state, solved: bool):
     conn.commit()
 
 def cl_check_riddle_answer(state):
+    # checks if the player has answered the riddle
     conn = state["db_conn"]
     save_id = state["save_id"]
     cursor = conn.execute("""
@@ -68,6 +71,7 @@ def cl_check_riddle_answer(state):
     result = cursor.fetchone()
     return bool(result and result[0] == 1)
 
+# laptop in the computer lab
 
 def cl_set_laptop_unlocked(state, unlocked: bool):
     conn = state["db_conn"]
@@ -80,6 +84,7 @@ def cl_set_laptop_unlocked(state, unlocked: bool):
     conn.commit()
 
 def cl_is_laptop_unlocked(state):
+    # checks if the player unlocked the laptop
     conn = state["db_conn"]
     save_id = state["save_id"]
     cursor = conn.execute("""
@@ -90,6 +95,7 @@ def cl_is_laptop_unlocked(state):
     result = cursor.fetchone()
     return bool(result and result[0] == 1)
 
+# computer lock
 
 def cl_set_softlock_value(state, value: float):
     conn = state["db_conn"]
@@ -104,6 +110,7 @@ def cl_set_softlock_value(state, value: float):
     return unlock_time
 
 def cl_check_softlock_value(state):
+    # checks if the laptop is still locked
     conn = state["db_conn"]
     save_id = state["save_id"]
     cursor = conn.execute("""
@@ -113,6 +120,8 @@ def cl_check_softlock_value(state):
     """, (save_id,))
     result = cursor.fetchone()
     return result[0] if result and result[0] is not None else None
+
+# seminar folder questions
 
 def cl_mark_seminar_completed(state, seminar_name: str):
     # marks a specific seminar as completed
