@@ -310,11 +310,11 @@ def laptop_screen(state):
 
 def handle_help():
         # shows available commands in the room
-        print("\nComputer Lab commands:")
-        print("- look around                      : Examine the room and its contents.")
-        print("- talk student                     : Talk to the student.")
-        print("- ask student                      : Ask a student a question.")
-        print("- interact laptop                  : Interact with the laptop.")
+        print("Computer Lab commands:")
+        print("- look around         : Examine the room and its contents.")
+        print("- talk student        : Talk to the student.")
+        print("- ask student         : Ask a student a question.")
+        print("- interact laptop     : Interact with the laptop.")
 
 def computer_lab_commands(command, state):
 
