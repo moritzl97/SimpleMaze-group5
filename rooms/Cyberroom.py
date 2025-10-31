@@ -298,7 +298,7 @@ def handle_lock_ghost(state):
     matrix_rain(rows=4, cols=50, delay=0.08)
     db_award_achievement(state, "ghost_lock")
 
-    # Mark choice made and spawn key
+    #  choice made and spawn key
     state["cyberroom"]["ghost"]["choice_made"] = True
     print("The ?_mark key glows inside!")
 
