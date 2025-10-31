@@ -10,7 +10,7 @@ from game.db_utils import *
 book_order = ["intercultural sensitivity", "beginner sql", "python tutorial"]
 
 def handle_help(state):
-    print("Library:")
+    print("\nLibrary:")
     print("- look around         : Get more information about you surrounding.")
     print("- take <booktitle>    : Take a book")
 

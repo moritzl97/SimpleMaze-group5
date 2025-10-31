@@ -142,7 +142,7 @@ def cloudroom_commands(command, state):
 
     # ---- helpers ----
     def show_help():
-        print("Cloud Room commands:")
+        print("\nCloud Room commands:")
         print("- look around         : Take a gander at the surroundings of the room.")
         print("- inspect <object>    : Use on desk, poster, server rack, whiteboard, plant and robot.")
         print("- unlock <password>   : To enter password (hint: the letters around spell something).")

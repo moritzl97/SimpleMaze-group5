@@ -306,7 +306,7 @@ def handle_interact(noun, state):
 
 def handle_help(noun, state):
     # list commands
-    print("Dragon Room commands:")
+    print("\nDragon Room commands:")
     print("Study Landscape commands:")
     print("- look around         : See what is in the room to interact with.")
     print("- take <item>         : Take a item")

@@ -47,3 +47,4 @@ def lab_corridor_commands(command, state):
         handle_help(state)
         return True
     return False
+

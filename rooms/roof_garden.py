@@ -184,7 +184,7 @@ def handle_look_greenhouse(state):
         print("In the greenhouse you see a orchid. However, looks a bit neglected.")
 
 def handle_help(state):
-    print("Roof Garden commands:")
+    print("\nRoof Garden commands:")
     print("- talk gardener       : Talk to the gardener.")
     if state["roof_garden"]["talked_to_gardener"] and state["roof_garden"]["dice"]:
         for key, value in state["roof_garden"]["actions"].items():

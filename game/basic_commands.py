@@ -162,7 +162,7 @@ def show_inventory(state):
     if item_list:
         print("You are carrying:")
         for item in item_list:
-            print(f" - {item.replace("_"," ").title()}")
+            print(f" - {item.replace('_', ' ').title()}")
     else:
         print("You are not carrying anything.")
 

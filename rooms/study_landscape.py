@@ -88,7 +88,7 @@ def handle_take(state, item):
         print(f"You can not pick up {item}.")
 
 def handle_help(state):
-    print("Study Landscape commands:")
+    print("\nStudy Landscape commands:")
     print("- look around         : Get more information about you surrounding.")
     print("- talk <person>       : Talk to someone in the room")
     print("- look summoning circle: Inspect the ominous circle in the corner.")
