@@ -28,6 +28,10 @@ def handle_look():
     print("The Laboratory Safety Officer is watching you through the window of the door to the Study Landscape.")
     print("You see a red button with a sign: 'Do not press' ")
 
+def handle_help(state):
+        print("\nLab Corridor commands:")
+        print("- look around         : Look around in the Lab corridor")
+
 def lab_corridor_commands(command, state):
     if command == "look around":
         handle_look()
@@ -38,5 +42,8 @@ def lab_corridor_commands(command, state):
         print("You look around.")
         time.sleep(2)
         print("But still nothing happens... Anyway. Better to move along before somebody catches you.")
+        return True
+    elif command in ["help", "?"]:
+        handle_help(state)
         return True
     return False

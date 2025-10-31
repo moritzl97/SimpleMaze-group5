@@ -28,10 +28,19 @@ def handle_look(state):
 def handle_take(state):
     db_add_item_to_inventory(state, "empty_soda_can")
 
+def handle_help(state):
+    print("\nNorth South Corridor commands:")
+    print("- look around         : Looks around in the North South corridor")
+
 def n_s_corridor_commands(command, state):
     if command == "look around":
         handle_look(state)
         return True
+
+    elif command in ["help", "?"]:
+        handle_help(state)
+        return True
+
     elif not db_is_item_in_inventory(state, "empty_soda_can") and (command == "take soda can" or command == "take can" or command == "take empty can" or command == "take empty soda can"):
         print("You pick up the empty soda can.")
         print("It is exactly what you thought it would be: A empty soda can.")

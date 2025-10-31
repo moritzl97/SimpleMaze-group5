@@ -36,8 +36,9 @@ def handle_talk(state):
         print("Janitor: Thanks again for the beer!")
 
 def handle_help(state):
-    print("East West Corridor commands:")
-    print("- talk janitor       : Talk to the janitor")
+    print("\nEast West Corridor commands:")
+    print("- look around         : Look around in the East West corridor")
+    print("- talk janitor        : Talk to the janitor")
 
 def e_w_corridor_commands(command, state):
     if command == "look around":
@@ -45,5 +46,8 @@ def e_w_corridor_commands(command, state):
         return True
     elif command == "talk janitor":
         handle_talk(state)
+        return True
+    elif command in ["help", "?"]:
+        handle_help(state)
         return True
     return False
