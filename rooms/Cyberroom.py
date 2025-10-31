@@ -4,7 +4,7 @@
 #   This room presents the player with math puzzles that unlock a terminal.
 #   A ghost NPC (Casper) interacts with the player, offering dialogue and a moral
 #   choice at the end (release or trap the ghost). The room progress is saved
-#   entirely in the database (no duplicated in-memory flags).
+#   entirely in the database
 # =============================================================================
 
 import random
