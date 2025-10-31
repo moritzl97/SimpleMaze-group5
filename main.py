@@ -54,7 +54,7 @@ def game_loop(save_id):
         / /`  | |_)  / /\  ( (` | |_|     |_/ |_/ |_/
         \_\_, |_| \ /_/--\ _)_) |_| |     (_) (_) (_)""")
         print("The bridge collapses behind you. You will have to find another way out...")
-        # time.sleep(6) TODO uncomment
+        time.sleep(6)
         # Start timer
         state["start_time"] = time.time()
 
@@ -153,7 +153,6 @@ state = {
     "db_conn": sqlite3.connect(path),
     "save_id": None,
     "start_time": None,
-    "roof_garden": {"weather": None, "talked_to_gardener":False, "dice": [], "orchid":{"water": False, "fertilizer": False, "robot": False}},
 }
 # Basic parameters for the database
 state["db_conn"].execute("PRAGMA foreign_keys = ON;")
