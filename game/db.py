@@ -240,7 +240,7 @@ def init_db(state):
         # tbd
         ('beer',),
         #controlroom
-        ('bootle_opener',),
+        ('bottle_opener',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
     # insert miscellaneous flags
