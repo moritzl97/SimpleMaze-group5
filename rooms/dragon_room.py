@@ -307,7 +307,12 @@ def handle_interact(noun, state):
 def handle_help(noun, state):
     # list commands
     print("Dragon Room commands:")
-    print("Type in a verb and a noun to interact with the things in the room.\nType 'look around' to see what is in the room. \nUse verbs lik: 'look', 'talk', 'inspect', 'trade' and 'take'")
+    print("Study Landscape commands:")
+    print("- look around         : See what is in the room to interact with.")
+    print("- take <item>         : Take a item")
+    print("- talk <person>       : Talk to someone in the room")
+    print("- inspect <object>    : Inspect a object.")
+    print("- trade               : Trade items.")
 
 # ---Parser---#
 def parse(user_input):
