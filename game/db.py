@@ -96,6 +96,28 @@ def init_db(state):
     #--------------end create common tables----------------#
 
     # --------------Create room specific tables------------#
+    # Computer Lab tables
+
+    conn.execute("""
+                 CREATE TABLE IF NOT EXISTS computer_lab_state (
+                     save_id           INTEGER PRIMARY KEY,
+                     riddle_answer     INTEGER DEFAULT 0,
+                     laptop_unlocked   INTEGER DEFAULT 0,
+                     laptop_softlocked REAL    DEFAULT 0,
+                     FOREIGN KEY (save_id) REFERENCES saves (save_id) ON DELETE CASCADE
+                 );
+                 """)
+
+    conn.execute("""
+                 CREATE TABLE IF NOT EXISTS computer_lab_seminars (
+                     save_id      INTEGER NOT NULL,
+                     seminar_name TEXT    NOT NULL,
+                     completed    INTEGER DEFAULT 0,
+                     PRIMARY KEY (save_id, seminar_name),
+                     FOREIGN KEY (save_id) REFERENCES saves (save_id) ON DELETE CASCADE
+                 );
+                 """)
+
     # CyberRoom tables
     conn.execute("""
         CREATE TABLE IF NOT EXISTS cyber_room_state (
@@ -207,8 +229,8 @@ def init_db(state):
         ('?_key',),
         #riddleroom
         ('magnet',),
-        #computerlab
-        ('lab_key',),
+        #computer lab
+        ('cloud_key',),
         #study landscape
         ('rusty_key',),('lab_permit',),
         # library
@@ -217,7 +239,7 @@ def init_db(state):
         ('cursed_rose',),
         # tbd
         ('beer',),
-        #computerlab
+        #controlroom
         ('bootle_opener',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
@@ -235,6 +257,8 @@ def init_db(state):
     rows_to_insert = [
         # general
         ('finish_a_game', 'Finish a game', '🏅',),
+        # computer lab
+        ('gnomed', 'You have been gnomed!', '🍄'),
         # dragon room
         ('kill_dragon', 'Kill the dragon', '🗡️🐉',),
         ('bribe_dragon', 'Bribe the dragon', '💎',),
@@ -249,7 +273,10 @@ def init_db(state):
         #riddleroom
         ('einstein', 'Too many wrong attempts', '🤓',),
         ('ghost_release', 'Released the ghost', '👻',),
-        ('ghost_lock', 'Locked the ghost in the room', '☠️')
+        ('ghost_lock', 'Locked the ghost in the room', '☠️'),
+        # controlroom
+        ('robot_master', 'Gained the robot’s respect', '🤖',),
+
     ]
     cursor.executemany(insert_query, rows_to_insert)
     #--------------End insert values into common tables-----------#
@@ -318,7 +345,7 @@ def create_new_save(state, current_player_name):
             INSERT INTO save_rooms (save_id, room_id, entered, completed)
             VALUES (?, ?, ?, 0);
         """, (save_id, room_id, entered))
-        
+
     # miscellaneous flags
     cursor.execute("""
             INSERT INTO flag_status (save_id, flag_id, status)
