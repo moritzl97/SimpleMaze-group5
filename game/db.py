@@ -273,7 +273,7 @@ def init_db(state):
         #riddleroom
         ('einstein', 'Too many wrong attempts', '🤓',),
         ('ghost_release', 'Released the ghost', '👻',),
-        ('ghost_lock', 'Locked the ghost in the room', '☠️')
+        ('ghost_lock', 'Locked the ghost in the room', '☠️'),
         # controlroom
         ('robot_master', 'Gained the robot’s respect', '🤖',),
 
