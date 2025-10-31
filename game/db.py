@@ -274,6 +274,9 @@ def init_db(state):
         ('einstein', 'Too many wrong attempts', '🤓',),
         ('ghost_release', 'Released the ghost', '👻',),
         ('ghost_lock', 'Locked the ghost in the room', '☠️')
+        # controlroom
+        ('robot_master', 'Gained the robot’s respect', '🤖',),
+
     ]
     cursor.executemany(insert_query, rows_to_insert)
     #--------------End insert values into common tables-----------#
@@ -342,7 +345,7 @@ def create_new_save(state, current_player_name):
             INSERT INTO save_rooms (save_id, room_id, entered, completed)
             VALUES (?, ?, ?, 0);
         """, (save_id, room_id, entered))
-        
+
     # miscellaneous flags
     cursor.execute("""
             INSERT INTO flag_status (save_id, flag_id, status)
