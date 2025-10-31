@@ -198,6 +198,8 @@ def handle_panel(panel, state):
     if ans.strip() == panels[panel]["answer"]:
         print("Correct! Panel {0} solved.".format(panel))
         cr_mark_panel_solved(state, panel)
+        if cr_are_all_panels_solved(state):
+            print("All panels are solved! Maybe you should try interacting with the terminal...")
 
     else:
         print("Wrong. Try again.")
