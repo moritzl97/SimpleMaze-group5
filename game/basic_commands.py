@@ -150,6 +150,10 @@ def handle_quit(state):
 
     db_update_elapsed_time(state)
     db_set_last_saved_time(state)
+    keep_keys = {"db_conn", "save_id", "start_time"}
+    for key in list(state.keys()):
+        if key not in keep_keys:
+            del state[key]
     print("Game Saved".center(82))
     print("\n")
     print("You wake up from a nightmare. Was this all a dream?".center(82))
