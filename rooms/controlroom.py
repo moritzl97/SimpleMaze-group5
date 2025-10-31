@@ -1,5 +1,5 @@
 import time
-from game.db_utils import db_add_item_to_inventory
+from game.db_utils import db_add_item_to_inventory, db_award_achievement
 
 EMOJI_QUESTION = "\u2753"  # ❓
 EMOJI_WRONG = "\u274C"     # ❌
@@ -60,6 +60,7 @@ def side_quest(state):
             return
         if answer == correct_answer:
             print(f"{EMOJI_CORRECT} Robot: Great job! You have unlocked the 'Robot Master' achievement.")
+            db_award_achievement(state, "robot_master")
             print("Hint: Understanding sequences will help solve the laptop puzzle ahead.")
             break
         else:
@@ -106,5 +107,5 @@ def puzzle(state):
     db_add_item_to_inventory(state, "bottle_opener")
     print("\nWith the bottle opener in hand, you feel one step closer to escaping this nightmare.\n")
     print("Now, head back and explore what lies beyond the control room door.")
-
+    time.sleep(4)
     return
