@@ -247,7 +247,9 @@ def init_db(state):
         #cyberroom
         ('schoolnerd', 'Go back to school', '📓',),
         #riddleroom
-        ('einstein', 'Too many wrong attempts', '🤓')
+        ('einstein', 'Too many wrong attempts', '🤓',),
+        ('ghost_release', 'Released the ghost', '👻',),
+        ('ghost_lock', 'Locked the ghost in the room', '☠️')
     ]
     cursor.executemany(insert_query, rows_to_insert)
     #--------------End insert values into common tables-----------#
