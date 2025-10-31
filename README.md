@@ -1,4 +1,4 @@
-# SimpleMaze – Group 5
+# ESCAPE THE NIGHTMARE
 
 A text-based adventure/maze game developed as part of the **Applied Computer Science** project at THUAS.  
 The goal is to explore rooms, solve small puzzles, and complete challenges to mark rooms as visited.
@@ -9,7 +9,7 @@ The goal is to explore rooms, solve small puzzles, and complete challenges to ma
 - CLI-based game (runs in the terminal).
 - Explore multiple rooms (Study Landscape, Classroom, Project Room, Cloud Room, …).
 - Each room has its own challenge
-- You win when you complete the challange of each room
+- You win after finding all 4 cursed items
 
 ## Tutorial
 Type commands in the console. This are the basic commands:
