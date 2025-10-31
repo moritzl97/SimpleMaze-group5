@@ -198,7 +198,7 @@ def show_status(state):
 
 def display_scoreboard(state, length=None):
     scoreboard_entries = db_get_scoreboard(state)
-    print(f"🏆 Scoreboard".center(82))
+    print("🏆 Scoreboard".center(82))
     if length:
         print(f"Top {length}".center(82))
     print("#" + "-"* 80 + "#")

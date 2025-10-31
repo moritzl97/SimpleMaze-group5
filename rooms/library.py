@@ -9,6 +9,11 @@ from game.db_utils import *
 
 book_order = ["intercultural sensitivity", "beginner sql", "python tutorial"]
 
+def handle_help(state):
+    print("Library:")
+    print("- look around         : Get more information about you surrounding.")
+    print("- take <booktitle>    : Take a book")
+
 def library_enter(state):
     if not db_is_item_in_inventory(state, "rusty_key"):
         print("You try to open the door to the library. However it is locked.")
@@ -56,6 +61,9 @@ def library_commands(command, state):
     if command.startswith("take"):
         item = command[5:]
         handle_take(state, item)
+        return True
+    if command == "?" or command == "help":
+        handle_help(state)
         return True
     return False
 
