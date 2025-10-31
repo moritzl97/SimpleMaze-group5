@@ -100,7 +100,7 @@ def handle_talk(target, state):
         return None
 
     if target == "student":
-        if cl_set_riddle_answer(state, True):
+        if cl_check_riddle_answer(state):
             print(f"\n👩 {Color.bold}{Color.orange}It's you again, didn't I help you already? {Color.end}")
         else:
             print("\nThe student turns around to face you. Confusion plastered on their face.")
@@ -111,7 +111,7 @@ def handle_talk(target, state):
 
 def handle_ask(target, state):
     if target == "student":
-        if cl_set_riddle_answer(state, True):
+        if cl_check_riddle_answer(state):
             print("\n\tThe student looks annoyed at you.")
             print(f"{Color.orange}{Color.bold}👩 Did you forget the password? It's crypt0. {Color.end}")
             return None
@@ -154,14 +154,15 @@ def play_two_random_questions(seminar_name, questions_list):
 def handle_interact(state):
     # checks if the laptop is still locked
     current_time = time.time()
-    if current_time < cl_set_softlock_value(state, 30):
-        remaining = cl_set_softlock_value(state, 30) - current_time
+    lock_time = cl_check_softlock_value(state)
+    if lock_time is not None and current_time < lock_time:
+        remaining = lock_time - current_time
         print(f"{Color.red}----------------------------------------------------------------")
         print(f"🚫 The laptop is still locked! Try again in {remaining} seconds.")
         print(f"----------------------------------------------------------------{Color.end}")
         return None
 
-    if cl_set_laptop_unlocked(state, True):
+    if cl_is_laptop_unlocked(state):
         print("\nYou open the laptop again.")
         laptop_screen(state)
         return None
@@ -187,9 +188,10 @@ def handle_interact(state):
             if attempts > 0:
                 print(f"❌ {Color.red}Incorrect password! Attempts left: {attempts}{Color.end}")
             else:
-                cl_set_softlock_value(state, 30) # the laptop gets locked after getting the password wrong 3 times
+                cl_set_softlock_value(state, 30)
+                lock_time = cl_check_softlock_value(state) # the laptop gets locked after getting the password wrong 3 times
                 print("\n🚫 The laptop has been locked for 30 seconds after too many failed attempts.")
-                remaining = cl_set_softlock_value(state, 30) - time.time()
+                remaining = lock_time - time.time()
                 print(f"{Color.red}--------------------------------------------")
                 print(f"⏳ {remaining} seconds remaining.")
                 print(f"--------------------------------------------{Color.end}")
