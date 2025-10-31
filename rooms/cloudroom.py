@@ -108,7 +108,7 @@ def cloudroom_enter(state):
 
     #Return to the corridor in case the "cloud_key" is missing
     if not check_cloud_access(state):
-        return "go lab corridor"
+        return False
 
     cr = cloud_db_get_state(state)
 
@@ -142,12 +142,11 @@ def cloudroom_commands(command, state):
 
     # ---- helpers ----
     def show_help():
-        print("\nCloud Room commands:")
-        print("  look or look around     (take a gander at the surroundings of the room)")
-        print("  inspect <object>        (desk, poster, server rack, whiteboard, plant, robot)")
-        print("  unlock <password>       (hint: the letters around spell something)")
-        print("  talk robot              (starts quiz if unlocked)")
-        print("  go <room>               (handled by global 'go' command)")
+        print("Cloud Room commands:")
+        print("- look around         : Take a gander at the surroundings of the room.")
+        print("- inspect <object>    : Use on desk, poster, server rack, whiteboard, plant and robot.")
+        print("- unlock <password>   : To enter password (hint: the letters around spell something).")
+        print("- talk robot          : Starts quiz if unlocked.")
         return True
 
     def look_around():
@@ -243,7 +242,7 @@ def cloudroom_commands(command, state):
             time.sleep(1.2)
             print("\nAmid the smoke, a faint blue glow catches your eye...")
             time.sleep(1)
-            print("Resting inside the robot’s remains is an unopened can, perfectly chilled.")
+            print("Resting inside the robot’s remains is an unopened bottle, perfectly chilled.")
             print("You lift it carefully — 'Cloud Lager', the brand says, though no such drink exists anymore.")
             print("You obtained: 🍺 *Cloud Lager*")
 
