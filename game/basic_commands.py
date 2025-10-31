@@ -13,11 +13,9 @@ from game.db_utils import *
 import datetime
 
 def handle_pause(state):
-
+    # pause the game and timer
     paused = True
     db_update_elapsed_time(state)
-    #player_name = state["player_name"]
-    #save_state(player_name, state)
     print(r"""
                   _______  _______           _______  _______ 
                   (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
@@ -62,6 +60,7 @@ def display_time(state, paused):
     print(f"Elapsed time: {int(elapsed)} seconds")
 
 def handle_go(command, state, room_functions, room_exits):
+    # lets the player go in another room
     if command.startswith("go "):
         destination_room = None
         input_destination_room = command[3:]
