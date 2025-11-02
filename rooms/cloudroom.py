@@ -235,7 +235,7 @@ def cloudroom_commands(command, state):
             time.sleep(1)
             print("💥 *BOOM!* The robot's head explodes in a puff of smoke and falls at your feet.")
             print("You pick it up — it's surprisingly intact.")
-            print("You obtained: 🧠 *Robot Head*")
+            print("You obtained: 🧠 *Cursed Robot Head*")
 
             db_add_item_to_inventory(state, "cursed_robot_head")
 
@@ -244,7 +244,7 @@ def cloudroom_commands(command, state):
             time.sleep(1)
             print("Resting inside the robot’s remains is an unopened bottle, perfectly chilled.")
             print("You lift it carefully — 'Cloud Lager', the brand says, though no such drink exists anymore.")
-            print("You obtained: 🍺 *Cloud Lager*")
+            print("You obtained: 🍺 *Cloud Lager Beer*")
 
             db_add_item_to_inventory(state, "beer")
 
