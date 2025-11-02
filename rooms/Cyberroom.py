@@ -313,7 +313,7 @@ def handle_take_key(state):
     if term_open and not has_key:
         print("You take the key and put it in your backpack.")
         db_add_item_to_inventory(state, "?_key")
-        db_mark_room_completed(state, "Cyberroom")
+        db_mark_room_completed(state, "cyber_room")
 
 
         if state["cyberroom"].get("ghost", {}).get("met"):

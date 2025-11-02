@@ -21,6 +21,7 @@ def handle_look():
 
 def handle_talk(state):
     if db_is_item_in_inventory(state, "beer") and db_is_item_in_inventory(state, "bottle_opener"):
+        print("The mood of the janitor lightens up.\nJanitor: Thanks for the beer! Here. I will make room for you to pass through.")
         db_remove_item_from_inventory(state, "beer")
         db_remove_item_from_inventory(state, "bottle_opener")
         db_set_flag(state, "n_s_unlocked", True)

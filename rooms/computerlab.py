@@ -292,7 +292,7 @@ def laptop_screen(state):
                     print(f"\n\n\n\n\n {Color.bold}An item called cloud_key has been added to your inventory.")
                     print("You can check it out by typing inventory in the console.")
                     print("You may now finish the cloud room by going back to the lab corridor.")
-                    db_add_item_to_inventory(state, "lab_key")
+                    db_add_item_to_inventory(state, "cloud_key")
                     db_mark_room_completed(state, "computer_lab")
                     break
                 else:

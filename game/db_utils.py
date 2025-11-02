@@ -6,6 +6,7 @@
 # School:  The Hague University of Applied Sciences (THUAS)
 # =============================================================================
 import time
+import datetime
 
 # Functions to easily interact with the database
 def db_is_item_in_inventory(state, item_name):
@@ -366,10 +367,12 @@ def db_set_last_saved_time(state):
     conn = state["db_conn"]
     save_id = state["save_id"]
 
+    local_time = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+
     cursor = conn.cursor()
     cursor.execute("""
                    UPDATE saves
-                   SET saved_at = CURRENT_TIMESTAMP
+                   SET saved_at = ?
                    WHERE save_id = ?;
-                   """, (save_id,))
+                   """, (local_time, save_id,))
     conn.commit()

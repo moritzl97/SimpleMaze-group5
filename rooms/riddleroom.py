@@ -1,5 +1,7 @@
 # --- Adventure Game: Riddle Room ---
 import random
+import time
+
 from game.db_utils import *
 
 def riddleroom_enter(state):
@@ -12,43 +14,44 @@ def riddleroom_enter(state):
         return True
 
 def riddleroom_commands(command, state):
-    challenge_solved = complex_challenge(state) # TODO Maybe don't just start the challenge but let the player start it by e.g. talking to the teacher
-    if challenge_solved:
-        print("You are inside Classroom 1.07.")
+    complex_challenge(state)
+    if db_is_item_in_inventory(state, 'challenge_solved'):
         if not db_is_item_in_inventory(state, 'cursed_magnet'):
             print("A shiny magnet is in a locked glass case. The teacher is watching you.")
         else:
             print("The glass case is empty now. The teacher nods approvingly.")
 
-        if command == "look around": #TODO add return True to all commands
+        if command == "look around":
             look_around(state)
+            return True
         elif command == "take magnet" and not db_is_item_in_inventory(state, 'cursed_magnet') and db_is_item_in_inventory(state, 'challenge_solved'):
             take("magnet", state)
+            print("You take the Cursed Magnet and are ready to move to another room.")
+            return True
     else:
         print(f"you failed the challenge, you can come back later")
+        time.sleep(2)
         return "go back"
 
 def look_around(state):
-    if not db_is_item_in_inventory(state, 'magnet_taken'):
+    if not db_is_item_in_inventory(state, 'cursed_magnet'):
         print("The magnet is in a locked glass case. The chalkboard reads: 'Solve the challenge to unlock it.'")
     else:
-        print("The classroom is empty except for the usual lab equipment.")
+        print("The classroom is empty except for the usual lab equipment. You are ready to move on.")
 
 def take(item, state):
-
     if item == "magnet":
         if db_is_item_in_inventory(state, 'challenge_solved'):
             db_add_item_to_inventory(state, 'cursed_magnet')
-            # state["riddleroom"]["magnet_taken"] = True
-            db_is_item_in_inventory(state, 'cursed_magnet')
-            print("You take the magnet and add it to your inventory.") #TODO add the state["completed"]["riddleroom"] = True here instead of below
+            db_mark_room_completed(state, "riddle_room")
+            print("You take the magnet and add it to your inventory.")
         else:
             print("The magnet is locked. Solve the challenge first.")
 
 
 
 def complex_challenge(state):
-    if db_is_item_in_inventory(state, 'challenge_solved'): # TODO challenge_solved shouldn't be an item added to the inventory, but a boolean flag in the state
+    if db_is_item_in_inventory(state, 'challenge_solved'):
         print("The teacher nods. You already solved the challenge here.")
         return True
 
@@ -97,7 +100,7 @@ def complex_challenge(state):
             break
         else:
             attempts -= 1
-            print(f"Wrong. Attempts left: {attempts}")
+            print(f"Wrong. Make sure to enter a word or a number as your answer. Attempts left: {attempts}")
     else:
         print("The teacher shakes his head. Come back when you're wiser.")
         return False
@@ -105,7 +108,7 @@ def complex_challenge(state):
     if attempts > 2:
         db_award_achievement(state, 'einstein')
 
-    # --- STEP 2: LOGIC PUZZLE --- #TODO Maybe split the puzzles such that the player has to start each round (you can look at the cyberroom for an example, Tieme did it there with the panels)
+    # --- STEP 2: LOGIC PUZZLE --- #
     print("\n--- Logic Puzzle ---")
     print("Three friends (Alice, Bob, and Carol) are sitting in a row.")
     print("Bob is not at either end. Carol is not next to Alice. Who is sitting in the middle?")
@@ -145,7 +148,7 @@ def complex_challenge(state):
 
     if final_input == expected_code:
         print("🔓 The glass case clicks open. You may now take the magnet!")
-        state["completed"]["riddleroom"] = True
+        db_add_item_to_inventory(state, "challenge_solved")
         return True
     else:
         print("Incorrect code. The challenge remains unsolved.")

@@ -1,9 +1,5 @@
 # db.py
 import json
-import datetime
-
-ISO = "%Y-%m-%dT%H:%M:%S.%fZ"
-def now_iso(): return datetime.datetime.now(datetime.UTC).strftime(ISO)
 
 def init_db(state):
     conn = state["db_conn"]
@@ -228,7 +224,7 @@ def init_db(state):
         #cyberroom
         ('?_key',),
         #riddleroom
-        ('magnet',),
+        ('cursed_magnet',),('challenge_solved',),
         #computer lab
         ('cloud_key',),
         #study landscape

@@ -1,5 +1,5 @@
 import time
-from game.db_utils import db_add_item_to_inventory, db_award_achievement
+from game.db_utils import db_add_item_to_inventory, db_award_achievement, db_mark_room_completed
 
 EMOJI_QUESTION = "\u2753"  # ❓
 EMOJI_WRONG = "\u274C"     # ❌
@@ -105,7 +105,8 @@ def puzzle(state):
 
     print("Correct! You found a bottle opener that might be useful ahead.")
     db_add_item_to_inventory(state, "bottle_opener")
+    db_mark_room_completed(state, "control_room")
     print("\nWith the bottle opener in hand, you feel one step closer to escaping this nightmare.\n")
     print("Now, head back and explore what lies beyond the control room door.")
-    time.sleep(4)
+    time.sleep(3)
     return
