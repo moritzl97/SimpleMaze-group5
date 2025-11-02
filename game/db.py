@@ -267,7 +267,7 @@ def init_db(state):
         #cyberroom
         ('schoolnerd', 'Go back to school', '📓',),
         #riddleroom
-        ('einstein', 'Too many wrong attempts', '🤓',),
+        ('einstein', 'Solved on first attempt', '🤓',),
         ('ghost_release', 'Released the ghost', '👻',),
         ('ghost_lock', 'Locked the ghost in the room', '☠️'),
         # controlroom

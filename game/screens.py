@@ -7,9 +7,8 @@
 # =============================================================================
 
 import sys
-from game.db import list_saves
+from game.db import list_saves, delete_save
 from game.basic_commands import display_scoreboard
-import datetime
 
 from game.db_utils import *
 from game.utils import *
@@ -77,12 +76,12 @@ def main_menu(state):
             # call exit function
             state["db_conn"].close()
             sys.exit()
-        # elif command.startswith("delete "):
-        #     # delete save
-        #     clear_screen()
-        #     save_id = int(command[7:])
-        #     delete_save(state, save_id)
-        #     time.sleep(2)
+        elif command.startswith("delete "):
+            # delete save
+            clear_screen()
+            save_id = int(command[7:])
+            delete_save(state, save_id)
+            time.sleep(2)
 
 def end_screen(state):
     # end screen

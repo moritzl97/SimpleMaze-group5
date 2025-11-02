@@ -25,7 +25,7 @@
                 }
             },
             "kill_dragon": {
-                "text": "You slay the beast. Triumphantly you fetch the trophy that it was hiding. You feel heroic and ready to move on to another room.",
+                "text": "You slay the beast. Triumphantly you fetch the cursed trophy that it was hiding. You feel heroic and ready to move on to another room.",
                 "action": [
                     [
                         "give_item",
@@ -51,7 +51,7 @@
                 "next_chapter": "dragon_angry"
             },
             "give_gem": {
-                "text": "The Dragon gives you a sceptical look. \nDragon:'Hmm. You really flatter me. I think I am ready to part with this old Trophy' \nThe Dragon hands you the Trophy. Satisfied you take the trophy. You feel accomplished and ready to move on to another room.",
+                "text": "The Dragon gives you a sceptical look. \nDragon:'Hmm. You really flatter me. I think I am ready to part with this old Trophy' \nThe Dragon hands you the Trophy. Satisfied you take the cursed trophy. You feel accomplished and ready to move on to another room.",
                 "action": [
                     [
                         "give_item",
@@ -97,7 +97,7 @@
                 }
             },
             "kill_dragon": {
-                "text": "You slay the beast. Triumphantly you fetch the trophy that it was hiding. You feel heroic and ready to move on to another room.",
+                "text": "You slay the beast. Triumphantly you fetch the cursed trophy that it was hiding. You feel heroic and ready to move on to another room.",
                 "action": [
                     [
                         "give_item",
@@ -736,7 +736,7 @@
                 }
             },
             "steal_success": {
-                "text": "Triumphantly you steal the trophy that the Dragon was hiding. You feel sneaky and ready to move on to another room.",
+                "text": "Triumphantly you steal the cursed trophy that the Dragon was hiding. You feel sneaky and ready to move on to another room.",
                 "action": [
                     [
                         "give_item",

@@ -42,6 +42,7 @@ def handle_look_summoning_circle(state):
         print("A portal opens up behind the figure. You see your bedroom and disturbingly yourself sleeping in the bed.")
         print(f"???: {Color.bold+Color.yellow}You can go now.{Color.end}")
         print("You step through the portal.")
+        db_mark_room_completed(state, "study_landscape")
         return "WIN"
     else:
         print("You hear a deep voice inside your head.")
