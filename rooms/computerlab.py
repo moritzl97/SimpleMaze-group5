@@ -17,39 +17,102 @@ from rooms.computer_lab_db_utils import *
 # questions for the folders
 
 intercultural_questions = [
-    ("When working with a team from different cultures, what is the best approach? (A) respect the differences and communicate openly, (B) assume everyone communicates the same way, (C) avoid discussing anything", ["a", "respect the differences and communicate openly"]),
-    ("You notice a team member is uncomfortable sharing their opinion due to cultural differences. What should you do? (A) ignore it to avoid awkwardness, (B) encourage them, (C) let others dominate the discussion", ["b", "encourage them"]),
-    ("What is key to successful intercultural collaboration? (A) speaking louder for clarity, (B) assuming others will adapt to your style, (C) empathy and understanding", ["c", "empathy and understanding"]),
-    ("How can you handle misunderstandings that arise due to cultural differences? (A) stop collaborating with them, (B) clarify politely and listen actively, (C) blame the other person for miscommunication", ["b", "clarify politely and listen actively"]),
-    ("How can leaders support intercultural collaboration? (A) discourage cultural discussions to stay neutral, (B) enforce one cultural standard for everyone, (C) promote inclusivity and model open communication", ["c", "promote inclusivity and model open communication"]),
-    ("What is the main benefit of intercultural collaboration? (A) it leads to innovation through diverse perspectives, (B) it increases misunderstandings and delays, (C) it makes decision-making slower and harder", ["a", "it leads to innovation through diverse perspectives"])
+    ("When working with a team from different cultures, what is the best approach? "
+     "\n(A) respect the differences and communicate openly, "
+     "\n(B) assume everyone communicates the same way, "
+     "\n(C) avoid discussing anything", ["a", "respect the differences and communicate openly"]),
+    ("You notice a team member is uncomfortable sharing their opinion due to cultural differences. What should you do? "
+     "\n(A) ignore it to avoid awkwardness "
+     "\n(B) encourage them "
+     "\n(C) let others dominate the discussion", ["b", "encourage them"]),
+    ("What is key to successful intercultural collaboration? "
+     "\n(A) speaking louder for clarity "
+     "\n(B) assuming others will adapt to your style "
+     "\n(C) empathy and understanding", ["c", "empathy and understanding"]),
+    ("How can you handle misunderstandings that arise due to cultural differences? "
+     "\n(A) stop collaborating with them "
+     "\n(B) clarify politely and listen actively "
+     "\n(C) blame the other person for miscommunication", ["b", "clarify politely and listen actively"]),
+    ("How can leaders support intercultural collaboration? "
+     "\n(A) discourage cultural discussions to stay neutral "
+     "\n(B) enforce one cultural standard for everyone "
+     "\n(C) promote inclusivity and model open communication", ["c", "promote inclusivity and model open communication"]),
+    ("What is the main benefit of intercultural collaboration? "
+     "\n(A) it leads to innovation through diverse perspectives "
+     "\n(B) it increases misunderstandings and delays "
+     "\n(C) it makes decision-making slower and harder", ["a", "it leads to innovation through diverse perspectives"])
 ]
 
 python_questions = [
     ("What is the output of print(3 + 4 * 2)?", ["11"]),
-    ("Which of these is a valid Python variable name? (A) 2fast (B) fast_2 (C) fast-2", ["b", "fast_2"]),
+    ("Which of these is a valid Python variable name? "
+     "\n(A) 2fast "
+     "\n(B) fast_2 "
+     "\n(C) fast-2", ["b", "fast_2"]),
     ("What does len('Python') return?", ["6"]),
-    ("Which keyword is used to define a function in Python? (A) function, (B) def, (C) func", ["b", "def"]),
-    ("How do you start a comment in Python? (A) /*, (B) //, (C) #", ["c", "#"]),
-    ("Which of the following creates a dictionary? (A) {1: 'a', 2: 'b'}, (B) (1: 'a', 2: 'b'), (C) [1: 'a', 2: 'b']", ["a", "{1: 'a', 2: 'b'}"])
+    ("Which keyword is used to define a function in Python? "
+     "\n(A) function "
+     "\n(B) def "
+     "\n(C) func", ["b", "def"]),
+    ("How do you start a comment in Python? "
+     "\n(A) /* "
+     "\n(B) // "
+     "\n(C) #", ["c", "#"]),
+    ("Which of the following creates a dictionary? "
+     "\n(A) {1: 'a', 2: 'b'} "
+     "\n(B) (1: 'a', 2: 'b') "
+     "\n(C) [1: 'a', 2: 'b']", ["a", "{1: 'a', 2: 'b'}"])
 ]
 
 database_questions = [
-    ("Which SQL command retrieves data from a table? (A) SELECT, (B) DELETE, (C) INSERT", ["a", "select"]),
-    ("Which SQL clause is used to filter rows? (A) WHERE, (B) FROM, (C) GROUP BY", ["a", "where"]),
+    ("Which SQL command retrieves data from a table? "
+     "\n(A) SELECT "
+     "\n(B) DELETE "
+     "\n(C) INSERT", ["a", "select"]),
+    ("Which SQL clause is used to filter rows? "
+     "\n(A) WHERE "
+     "\n(B) FROM "
+     "\n(C) GROUP BY", ["a", "where"]),
     ("A table has columns: ID, Name, Age. Which is a primary key?", ["id"]),
-    ("What does the INSERT command do in SQL? (A) deletes rows from a table, (B) adds new rows to a table, (C) retrieves data from a table", ["b", "adds new rows to a tabl"]),
-    ("What keyword combines rows from two or more tables based on a related column? (A) MERGE, (B) LINK, (C) JOIN", ["c", "join"]),
-    ("Which SQL command is used to change a table’s structure? (A) UPDATE TABLE, (B) ALTER TABLE, (C) CHANGE TABLE", ["b", "alter table"])
+    ("What does the INSERT command do in SQL? "
+     "\n(A) deletes rows from a table "
+     "\n(B) adds new rows to a table "
+     "\n(C) retrieves data from a table", ["b", "adds new rows to a tabl"]),
+    ("What keyword combines rows from two or more tables based on a related column? "
+     "\n(A) MERGE "
+     "\n(B) LINK "
+     "\n(C) JOIN", ["c", "join"]),
+    ("Which SQL command is used to change a table’s structure? "
+     "\n(A) UPDATE TABLE "
+     "\n(B) ALTER TABLE "
+     "\n(C) CHANGE TABLE", ["b", "alter table"])
 ]
 
 professional_questions = [
-    ("Best way to handle conflict with a colleague? (A) avoid them until the issue goes away, (B) communicate directly and discuss the issue calmly, (C) complain to everyone else about the problem", ["b", "communicate directly and discuss the issue calmly"]),
-    ("How can you improve your communication skills at work? (A) practice active listening and clear expression, (B) talk more loudly to be notice, (C) avoid giving feedback to others", ["a", "practice active listening and clear expression"]),
-    ("Receiving feedback: which is the best approach? (A) defend yourself immediately, (B) ignore it if it feels uncomfortable, (C) listen openly and reflect before responding", ["c", "listen openly and reflect before responding"]),
-    ("If you make a mistake at work, what should you do? (A) deny responsibility, (B) admit it, apologize, and correct it, (C) blame someone else", ["b", "admit it apologize and correct it"]),
-    ("If someone upsets you, what should you do first? (A) take a moment before responding calmly, (B) reply immediately with your emotions, (C) forward it to everyone in frustration", ["a", "take a moment before responding calmly"]),
-    ("What’s the best way to handle a missed deadline? (A) say nothing and hope they don’t notice, (B) blame technical issues, (C) inform your supervisor early and provide a plan to catch up", ["c", "inform your supervisor early and provide a plan to catch up"])
+    ("Best way to handle conflict with a colleague? "
+     "\n(A) avoid them until the issue goes away "
+     "\n(B) communicate directly and discuss the issue calmly "
+     "\n(C) complain to everyone else about the problem", ["b", "communicate directly and discuss the issue calmly"]),
+    ("How can you improve your communication skills at work? "
+     "\n(A) practice active listening and clear expression "
+     "\n(B) talk more loudly to be notice "
+     "\n(C) avoid giving feedback to others", ["a", "practice active listening and clear expression"]),
+    ("Receiving feedback: which is the best approach? "
+     "\n(A) defend yourself immediately, "
+     "\n(B) ignore it if it feels uncomfortable, "
+     "\n(C) listen openly and reflect before responding", ["c", "listen openly and reflect before responding"]),
+    ("If you make a mistake at work, what should you do? "
+     "\n(A) deny responsibility "
+     "\n(B) admit it, apologize, and correct it "
+     "\n(C) blame someone else", ["b", "admit it apologize and correct it"]),
+    ("If someone upsets you, what should you do first? "
+     "\n(A) take a moment before responding calmly "
+     "\n(B) reply immediately with your emotions "
+     "\n(C) forward it to everyone in frustration", ["a", "take a moment before responding calmly"]),
+    ("What’s the best way to handle a missed deadline? "
+     "\n(A) say nothing and hope they don’t notice "
+     "\n(B) blame technical issues "
+     "\n(C) inform your supervisor early and provide a plan to catch up", ["c", "inform your supervisor early and provide a plan to catch up"])
 ]
 
 
@@ -217,6 +280,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}ac__ ___ h___{Color.end}")
             else:
                 print("\n📂 You've already completed this folder and collected the key fragment.")
+                print(f"{Color.blue}ac__ ___ h___{Color.end}")
 
         elif player_choice in ["database & data structures", "2"]:
             if not cl_is_seminar_completed(state, 'database & data structures'):
@@ -230,6 +294,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}__es f__ ____{Color.end}")
             else:
                 print("\n📂 You've already completed this folder and collected the key fragment.")
+                print(f"{Color.blue}__es f__ ____{Color.end}")
 
 
         elif player_choice in ["professional skills", "3"]:
@@ -244,6 +309,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}____ _ly ___h{Color.end}")
             else:
                 print("\n📂 You've already completed this folder and collected the key fragment.")
+                print(f"{Color.blue}____ _ly ___h{Color.end}")
 
 
         elif player_choice in ["python programming", "4"]:
@@ -258,6 +324,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}____ ___ _ig_{Color.end}")
             else:
                 print("\n📂 You've already completed this folder and collected the key fragment.")
+                print(f"{Color.blue}____ ___ _ig_{Color.end}")
 
 
         elif player_choice in ["readme", "5"]:
