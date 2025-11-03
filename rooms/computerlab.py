@@ -280,6 +280,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}ac__ ___ h___{Color.end}")
             else:
                 print("\n📂 You've already completed this folder and collected the key fragment.")
+                print(f"{Color.blue}ac__ ___ h___{Color.end}")
 
         elif player_choice in ["database & data structures", "2"]:
             if not cl_is_seminar_completed(state, 'database & data structures'):
@@ -293,6 +294,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}__es f__ ____{Color.end}")
             else:
                 print("\n📂 You've already completed this folder and collected the key fragment.")
+                print(f"{Color.blue}__es f__ ____{Color.end}")
 
 
         elif player_choice in ["professional skills", "3"]:
@@ -307,6 +309,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}____ _ly ___h{Color.end}")
             else:
                 print("\n📂 You've already completed this folder and collected the key fragment.")
+                print(f"{Color.blue}____ _ly ___h{Color.end}")
 
 
         elif player_choice in ["python programming", "4"]:
@@ -321,6 +324,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}____ ___ _ig_{Color.end}")
             else:
                 print("\n📂 You've already completed this folder and collected the key fragment.")
+                print(f"{Color.blue}____ ___ _ig_{Color.end}")
 
 
         elif player_choice in ["readme", "5"]:
