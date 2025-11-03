@@ -50,6 +50,9 @@ def handle_resume(state, paused):
     state["start_time"] = time.time() - db_get_elapsed_time(state)
     print("Game resumed.")
 
+def admin_give(state, item):
+    db_add_item_to_inventory(state, item)
+
 def display_time(state, paused):
 
     if paused:
@@ -357,4 +360,6 @@ def handle_basic_commands(command, state, room_exits):
     elif command == "scoreboard":
         display_scoreboard(state, 5)
         return True
+    elif command.startswith("admin give "):
+        admin_give(state, command[11:])
     return False
