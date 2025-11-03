@@ -245,7 +245,7 @@ def roof_garden_enter(state):
         dice = [3,3,4,4,5,6]
     else:
         weather = "wind"
-        dice = [1,1,2,2,2,6]
+        dice = [1,1,2,2,3,6]
 
     state["roof_garden"]["weather"] = weather
     state["roof_garden"]["dice"] = dice
