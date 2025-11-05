@@ -7,6 +7,7 @@
 # =============================================================================
 
 import os
+import sys
 import math
 
 def clear_screen():
@@ -45,3 +46,26 @@ def print_room_entry_banner(room):
     `-._.-'                                                                 `-._.-'"""
     print(banner[:296 - int(room_name_len / 2)] + Color.bold + room_display_name + Color.end + banner[
         296 + math.ceil(room_name_len / 2):])
+
+def resource_path(relative_path):
+    try:
+        # PyInstaller creates a temp folder and stores path here
+        base_path = sys._MEIPASS
+    except AttributeError:
+        # When running in a normal Python environment, just use current dir
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+def print_and_center(input_str, end="\n"):
+    try:
+        width = os.get_terminal_size().columns
+    except OSError:
+        width = 80
+
+    lines = input_str.splitlines()
+    for i, line in enumerate(lines):
+        if i == len(lines) - 1:
+            print(line.center(width), end=end)  # Use custom end for last line
+        else:
+            print(line.center(width))

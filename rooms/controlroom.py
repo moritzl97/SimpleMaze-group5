@@ -1,5 +1,5 @@
 import time
-from game.db_utils import db_add_item_to_inventory, db_award_achievement, db_mark_room_completed
+from game.db_utils import *
 
 EMOJI_QUESTION = "\u2753"  # ❓
 EMOJI_WRONG = "\u274C"     # ❌
@@ -7,106 +7,108 @@ EMOJI_CORRECT = "\u2705"   # ✅
 EMOJI_ROBOT = "\U0001F916" # 🤖
 EMOJI_FREEZE = "\u2744"    # ❄️
 
-def ask_until_correct(question, correct_answer, error_msg="Incorrect, try again."):
-    attempts = 0
-    answer = ""
-    while answer != correct_answer:
-        answer = input(f"{EMOJI_QUESTION} {question}").strip()
-        if answer.lower() == "skip":
-            print("Puzzle skipped.")
-            return None, False
-        if answer != correct_answer:
-            attempts += 1
-            print(f"{EMOJI_WRONG} {error_msg}")
-            if attempts > 1:  # Congela tras más de un fallo
-                print(f"{EMOJI_FREEZE} Too many failed attempts! You are blocked for 15 seconds.")
-                time.sleep(15)
-                print("You can try again.")
-    print(f"{EMOJI_CORRECT} Correct!")
-    return answer, False
-
 def controlroom_enter(state):
     print("You enter the control room.")
-    print("You see a laptop on a desk buzzing softly with light.")
-    print("The door you came through is now locked behind you.\n")
-    print("Basic commands: show, look around, side quest, continue, go back")
-    print("Solve the puzzles to find something useful for your escape...")
+    print("All walls are covered in screens. You see buttons and levers controlling all sorts of systems in the school.")
+    print("A big machine stands in the middle of the room. Gears are turning and the machine is clicking.")
+    print("However, something seams not quite to work correctly.")
     return True
 
 def controlroom_commands(cmd, state):
-    if cmd in ["show", "look around"]:
-        print("You see a laptop on the desk and some scattered papers.")
+    if cmd == "look around":
+        if not db_get_room_completed(state, "control_room"):
+            print("The machine in the middle of the room needs repairs.")
+        print("One screen on the wall is pitch black. Behind it you see a robot with a soldering device fixing some electronics.")
         return True
-    elif cmd == "side quest":
+    elif cmd in ["?", "help"]:
+        handle_help(state)
+        return True
+    elif cmd in ["talk robot", "look robot", "robot"]:
         side_quest(state)
         return True
-    elif cmd == "continue":
-        print("You approach the laptop to start the puzzle.")
+    elif cmd in ["repair", "repair machine"]:
         puzzle(state)
-        return "go back"
-    else:
-        print("Invalid command. Try: show, look around, side quest, continue, go back.")
-        return False
+        return True
+    return False
+
+def handle_help(state):
+    print("\nControl Room commands:")
+    print("- look around         : Looks around in the North South corridor")
+    print("- talk robot          : Speak with the robot")
+    print("- repair machine      : Repair the big machine")
+
+def wait(seconds):
+    # Wait for input seconds
+    for i in range(seconds, 0, -1):
+        # print the whole line each time, start with \r to return to line start
+        print(f"\r{EMOJI_FREEZE} You are stunned for {i} seconds.  ", end='', flush=True)
+        time.sleep(1)
+    print("\nYou shake it off and can act again.")
+
+def ask_until_correct(question, correct_answer):
+    attempts = 0
+    answer = ""
+    while answer != correct_answer:
+        answer = input(f"{EMOJI_QUESTION} {question} ").strip()
+        if answer.lower() == "skip":
+            print("Puzzle skipped.")
+            return None
+        if answer != correct_answer:
+            attempts += 1
+            print(f"{EMOJI_WRONG} Incorrect, try again.")
+            if attempts > 1:
+                print("Too many failed attempts!")
+                wait(5)
+                print("You can try again.")
+    print(f"{EMOJI_CORRECT} Correct!")
+    return answer
 
 def side_quest(state):
-    print(f"{EMOJI_ROBOT} A friendly robot approaches you and says:")
-    print('"I can help with your puzzle if you answer this easy question."')
-    question = "I grow by adding the same number each time. If you start with 3 and add 3 repeatedly, what is the fourth number? "
+    if db_get_flag(state, "side_quest_completed"):
+        print("The robot doesn't respond anymore.")
+        return
+    print("Behind a damaged screen stands a robot. The robot stares on a small screen with a loading bar stuck at 99%.")
+    print("As you approach it looks up to you.")
+    print(f'{EMOJI_ROBOT}: My calculation chip got damaged. Can you help me out with the final problem?')
     correct_answer = "12"
-    while True:
-        answer = input(f"{EMOJI_ROBOT} {question}").strip()
-        if answer.lower() == "skip":
-            print(f"{EMOJI_ROBOT} Robot: Maybe next time!")
-            return
-        if answer == correct_answer:
-            print(f"{EMOJI_CORRECT} Robot: Great job! You have unlocked the 'Robot Master' achievement.")
-            db_award_achievement(state, "robot_master")
-            print("Hint: Understanding sequences will help solve the laptop puzzle ahead.")
-            break
-        else:
-            print(f"{EMOJI_WRONG} That's not it, try again or type 'skip' to leave the robot.")
+    answer = input(f"{EMOJI_ROBOT}: The number I am looking for grows by adding the same number each time. If you start with 3 and add 3 repeatedly, what is the fourth number? ").strip().lower()
+    print(f"The robot types in the answer {answer} into his terminal.")
+    if answer == correct_answer:
+        print("It displays 100%")
+        print(f"{EMOJI_ROBOT}: {EMOJI_CORRECT} Great job! Thank you for helping me!")
+        db_award_achievement(state, "robot_master")
+    else:
+        print(f"{EMOJI_WRONG} The progress bar stays stuck 99%. The robots eyes are fixed on the progress bar and it doesn't answer anymore.")
+    db_set_flag(state, "side_quest_completed", True)
 
 def puzzle(state):
-    print("\nSolve these number challenges to proceed:")
-    ans1, _ = ask_until_correct("What number comes next in the sequence 3, 6, 12, 24, __? ", "48")
+    if db_get_room_completed(state, "control_room"):
+        print("You already fixed the machine and are ready to move on to another room.")
+        return
+
+    print("You see different gears with numbers on them locked together. However, the last one is missing.")
+    ans1 = ask_until_correct("The numbers on the gears are 3, 6, 12 and 24. Which number should the last gear show?", "48")
     if ans1 is None:
         print("Puzzle exited.")
         return
-    ans2, _ = ask_until_correct("Which number doesn't belong: 14, 21, 28, 35, 40? ", "40")
+    print("Five levers that direct electricity are turned on.")
+    ans2 = ask_until_correct("The levers are labeled with numbers 14, 21, 28, 35 and 40. Which lever doesn't belong and should be turned of? ", "40")
     if ans2 is None:
         print("Puzzle exited.")
         return
-    ans3, _ = ask_until_correct("How much is the answer to 3 x 5 + 21? ", "36")
+    print("A screen and a keyboard folds out from the inside the machine.")
+    ans3 = ask_until_correct("The screen shows the math equation 3 x 5 + 21. What number should you enter? ", "36")
     if ans3 is None:
         print("Puzzle exited.")
         return
 
     password = ans1 + ans2 + ans3
-    print(f"\nThe laptop is password protected. Password = answers combined")
+    print("The last thing to do to repair the machine is to enter the final password.")
 
-    attempts = 0
-    frozen = False
-    attempt = ""
-    while attempt != password:
-        attempt = input("Enter the password to unlock the laptop: ").strip()
-        if attempt != password:
-            attempts += 1
-            print(f"{EMOJI_WRONG} Wrong password, try again.")
-            if attempts > 1:
-                print(f"{EMOJI_FREEZE} Too many failed attempts! You are blocked for 15 seconds.")
-                time.sleep(15)
-                print("You can try again.")
+    ask_until_correct("Combine all three answers from before to a 6 digit code.", password)
 
-    print("Laptop unlocked! Final question:")
-    finale, _ = ask_until_correct("What is the only even prime number? ", "2")
-    if finale is None:
-        print("Puzzle exited.")
-        return
-
-    print("Correct! You found a bottle opener that might be useful ahead.")
+    print("The machine starts to hum melodically. In the machine you find the cause of the malfunction. A bottle opener was jammed in between two gears.")
+    print("You are not sure how it will help you in the future, but you add it to your inventory. Now it is time to head back and explore what lies beyond the control room.")
     db_add_item_to_inventory(state, "bottle_opener")
     db_mark_room_completed(state, "control_room")
-    print("\nWith the bottle opener in hand, you feel one step closer to escaping this nightmare.\n")
-    print("Now, head back and explore what lies beyond the control room door.")
-    time.sleep(3)
     return

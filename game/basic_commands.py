@@ -12,56 +12,6 @@ from game.utils import *
 from game.db_utils import *
 import datetime
 
-def handle_pause(state):
-    # pause the game and timer
-    paused = True
-    db_update_elapsed_time(state)
-    print(r"""
-                  _______  _______           _______  _______ 
-                  (  ____ )(  ___  )|\     /|(  ____ \(  ____ \
-                  | (    )|| (   ) || )   ( || (    \/| (    \/
-                  | (____)|| (___) || |   | || (_____ | (__    
-                  |  _____)|  ___  || |   | |(_____  )|  __)   
-                  | (      | (   ) || |   | |      ) || (      
-                  | )      | )   ( || (___) |/\____) || (____/\
-                  |/       |/     \|(_______)\_______)(_______/
-    """)
-    print("Type 'time', 'resume', or 'quit'.".center(82))
-
-    while True:
-        command = input("> ").strip().lower()
-
-        if command == "time":
-            display_time(state, paused)
-
-        elif command == "resume":
-            handle_resume(state, paused)
-            break
-
-        elif command == "quit":
-            quit_flag = handle_quit(state)
-            return quit_flag
-
-        else:
-            print("Game is paused. Only available commands: time, resume and quit.")
-
-def handle_resume(state, paused):
-
-    state["start_time"] = time.time() - db_get_elapsed_time(state)
-    print("Game resumed.")
-
-def admin_give(state, item):
-    db_add_item_to_inventory(state, item)
-
-def display_time(state, paused):
-
-    if paused:
-        elapsed = db_get_elapsed_time(state)
-    else:
-        elapsed = time.time() - state["start_time"]
-
-    print(f"Elapsed time: {int(elapsed)} seconds")
-
 def handle_go(command, state, room_functions, room_exits):
     # lets the player go in another room
     if command.startswith("go "):
@@ -134,6 +84,16 @@ def handle_admin_go(command, state, room_functions, room_exits):
     db_set_current_room(state, destination_room)
     return True
 
+def handle_admin_give(command, state):
+    item = command[11:]
+    db_add_item_to_inventory(state, item)
+    if db_is_item_in_inventory(state, item):
+        print("Admin command executed. Item was added to inventory.")
+        print("WARNING: This could break things down the line.")
+    else:
+        print("Item not found.")
+    return
+
 def handle_help():
     #Show help message with available commands.
     print("\nAvailable commands:")
@@ -152,7 +112,7 @@ def handle_quit(state):
 
     db_update_elapsed_time(state)
     db_set_last_saved_time(state)
-    keep_keys = {"db_conn", "save_id", "start_time"}
+    keep_keys = {"db_conn", "save_id", "start_time", "volume"}
     for key in list(state.keys()):
         if key not in keep_keys:
             del state[key]
@@ -204,7 +164,11 @@ def show_status(state):
 
 def display_scoreboard(state, length=None):
     scoreboard_entries = db_get_scoreboard(state)
-    print("🏆 Scoreboard".center(82))
+    print_and_center(r""" ____                     _                         _ 
+/ ___|  ___ ___  _ __ ___| |__   ___   __ _ _ __ __| |
+\___ \ / __/ _ \| '__/ _ \ '_ \ / _ \ / _` | '__/ _` |
+ ___) | (_| (_) | | |  __/ |_) | (_) | (_| | | | (_| |
+|____/ \___\___/|_|  \___|_.__/ \___/ \__,_|_|  \__,_|""")
     if length:
         print(f"Top {length}".center(82))
     print("#" + "-"* 80 + "#")
@@ -337,11 +301,6 @@ def handle_basic_commands(command, state, room_exits):
     if command == "quit":
         quit_flag = handle_quit(state)
         return quit_flag
-    elif command == "pause":
-        quit_flag = handle_pause(state)
-        if quit_flag:
-            return quit_flag
-        return True
     elif command == "map":
         show_map(state, room_exits)
         return True
@@ -354,12 +313,10 @@ def handle_basic_commands(command, state, room_exits):
     elif command == "inventory" or command == "inv":
         show_inventory(state)
         return True
-    elif command == "time":
-        display_time(state, paused=False)
-        return True
     elif command == "scoreboard":
         display_scoreboard(state, 5)
         return True
     elif command.startswith("admin give "):
-        admin_give(state, command[11:])
+        handle_admin_give(command, state)
+        return True
     return False

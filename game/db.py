@@ -1,5 +1,6 @@
 # db.py
 import json
+from game.utils import resource_path
 
 def init_db(state):
     conn = state["db_conn"]
@@ -132,6 +133,21 @@ def init_db(state):
             FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE
         );
     """)
+    # Library
+    conn.execute("""
+                 CREATE TABLE IF NOT EXISTS library_books (
+                     book_id INTEGER PRIMARY KEY,
+                     title TEXT UNIQUE 
+                 );
+                 """)
+    conn.execute("""
+                 CREATE TABLE IF NOT EXISTS library_state (
+                     save_id INTEGER NOT NULL,
+                     book_id INTEGER NOT NULL,
+                     PRIMARY KEY (save_id, book_id),
+                     FOREIGN KEY (save_id) REFERENCES saves (save_id) ON DELETE CASCADE
+                 );
+                 """)
 
     #Cloud room table for state saving
     cursor.execute("""
@@ -224,7 +240,7 @@ def init_db(state):
         #cyberroom
         ('?_key',),
         #riddleroom
-        ('cursed_magnet',),('challenge_solved',),
+        ('cursed_magnet',),('money',),
         #computer lab
         ('cloud_key',),
         #study landscape
@@ -239,6 +255,12 @@ def init_db(state):
         ('bottle_opener',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
+    # insert books for library
+    insert_query = "INSERT OR IGNORE INTO library_books (title) VALUES (?);"
+    rows_to_insert = [
+        ('intercultural sensitivity',),('beginner sql',),('python tutorial',),
+    ]
+    cursor.executemany(insert_query, rows_to_insert)
     # insert miscellaneous flags
     insert_query = "INSERT OR IGNORE INTO flags (flag_id) VALUES (?);"
     rows_to_insert = [
@@ -246,6 +268,8 @@ def init_db(state):
         ('n_s_unlocked',),
         ('tutorial_finished',),
         ('skip_tutorial',),
+        ('challenge_solved',),
+        ('side_quest_completed',),
     ]
     cursor.executemany(insert_query, rows_to_insert)
     # insert all possible achievements
@@ -268,18 +292,22 @@ def init_db(state):
         ('schoolnerd', 'Go back to school', '📓',),
         #riddleroom
         ('einstein', 'Solved on first attempt', '🤓',),
+        ('jackpot', 'Win a Jackpot', '🎰',),
+        #cyberroom
         ('ghost_release', 'Released the ghost', '👻',),
         ('ghost_lock', 'Locked the ghost in the room', '☠️'),
         # controlroom
         ('robot_master', 'Gained the robot’s respect', '🤖',),
+
 
     ]
     cursor.executemany(insert_query, rows_to_insert)
     #--------------End insert values into common tables-----------#
 
     #--------------Insert values into room specific tables--------#
+    asset_file_path = resource_path("assets/dragon_room_dialog.json")
     #dragon room insert data in tables
-    with open("rooms/dragon_room_dialog.json", "r", encoding="utf-8") as file:
+    with open(asset_file_path, "r", encoding="utf-8") as file:
         dialog_tree = json.load(file)
     # dragon room insert all possible objects
     insert_query = "INSERT OR IGNORE INTO dragon_room_objects (name, dialog_tree) VALUES (?, ?);"
@@ -354,6 +382,12 @@ def create_new_save(state, current_player_name):
         INSERT INTO cloud_room_state (save_id, robot_locked, quiz_passed)
         VALUES (?, 1, 0);
     """, (save_id,))
+    #library
+    cursor.execute("""
+            INSERT INTO library_state (save_id, book_id)
+            SELECT ?, book_id
+            FROM library_books;
+            """, (save_id,))
 
     #dragon room
     # insert starting objects in the room

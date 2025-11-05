@@ -143,7 +143,7 @@ def repair_robot(state):
 def search_garden(state):
     print("You see a hammock spanned between two berry bushes. A garden robot is standing still, as if it is rusted in place.")
     print("A black shadow startles you. However it is just a cat.")
-    state["roof_garden"]["actions"]["lay_hammock"] = {"text": "Lay hammock", "description": "+1 to all dice", "dice": [1, 2, 3, 4, 5, 6], "action": lay_hammock}
+    state["roof_garden"]["actions"]["lay_hammock"] = {"text": "Lay hammock", "description": "+1 to all dice (can be used multiple times)", "dice": [1, 2, 3, 4, 5, 6], "action": lay_hammock}
     state["roof_garden"]["actions"]["pet_cat"] = {"text": "Pet cat", "dice": [5, 6], "action": pet_cat}
     state["roof_garden"]["actions"]["repair_robot"] = {"text": "Repair robot", "description": "combine two dice together", "dice": [5, 6], "action": repair_robot, "color":Color.green}
     state["roof_garden"]["actions"]["eat_berry"] = {"text": "Eat berry", "description": "-2 to all dice", "dice": [3, 4, 5, 6], "action": eat_berry}
