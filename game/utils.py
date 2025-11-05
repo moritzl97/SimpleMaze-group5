@@ -36,16 +36,15 @@ class Color:
 def print_room_entry_banner(room):
     room_display_name = room.replace("_", " ").title()
     room_name_len = len(room_display_name)
-    banner = r"""
-    .-=~=-.                                                                 .-=~=-.
-    (__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
-    ( _ __)                                                                 ( _ __)
-    (__  _)                                                                 (__  _)
-    ( _ __)                                                                 ( _ __)
-    (_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
-    `-._.-'                                                                 `-._.-'"""
-    print(banner[:296 - int(room_name_len / 2)] + Color.bold + room_display_name + Color.end + banner[
-        296 + math.ceil(room_name_len / 2):])
+    banner = r""".-=~=-.                                                                 .-=~=-.
+(__  _)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(__  _)
+( _ __)                                                                 ( _ __)
+(__  _)                                                                 (__  _)
+( _ __)                                                                 ( _ __)
+(_ ___)-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-=-._.-(_ ___)
+`-._.-'                                                                 `-._.-'"""
+    banner_with_text = banner[:280 - int(room_name_len / 2)] + room_display_name + banner[280 + math.ceil(room_name_len / 2):]
+    print_and_center(banner_with_text)
 
 def resource_path(relative_path):
     try:
@@ -58,10 +57,11 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 def print_and_center(input_str, end="\n"):
-    try:
-        width = os.get_terminal_size().columns
-    except OSError:
-        width = 80
+    # try:
+    #     width = os.get_terminal_size().columns
+    # except OSError:
+    #     width = 80
+    width = 126
 
     lines = input_str.splitlines()
     for i, line in enumerate(lines):

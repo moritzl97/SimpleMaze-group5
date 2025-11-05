@@ -437,3 +437,12 @@ def delete_save(state, save_id):
     cursor.execute("DELETE FROM saves WHERE save_id = ?;", (save_id,))
     conn.commit()
     print("Save deleted.")
+
+def delete_all_saves(state):
+    # delete a save file for a given save id
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM saves;")
+    cursor.execute("DELETE FROM players;")
+    conn.commit()
+    print("Save deleted.")

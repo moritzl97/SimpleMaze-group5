@@ -8,9 +8,7 @@
 
 import sys
 import time
-
-from game.db import list_saves, delete_save
-from game.basic_commands import display_scoreboard, handle_quit
+from game.db import list_saves, delete_save, delete_all_saves
 from game.db_utils import *
 from game.utils import *
 import pygame
@@ -21,6 +19,7 @@ def main_menu(state):
     while True:
         title_music.set_volume(state["volume"])
         clear_screen()
+        print("\n\n")
         print_and_center(r""" _______  _______  _______  _______  _______  _______ 
 (  ____ \(  ____ \(  ____ \(  ___  )(  ____ )(  ____ \
 | (    \/| (    \/| (    \/| (   ) || (    )|| (    \/
@@ -29,7 +28,8 @@ def main_menu(state):
 | (            ) || |      | (   ) || (      | (      
 | (____/\/\____) || (____/\| )   ( || )      | (____/\
 (_______/\_______)(_______/|/     \||/       (_______/""")
-        print_and_center(r""" ____  _____   _____ _     _____
+        print_and_center(r"""
+ ____  _____   _____ _     _____
 /  _ \/    /  /__ __Y \ /|/  __/
 | / \||  __\    / \ | |_|||  \  
 | \_/|| |       | | | | |||  /_ 
@@ -48,6 +48,7 @@ def main_menu(state):
         print(Color.end, end="")
         space = "   "
         print_and_center("Start new game" + space + "Load game" + space + "Delete save" + space + "Scoreboard" + space + "Achievements" + space + "Credits" + space + "Options" + space + "Exit game")
+        print("")
         # start game
         # load game
         # highscores
@@ -55,7 +56,7 @@ def main_menu(state):
 
         command = input("").strip().lower()
 
-        if command == "start new game" or command == "start" or command == "start game" or command == "new game":
+        if command in ["start new game", "start", "start game", "new game"]:
             title_music.stop()
             return None
         elif command == "load game" or command == "load":
@@ -68,7 +69,7 @@ def main_menu(state):
         elif command == "scoreboard":
             # call status command
             clear_screen()
-            display_scoreboard(state)
+            scoreboard_menu(state)
             input("")
         elif command == "options":
             # open option screen
@@ -95,29 +96,28 @@ def main_menu(state):
 def end_screen(state):
     # end screen
     clear_screen()
-    print(r"""
-                             _______  _        ______  
-                            (  ____ \( (    /|(  __  \ 
-                            | (    \/|  \  ( || (  \  )
-                            | (__    |   \ | || |   ) |
-                            |  __)   | (\ \) || |   | |
-                            | (      | | \   || |   ) |
-                            | (____/\| )  \  || (__/  )
-                            (_______/|/    )_)(______/ 
-    """)
+    print_and_center(r"""
+ _______  _        ______  
+(  ____ \( (    /|(  __  \ 
+| (    \/|  \  ( || (  \  )
+| (__    |   \ | || |   ) |
+|  __)   | (\ \) || |   | |
+| (      | | \   || |   ) |
+| (____/\| )  \  || (__/  )
+(_______/|/    )_)(______/ """)
     print("")
-    print("Congratulations! You escaped the nightmare!".center(82))
+    print_and_center("Congratulations! You escaped the nightmare!")
     time_delta = datetime.timedelta(seconds=db_get_elapsed_time(state))
     total_seconds = int(time_delta.total_seconds())
     hours, remainder = divmod(total_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     time_formatted = f"{hours}:{minutes:02}:{seconds:02}"
-    print(f"You completed the game in {time_formatted}".center(82))
+    print_and_center(f"You completed the game in {time_formatted}")
     achievements = db_get_all_achievements_of_a_save(state, state["save_id"])
     if achievements:
         print("")
-        print("You have gained the following achievements:".center(82))
-        print(f"{' '.join(achievements)}".center(82))
+        print_and_center("You have gained the following achievements:")
+        print_and_center(f"{' '.join(achievements)}")
     input("").strip().lower()
     return
 
@@ -127,22 +127,23 @@ def credits_screen():
 | |   | '__/ _ \/ _` | | __/ __|
 | |___| | |  __/ (_| | | |_\__ \
  \____|_|  \___|\__,_|_|\__|___/""")
+    print("")
     print_and_center("Escape of the Nightmare was created by:")
-    print("#" + "-" * 80 + "#")
+    print("#" + "-" * 124 + "#")
     print_and_center("""   Moritz Lackner    
     Oskar Lukáč      
  Dominika Nowakiewicz
    Mihail Petrov     
   Rodrigo Polo Lopez 
     Tieme van Rees   """)
-    print("#" + "-" * 80 + "#")
+    print("#" + "-" * 124 + "#")
     print_and_center("""This student project was created as part of the application\ndevelopment course at The Hague University of Applied Sciences.""")
-    print("#" + "-" * 80 + "#")
+    print("#" + "-" * 124 + "#")
     print_and_center("""Music and Sound Effect by
 Stronger Together by Nicolas Gasparini (Myuu)
 Mystery by HolFix
 Sound effect by LordSonny from Pixabay""")
-    print("#" + "-" * 80 + "#")
+    print("#" + "-" * 124 + "#")
     return
 
 def achievement_screen(state):
@@ -153,7 +154,8 @@ def achievement_screen(state):
   / _ \ / __| '_ \| |/ _ \ \ / / _ \ '_ ` _ \ / _ \ '_ \| __/ __|
  / ___ \ (__| | | | |  __/\ V /  __/ | | | | |  __/ | | | |_\__ \
 /_/   \_\___|_| |_|_|\___| \_/ \___|_| |_| |_|\___|_| |_|\__|___/""")
-    print("#" + "-"* 80 + "#")
+    print("")
+    print("#" + "-"* 124 + "#")
     for item in achievement_list:
         if not item[2]:
             player_percent = 0
@@ -161,9 +163,9 @@ def achievement_screen(state):
             player_percent = item[2]
         icon = item[0]
         description = item[1]
-        print(f"               {int(player_percent):>4}%    {icon}    {description.ljust(30)}")
-    print("#" + "-"* 80 + "#")
-    print("Percentages represent players who have unlocked the achievement.".center(82))
+        print(f"                                  {int(player_percent):>4}%    {icon}    {description.ljust(30)}")
+    print("#" + "-"* 124 + "#")
+    print_and_center("Percentages represent players who have unlocked the achievement.")
     return
 
 def load_menu(state):
@@ -176,7 +178,7 @@ def load_menu(state):
 |_____\___/ \__,_|\__,_| |____/ \__,_| \_/ \___|""")
     print("")
     rows = list_saves(conn)  # [(save_id, player_name, current_room, saved_at), ...]
-    print("#" + "-" * 80 + "#")
+    print("#" + "-" * 124 + "#")
     if not rows:
         print("There are no saves yet.")
         time.sleep(2)
@@ -197,8 +199,8 @@ def load_menu(state):
         date_only = timestamp.strftime("%d-%m-%Y")
         time_only = timestamp.strftime("%H:%M:%S")
         achievements = db_get_all_achievements_of_a_save(state, save_id)
-        print(f"   {row_number+1:>3}. {name:<12} In {last_room.replace('_', ' ').title():<18} Last saved at {date_only} {time_only} {' '.join(achievements)}")
-    print("#" + "-" * 80 + "#")
+        print(f"                        {row_number+1:>3}. {name:<12} In {last_room.replace('_', ' ').title():<18} Last saved at {date_only} {time_only} {' '.join(achievements)}")
+    print("#" + "-" * 124 + "#")
     print("")
 
     # Input loop
@@ -229,7 +231,7 @@ def delete_menu(state):
 |____/ \___|_|\___|\__\___| |____/ \__,_| \_/ \___|""")
     print("")
     rows = list_saves(conn)  # [(save_id, player_name, current_room, saved_at), ...]
-    print("#" + "-" * 80 + "#")
+    print("#" + "-" * 124 + "#")
     if not rows:
         print("There are no saves yet.")
         time.sleep(2)
@@ -243,14 +245,24 @@ def delete_menu(state):
         date_only = timestamp.strftime("%d-%m-%Y")
         time_only = timestamp.strftime("%H:%M:%S")
         achievements = db_get_all_achievements_of_a_save(state, save_id)
-        print(f"   {row_number+1:>3}. {name:<12} In {last_room.replace('_', ' ').title():<18} Last saved at {date_only} {time_only} {' '.join(achievements)}")
-    print("#" + "-" * 80 + "#")
+        print(f"                        {row_number+1:>3}. {name:<12} In {last_room.replace('_', ' ').title():<18} Last saved at {date_only} {time_only} {' '.join(achievements)}")
+    print("#" + "-" * 124 + "#")
     print("")
 
     # Input loop
     while True:
-        choice = input("Enter a number of the save you want to delete or 'back' to go to the main menu: ").strip().lower()
-        if choice.lower() == "back":
+        choice = input("Enter a number of the save you want to delete, 'delete all' to delete all saves or 'back' to go to the main menu: ").strip().lower()
+        if choice == "back":
+            return
+        elif choice == "delete all":
+            print("Are you sure you want to delete ALL saves? (y/n)")
+            print("Warning this is not reversible and will also delete ALL earned achievements.")
+            conformation = input("").strip().lower()
+            if conformation in ["yes", "y"]:
+                delete_all_saves(state)
+            else:
+                print("Nothing was deleted.")
+            time.sleep(2)
             return
         try:
             choice = int(choice)
@@ -280,6 +292,8 @@ def delete_menu(state):
     return
 
 def options_menu(state):
+    while True:
+        clear_screen()
         conn = state["db_conn"]
         print_and_center(r"""
   ___        _   _                 
@@ -294,19 +308,19 @@ def options_menu(state):
         print_and_center(f"Back         ")
 
         # Input loop
-        while True:
-            choice = input("").strip().lower()
-            if choice == "back":
-                return
-            elif choice.startswith("volume"):
-                try:
-                    choice = int(choice[7:])
-                except ValueError:
-                    print("To change the volume enter 'Volume <number>' with a number between 0 and 100.")
-                    continue
-                choice = min(max(choice, 0), 100)
-                state["volume"] = 0.25 * choice/100
-                return
+        choice = input("").strip().lower()
+        if choice == "back":
+            return
+        elif choice.startswith("volume"):
+            try:
+                choice = int(choice[7:])
+            except ValueError:
+                print("To change the volume enter 'Volume <number>' with a number between 0 and 100.")
+                time.sleep(3)
+                continue
+            choice = min(max(choice, 0), 100)
+            state["volume"] = 0.25 * choice/100
+            return
 
 def pause_menu(state, game_music):
     # pause the game and timer
@@ -340,10 +354,68 @@ def pause_menu(state, game_music):
             state["start_time"] = time.time() - db_get_elapsed_time(state)
             print("Game resumed.")
             return None
-        elif command == "quit":
+        elif command in ["quit", "exit", "quit game"]:
             quit_flag = handle_quit(state)
             return quit_flag
         elif command == "options":
             clear_screen()
             options_menu(state)
             game_music.set_volume(state["volume"])
+
+def scoreboard_menu(state, length=None):
+    scoreboard_entries = db_get_scoreboard(state)
+    print_and_center(r""" ____                     _                         _ 
+/ ___|  ___ ___  _ __ ___| |__   ___   __ _ _ __ __| |
+\___ \ / __/ _ \| '__/ _ \ '_ \ / _ \ / _` | '__/ _` |
+ ___) | (_| (_) | | |  __/ |_) | (_) | (_| | | | (_| |
+|____/ \___\___/|_|  \___|_.__/ \___/ \__,_|_|  \__,_|""")
+    print("")
+    if length:
+        print_and_center(f"Top {length}")
+    print("#" + "-"* 124 + "#")
+    if not scoreboard_entries:
+        print_and_center("There are no highscores yet.")
+    for placement, item in enumerate(scoreboard_entries, 1):
+        time_delta = datetime.timedelta(seconds=item[2])
+        total_seconds = int(time_delta.total_seconds())
+        hours, remainder = divmod(total_seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        time_formatted = f"{hours}:{minutes:02}:{seconds:02}"
+        if placement == 1:
+            color = Color.yellow
+        elif placement == 2:
+            color = Color.silver
+        elif placement == 3:
+            color = Color.bronze
+        else:
+            color = Color.end
+        print(f"                                {color}{placement:>3}. {item[0]:<12} {item[1]:>5}% completed     {time_formatted}{Color.end} {item[3].replace(',',' ') if item[3] is not None else ''}")
+        if placement == 3:
+            print("#" + "-"* 124 + "#")
+        if length:
+            if placement == length:
+                break
+    print("#" + "-"* 124 + "#")
+
+def intro_screen(state):
+    print("-" * 126)
+    print_and_center("For the best experience fullscreen the console and zoom in such that the lines touch on the left and right.\n(For most terminals use the keybind 'Cmd'+'+' or 'Cmd'+'mouse wheel' to zoom in.)\n")
+    print_and_center("Press any key to continue.")
+    print("-" * 126)
+    input("")
+
+def handle_quit(state):
+    clear_screen()
+
+    db_update_elapsed_time(state)
+    db_set_last_saved_time(state)
+    keep_keys = {"db_conn", "save_id", "start_time", "volume"}
+    for key in list(state.keys()):
+        if key not in keep_keys:
+            del state[key]
+    print("\n\n\n")
+    print_and_center("Game Saved")
+    print("\n")
+    print_and_center("You wake up from a nightmare. Was this all a dream?")
+    time.sleep(3)
+    return "quit"

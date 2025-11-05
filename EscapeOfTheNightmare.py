@@ -9,7 +9,7 @@
 import time
 from rooms import *
 from game.basic_commands import handle_basic_commands, handle_go, handle_admin_go
-from game.screens import pause_menu, main_menu, end_screen, credits_screen
+from game.screens import pause_menu, main_menu, end_screen, credits_screen, intro_screen
 from game.db import init_db, create_new_save
 from game.utils import *
 from game.db_utils import *
@@ -29,19 +29,26 @@ def game_loop(save_id):
         state["start_time"] = time.time() - db_get_elapsed_time(state)
     else:
         # Ask player name
-        print("\n\n\n")
-        print("Enter your name".center(82))
-        print("")
-        player_name = input(" " * 37)
+        while True:
+            print("\n\n\n")
+            print_and_center("Enter your name")
+            print("")
+            player_name = input(" " * 60).strip()
+            if player_name == "" or len(player_name)<4 or len(player_name)>20:
+                print_and_center("Please enter a valid username with at least 4 and less than 20 characters.")
+                time.sleep(2)
+                clear_screen()
+            else:
+                break
 
         clear_screen()
         print("\n\n\n")
-        print(f"Welcome to the Nightmare, {player_name}!".center(82))
+        print_and_center(f"Welcome to the Nightmare, {player_name}!")
         player_achievements = db_get_all_achievements_of_a_player(state, player_name)
         if player_achievements:
             print("")
-            print("You have already got the following achievements in previous games:".center(82))
-            print(f"{' '.join(player_achievements)}".center(82))
+            print_and_center("You have already got the following achievements in previous games:")
+            print_and_center(f"{' '.join(player_achievements)}")
 
         # Create new save in database
         create_new_save(state, player_name)
@@ -96,6 +103,7 @@ def game_loop(save_id):
     game_music.play(loops=-1, fade_ms=3000)
 
     # print entry banner for the first room
+    print("")
     print_room_entry_banner(db_get_current_room(state))
 
     # Display the enter message of the first room (or the room you are in, when loading a save)
@@ -184,6 +192,9 @@ init_db(state)
 
 #init sound player
 pygame.mixer.init()
+
+clear_screen()
+intro_screen(state)
 
 # Switch between main menu and game loop
 while True:

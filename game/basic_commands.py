@@ -10,6 +10,7 @@
 import time
 from game.utils import *
 from game.db_utils import *
+from game.screens import scoreboard_menu, handle_quit
 import datetime
 
 def handle_go(command, state, room_functions, room_exits):
@@ -107,21 +108,6 @@ def handle_help():
     print("- pause               : Pause the game")
     print("- quit                : Save and quit to the main menu.")
 
-def handle_quit(state):
-    clear_screen()
-
-    db_update_elapsed_time(state)
-    db_set_last_saved_time(state)
-    keep_keys = {"db_conn", "save_id", "start_time", "volume"}
-    for key in list(state.keys()):
-        if key not in keep_keys:
-            del state[key]
-    print("Game Saved".center(82))
-    print("\n")
-    print("You wake up from a nightmare. Was this all a dream?".center(82))
-    time.sleep(3)
-    return "quit"
-
 def show_inventory(state):
     #list items in inventory
     item_list = db_get_all_items_in_inventory(state)
@@ -146,11 +132,11 @@ def show_status(state):
     minutes, seconds = divmod(remainder, 60)
     time_formatted = f"{hours}:{minutes:02}:{seconds:02}"
 
-    print("#" + "-"* 80 + "#")
+    print("#" + "-"* 124 + "#")
     all_items = db_get_all_items_in_inventory(state)
     cursed_items = [item.replace("_"," ").title() for item in all_items if item.startswith("cursed")]
-    print(f"Progress of {player_name}".center(82))
-    print(f"{visited_rooms}/{total_rooms} Rooms completed ({percentage}%), {len(cursed_items)}/4 Cursed items, Time: {time_formatted}".center(82))
+    print_and_center(f"Progress of {player_name}")
+    print_and_center(f"{visited_rooms}/{total_rooms} Rooms completed ({percentage}%), {len(cursed_items)}/4 Cursed items, Time: {time_formatted}")
     completed_rooms = db_get_completed_rooms_list(state)
     completed_rooms = [item.replace("_"," ").title() for item in completed_rooms]
     achievements = db_get_all_achievements_of_a_save(state, state["save_id"])
@@ -160,39 +146,7 @@ def show_status(state):
         print(f"Cursed Items: {Color.purple + ', '.join(cursed_items) + Color.end}")
     if achievements:
         print(f"Earned Achievements: {' '.join(achievements)}")
-    print("#" + "-"* 80 + "#")
-
-def display_scoreboard(state, length=None):
-    scoreboard_entries = db_get_scoreboard(state)
-    print_and_center(r""" ____                     _                         _ 
-/ ___|  ___ ___  _ __ ___| |__   ___   __ _ _ __ __| |
-\___ \ / __/ _ \| '__/ _ \ '_ \ / _ \ / _` | '__/ _` |
- ___) | (_| (_) | | |  __/ |_) | (_) | (_| | | | (_| |
-|____/ \___\___/|_|  \___|_.__/ \___/ \__,_|_|  \__,_|""")
-    if length:
-        print(f"Top {length}".center(82))
-    print("#" + "-"* 80 + "#")
-    for placement, item in enumerate(scoreboard_entries, 1):
-        time_delta = datetime.timedelta(seconds=item[2])
-        total_seconds = int(time_delta.total_seconds())
-        hours, remainder = divmod(total_seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        time_formatted = f"{hours}:{minutes:02}:{seconds:02}"
-        if placement == 1:
-            color = Color.yellow
-        elif placement == 2:
-            color = Color.silver
-        elif placement == 3:
-            color = Color.bronze
-        else:
-            color = Color.end
-        print(f"     {color}{placement:>3}. {item[0]:<12} {item[1]:>5}% completed     {time_formatted}{Color.end} {item[3].replace(',',' ') if item[3] is not None else ''}")
-        if placement == 3:
-            print("#" + "-"* 80 + "#")
-        if length:
-            if placement == length:
-                break
-    print("#" + "-"* 80 + "#")
+    print("#" + "-"* 124 + "#")
 
 class MapRoom:
     def __init__(self, name, text_position, player_position, display_text):
@@ -298,7 +252,7 @@ def show_map(state, room_exits):
     floor_map.show(current_room, state, room_exits)
 
 def handle_basic_commands(command, state, room_exits):
-    if command == "quit":
+    if command in ["quit", "exit", "exit game", "quit game"]:
         quit_flag = handle_quit(state)
         return quit_flag
     elif command == "map":
@@ -314,7 +268,7 @@ def handle_basic_commands(command, state, room_exits):
         show_inventory(state)
         return True
     elif command == "scoreboard":
-        display_scoreboard(state, 5)
+        scoreboard_menu(state, 5)
         return True
     elif command.startswith("admin give "):
         handle_admin_give(command, state)
