@@ -436,7 +436,7 @@ def dragon_room_commands(command, state):
         command_executed = True
 
     if db_is_item_in_inventory(state, "cursed_trophy"):
-        print("You have successfully dealt with the dragon. You can now move on to another room.")
+        print("\nYou have successfully dealt with the dragon. You can now move on to another room.")
         db_mark_room_completed(state, "dragon_room")
 
     return command_executed

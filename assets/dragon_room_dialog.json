@@ -639,7 +639,7 @@
                         "next_failure": "failed_break_drawer",
                         "base_success_rate": 0.2,
                         "success_modifiers": {
-                            "pickaxe": 0.5
+                            "pickaxe": 0.4
                         }
                     },
                     "2": {
@@ -648,7 +648,7 @@
                         "next_failure": "failed_open_drawer",
                         "base_success_rate": 0.05,
                         "success_modifiers": {
-                            "lockpick": 0.6
+                            "lockpick": 0.8
                         }
                     }
                 }

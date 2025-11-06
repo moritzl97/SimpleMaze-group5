@@ -399,7 +399,7 @@ def scoreboard_menu(state, length=None):
 
 def intro_screen(state):
     print("-" * 126)
-    print_and_center("For the best experience fullscreen the console and zoom in such that the lines touch on the left and right.\n(For most terminals use the keybind 'Cmd'+'+' or 'Cmd'+'mouse wheel' to zoom in.)\n")
+    print_and_center("For the best experience maximize the terminal window and zoom in, such that the lines touch on the left and right.\n(For most terminals use the keybind 'Cmd'+'+' or 'Cmd'+'mouse wheel' to zoom in.)\n")
     print_and_center("Press any key to continue.")
     print("-" * 126)
     input("")
