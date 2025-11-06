@@ -417,7 +417,7 @@
                 "text": "There is a crack in the wall. You hear the sound of a someone digging beyond it. Trying to break it open without the right tools could have devastating results.",
                 "options": {
                     "1": {
-                        "text": "Break the wall open.",
+                        "text": "Break the wall open. You will only have one chance at this.",
                         "next_success": "open_wall",
                         "next_failure": "failed_open_wall",
                         "base_success_rate": 0.4,
@@ -561,7 +561,7 @@
                 "text": "A Chest with a heavy lock.",
                 "options": {
                     "1": {
-                        "text": "Break the chest open. You will only have one chance at this",
+                        "text": "Break the chest open. You will only have one chance at this.",
                         "next_success": "open_chest",
                         "next_failure": "failed_break_chest",
                         "base_success_rate": 0.4,
