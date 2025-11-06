@@ -216,6 +216,13 @@ def init_db(state):
                      CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE,
                      CONSTRAINT fk_trade FOREIGN KEY (trade_id) REFERENCES dragon_room_trades(trade_id)
                        );""")
+    cursor.execute("""
+                 CREATE TABLE IF NOT EXISTS dragon_room_grace (
+                     save_id INTEGER,
+                     grace INTEGER DEFAULT 0,
+                     PRIMARY KEY (save_id),
+                     CONSTRAINT fk_save FOREIGN KEY (save_id) REFERENCES saves(save_id) ON DELETE CASCADE
+                   );""")
     #--------------Create room specific tables end------------#
     conn.commit()
 
@@ -234,7 +241,7 @@ def init_db(state):
     insert_query = "INSERT OR IGNORE INTO items (name) VALUES (?);"
     rows_to_insert = [
         #dragon room
-        ('lockpick',),('broadsword',),('sneaking_boots',),('chalk',),('paper',),('invisibility_cloak',),('milk_carton',),('gemstone',),('pickaxe',),('cursed_trophy',),
+        ('lockpick',),('broadsword',),('sneaking_boots',),('chalk',),('paper',),('invisibility_cloak',),('milk_carton',),('gemstone',),('pickaxe',),('cursed_trophy',),('dagger',),
         #cloud_room
         ('cursed_robot_head',),
         #cyberroom
@@ -336,7 +343,8 @@ def init_db(state):
         JOIN (SELECT name, item_id FROM items) AS wanted
         WHERE sale.name = 'gemstone' AND wanted.name = 'broadsword'
             OR sale.name = 'chalk' AND wanted.name = 'sneaking_boots'
-            OR sale.name = 'pickaxe' AND wanted.name = 'lockpick';
+            OR sale.name = 'pickaxe' AND wanted.name = 'lockpick'
+            OR sale.name = 'paper' AND wanted.name = 'dagger';
                     """)
     #--------------End of Insert values into room specific tables------#
 
@@ -416,6 +424,11 @@ def create_new_save(state, current_player_name):
             SELECT ?, trade_id
             FROM dragon_room_trades;
             """, (save_id,))
+    # insert starting grace
+    cursor.execute("""
+            INSERT INTO dragon_room_grace (save_id)
+               VALUES (?);
+                   """, (save_id,))
 
     conn.commit()
     return

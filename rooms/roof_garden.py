@@ -291,21 +291,27 @@ def roof_garden_commands(command, state):
                     break
                 if input_dice in item["dice"]:
                     state["roof_garden"]["dice"].remove(input_dice) # remove spend dice
+                    print(f"You spend {convert_dice_to_faces([input_dice])[0]}")
                     item["action"](state) # call function associated with the chosen action
                     if not command[:-2] == "lay hammock": # Delete the action, you can only do it once. Except if it is 'lay hammock', this can be performed multiple times
                         del state["roof_garden"]["actions"][key]
                     break
+                else:
+                    print(f"The entered dice {convert_dice_to_faces([input_dice])[0]} cannot be used for this action. To perform this action you have to spend on of these dice: {' '.join(convert_dice_to_faces(item["dice"]))}")
             elif item["text"].lower() == command: # If the player just entered the action, but not a die remind them to enter a die
                 command_executed = True
                 print("Make sure to type in a number representing one of your dice after each command.")
         print("")
         if state["roof_garden"]["dice"]: # If there are dice left, print dice and all available action with their associated dice
-            print(f"Your energy dice: {' '.join(convert_dice_to_faces(state['roof_garden']['dice']))}")
+            print(f"Your available energy dice: {Color.framed + ' ' + ' '.join(convert_dice_to_faces(state['roof_garden']['dice'])) + ' ' + Color.end}\n")
+
+            print("Actions              Die needed to perform the action")
+            print("------------------------------------------------------")
             for key, value in state["roof_garden"]["actions"].items():
-                print(f"\n{value.get('color', Color.end)}{value['text']}{Color.end} {'/'.join(convert_dice_to_faces(value['dice']))}", end='')
+                print(f"{value.get('color', Color.end)}{value['text']:<20}{Color.end} ({'/'.join(convert_dice_to_faces(value['dice']))})", end='')
                 if value.get('description', False):
-                    print(f": This will result in {value.get('description')}", end='')
-        print("")
+                    print(f" Taking this action will result in {value.get('description')}", end='')
+                print("")
 
     if state["roof_garden"]["orchid"]["water"] and state["roof_garden"]["orchid"]["fertilizer"] and state["roof_garden"]["orchid"]["robot"]:
         # If the player fulfilled all necessary tasks, print the end message and complete roof garden

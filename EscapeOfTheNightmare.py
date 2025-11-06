@@ -34,8 +34,8 @@ def game_loop(save_id):
             print_and_center("Enter your name")
             print("")
             player_name = input(" " * 60).strip()
-            if player_name == "" or len(player_name)<4 or len(player_name)>20:
-                print_and_center("Please enter a valid username with at least 4 and less than 20 characters.")
+            if player_name == "" or len(player_name)<3 or len(player_name)>20 or " " in player_name:
+                print_and_center("Please enter a valid username without spaces and with at least 3 and less than 20 characters.")
                 time.sleep(2)
                 clear_screen()
             else:

@@ -217,3 +217,27 @@ def db_remove_trade(state, trade_id):
                    WHERE save_id = ? AND trade_id = ?;
                    """, (current_save_id, trade_id,))
     conn.commit()
+
+def db_add_grace(state):
+    save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+    cursor.execute("""
+                   UPDATE dragon_room_grace
+                        SET grace = grace + 0.005
+                        WHERE save_id = ?;
+                   """, (save_id,))
+    return
+
+def db_get_grace(state):
+    save_id = state["save_id"]
+    conn = state["db_conn"]
+    cursor = conn.cursor()
+    cursor.execute("""
+                   SELECT grace
+                       FROM dragon_room_grace
+                       WHERE save_id = ?;
+                   """, (save_id,))
+    rows = cursor.fetchone()
+    grace = rows[0]
+    return grace

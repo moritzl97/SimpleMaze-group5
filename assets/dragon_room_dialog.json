@@ -8,9 +8,10 @@
                         "text": "Attempt to attack the dragon",
                         "next_success": "kill_dragon",
                         "next_failure": "failed_attack",
-                        "base_success_rate": 0.1,
+                        "base_success_rate": 0.01,
                         "success_modifiers": {
-                            "broadsword": 0.8
+                            "broadsword": 0.8,
+                            "dagger": 0.1
                         }
                     },
                     "2": {
@@ -79,19 +80,16 @@
         },
         "dragon_angry": {
             "start": {
-                "text": "Dragon:'You have made me angry. That is what you get!'\nYou are engulfed in flames.",
-                "action": [
-                    "wait",
-                    5
-                ],
+                "text": "The Dragon hisses at you.\nDragon: You have made me angry!",
                 "options": {
                     "1": {
                         "text": "Attempt to attack the dragon",
                         "next_success": "kill_dragon",
                         "next_failure": "failed_attack",
-                        "base_success_rate": 0.10,
+                        "base_success_rate": 0.01,
                         "success_modifiers": {
-                            "broadsword": 0.8
+                            "broadsword": 0.8,
+                            "dagger": 0.1
                         }
                     }
                 }
@@ -115,10 +113,10 @@
                 "next_chapter": "end"
             },
             "failed_attack": {
-                "text": "Your attack misses and you are hit by the Dragons tail.",
+                "text": "Your attack misses and you fall over.\nThe dragon just laughs at you.\nHowever, you feel that you become a bit stronger.",
                 "action": [
-                    "wait",
-                    10
+                    "make_stronger",
+                    null
                 ],
                 "next_chapter": "dragon_angry"
             }
