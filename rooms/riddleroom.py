@@ -191,12 +191,8 @@ def complex_challenge(state):
 
     while wrong_attempts < max_wrong_attempts:
         print(f"\n{Color.purple}--- Final Code ---{Color.end}")
-        print("Combine: first letter of quiz answer + number of letters in the logic puzzle answer. Reverse the order if the True or False Riddle was False.")
-        if selected_logic_puzzle["answer"]:
-            expected_code = (str(len(selected_logic_puzzle["answer"]))+ selected_quiz["answer"][0])
-        else:
-            expected_code = (selected_quiz["answer"][0] + str(len(selected_logic_puzzle["answer"])))
-
+        print("Combine: first letter of quiz answer + number of letters in the logic puzzle answer + first letter of the true or false riddle (t or f).")
+        expected_code = (selected_quiz["answer"][0]+ str(len(selected_logic_puzzle["answer"])) + selected_true_or_false["answer"][0])
 
         final_input = input("Enter the code: ").strip().lower()
         if final_input == expected_code:
