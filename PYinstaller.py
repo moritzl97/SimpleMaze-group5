@@ -4,7 +4,7 @@ import PyInstaller.__main__
 PyInstaller.__main__.run([
     'EscapeOfTheNightmare.py',
     '--windowed',
-    '--noconsole',
+    '--console', # --noconsole for MacOs
     '--onefile',
     '--icon=./assets/icon.png',
     '--distpath=./output',

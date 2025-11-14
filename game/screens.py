@@ -398,10 +398,10 @@ def scoreboard_menu(state, length=None):
     print("#" + "-"* 124 + "#")
 
 def intro_screen(state):
-    print("-" * 126)
+    print("-" * 128)
     print_and_center("For the best experience maximize the terminal window and zoom in, such that the lines touch on the left and right.\n(For most terminals use the keybind 'Cmd'+'+' or 'Cmd'+'mouse wheel' to zoom in.)\n")
     print_and_center("Press any key to continue.")
-    print("-" * 126)
+    print("-" * 128)
     input("")
 
 def handle_quit(state):
