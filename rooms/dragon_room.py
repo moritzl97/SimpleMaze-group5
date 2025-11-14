@@ -287,7 +287,7 @@ def handle_interact(noun, state):
             else:
                 #Print ASCII art if you talk with dragon
                 if noun == "dragon":
-                    print(Color.red+r"""                                              /(  /(
+                    print(Color.red+r"""                                          /(  /(
                                             /   \/   \
                               |\___/|      //||\//|| \\
                              (,\  /,)\__  // ||// || \\ \
@@ -317,7 +317,7 @@ def handle_attack(noun, state):
     elif noun != "dragon" or not db_check_if_in_room(state, "dragon", "npcs"):
         print(f"You can not attack {noun}.")
     else:
-        print(Color.red+r"""                                              /(  /(
+        print(Color.red+r"""                              /(  /(
                                 /   \/   \
                   |\___/|      //||\//|| \\
                  (,\  /,)\__  // ||// || \\ \
