@@ -14,8 +14,9 @@ from game.db import init_db, create_new_save
 from game.utils import *
 from game.db_utils import *
 import sqlite3
-import os
+import os, sys
 import pygame
+from pathlib import Path
 
 ###################################################
 # Main game
@@ -166,19 +167,36 @@ def game_loop(save_id):
             print("Please enter a valid command. Type '?' to get help.")
         print("")
 
-#--------------Definition or variables on start up-------------#
-# Set console width if possible
-#cmd = 'mode 82,50'
-#os.system(cmd)
+# --------------Definition or variables on start up-------------#
+# Cross-platform save location + DB init (macOS / Windows / Linux)
 
-# create database and connection to it
-appdata = os.getenv('LOCALAPPDATA')  # typically C:\Users\username\AppData\Local
-db_path = os.path.join(appdata, "EscapeTheNightmare", "saves.db")
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
-path = db_path
+
+
+APP_NAME = "EscapeTheNightmare"
+
+def user_data_dir(app_name: str = APP_NAME) -> Path:
+    if sys.platform == "darwin":  # macOS
+        return Path.home() / "Library" / "Application Support" / app_name
+    elif os.name == "nt":         # Windows
+        base = os.environ.get("LOCALAPPDATA") or os.environ.get("APPDATA")
+        if not base:
+            base = Path.home() / "AppData" / "Local"
+        return Path(base) / app_name
+    else:                         # Linux / other Unix
+        base = os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local" / "share"))
+        return Path(base) / app_name
+
+# Ensure save dir exists
+data_dir = user_data_dir()
+data_dir.mkdir(parents=True, exist_ok=True)
+
+# Database path
+db_path = data_dir / "saves.db"
+
+# Game state + DB connection
 starting_room = "study_landscape"
 state = {
-    "db_conn": sqlite3.connect(path),
+    "db_conn": sqlite3.connect(str(db_path)),
     "save_id": None,
     "start_time": None,
     "volume": 0.2,
