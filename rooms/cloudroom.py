@@ -169,6 +169,12 @@ def unlock(attempt, cr, state):
     if attempt == "CLOUD":
         if cr["robot_locked"]:
             cloud_db_set_robot_locked(state, False)
+            print("""
+             _\__/_
+             [_•_•_]
+            /|     |
+               |￣|
+            """)
             print("\n🔓 The robot whirs to life. It's ready to talk.")
         else:
             print("\nThe robot is already unlocked.")

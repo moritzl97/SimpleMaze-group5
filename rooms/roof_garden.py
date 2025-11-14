@@ -316,6 +316,10 @@ def roof_garden_commands(command, state):
     if state["roof_garden"]["orchid"]["water"] and state["roof_garden"]["orchid"]["fertilizer"] and state["roof_garden"]["orchid"]["robot"]:
         # If the player fulfilled all necessary tasks, print the end message and complete roof garden
         print("The orchid starts to bloom.")
+        print("""
+        °❀.ೃ࿔*°❀.ೃ࿔*
+             """)
+        time.sleep(1)
         print("Gardener: Thank you for helping me out!")
         db_mark_room_completed(state, "roof_garden")
         print("Gardener: I don't have much to give, but I have this beautiful rose I can give you.")
