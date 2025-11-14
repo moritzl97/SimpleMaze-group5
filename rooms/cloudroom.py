@@ -169,7 +169,7 @@ def unlock(attempt, cr, state):
     if attempt == "CLOUD":
         if cr["robot_locked"]:
             cloud_db_set_robot_locked(state, False)
-            print("""
+            print(r"""
              _\__/_
              [_•_•_]
             /|     |
