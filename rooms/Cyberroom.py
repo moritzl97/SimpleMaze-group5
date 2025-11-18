@@ -54,8 +54,7 @@ def cyberroom_enter(state):
     print("You step into the CyberRoom.")
     print("In front of you, a big terminal blocks the exit.")
     print("The screen flashes: Access denied, security code required.")
-    print(
-        "The walls are tall screens filled with cascading green code, but most of it is glitching, stuttering, and breaking apart.")
+    print("The walls are tall screens filled with cascading green code, but most of it is glitching, stuttering, and breaking apart.")
     print("Next to it, three panels flicker with mathematical problems.\n")
 
     # Internal function to generate random math expressions for panels
@@ -116,8 +115,7 @@ def cyberroom_enter(state):
 # Shows room description, ghost intro, and progress hints
 # -----------------------------------------------------------------------------
 def handle_look(state):
-    ghost = state["cyberroom"].setdefault("ghost", {"met": False, "commented_after_panels": False,
-                                                    "commented_after_unlock": False})
+    ghost = state["cyberroom"].setdefault("ghost", {"met": False, "commented_after_panels": False, "commented_after_unlock": False})
 
     # Ghost intro scene (printed once)
     if not ghost["met"]:
@@ -240,7 +238,7 @@ def handle_code(command, state):
     # Ensure the player entered a number after "code"
     parts = command.split(" ")
     if len(parts) < 2:
-        print("Enter a code, e.g. 'code 123'")
+        print("Enter a code, e.g. 'unlock 123'")
         return
 
     guess = parts[1]
@@ -331,7 +329,7 @@ def handle_help():
     print("\nCyberroom commands:")
     print("- look around         : Look around the room")
     print("- panel <1/2/3>       : Try solving a math panel")
-    print("- code <......>       : Enter the terminal code")
+    print("- unlock <......>     : Unlock the terminal by entering the right code")
     print("- take key            : Take the key if unlocked")
     print("- release ghost       : Free the classmate ghost (after unlock, before key)")
     print("- lock ghost          : Keep the ghost trapped (after unlock, before key)")
@@ -360,7 +358,7 @@ def cyberroom_commands(command, state):
         panel = command.split(" ")[1]
         handle_panel(panel, state)
         return True
-    elif command.startswith("code "):
+    elif command.startswith("unlock "):
         handle_code(command, state)
         return True
     elif command == "release ghost":

@@ -6,8 +6,7 @@
 # School:  The Hague University of Applied Sciences (THUAS)
 # =============================================================================
 from game.db_utils import *
-
-book_order = ["intercultural sensitivity", "beginner sql", "python tutorial"]
+from rooms.library_db_utils import *
 
 def handle_help(state):
     print("\nLibrary:")
@@ -28,7 +27,42 @@ def library_enter(state):
 
 def handle_look(state):
     print("Dim skylight falls through the roof window. However the window is barred behind steel bars. This is definitely not the right way out.")
+    book_order = db_get_book_list(state)
     if book_order:
+        time.sleep(2)
+        print("""
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡴⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢰⠾⢿⣶⡶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⣶⢾⡿⢷⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⣿⢸⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡟⣇⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⣇⢿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⣿⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⣤⣤⡤⠶⠶⢿⠀⢿⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⢱⡇⢰⣿⣶⢶⡄⠀⠀⠀⠀⠀
+⠀⠀⠀⠈⢹⠟⠶⣤⣜⡛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⣛⣛⣛⣿⣿⡿⠿⠿⠛⠛⠛⠛⠛⢻⡄⢹⡾⣧⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢸⠃⠀⠀⠉⠙⠻⢶⣤⣀⡀⠀⣀⣀⣀⣤⣤⣴⡶⠶⠾⠟⠛⠛⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⢸⡇⣿⠀⠀⠀⠀⠀
+⠀⠀⠀⣴⣾⣇⡀⠀⠀⠀⠀⠀⠀⠉⠻⣟⢻⡋⣿⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠇⢸⣧⣿⠀⠀⠀⠀⠀
+⠀⠀⠀⠾⣿⣿⢿⣷⣦⣄⡀⠀⠀⠀⠀⣿⠘⡇⢸⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣤⣤⣾⣶⣾⡿⠷⣦⠀⠀⠀⠀
+⠀⠀⠀⠀⢸⡟⠻⢿⣿⣾⣟⡷⣦⣀⠀⣿⢠⡏⢸⡇⠀⠀⠀⠀⢀⣀⣀⣤⣤⣤⣶⣶⣾⣿⡿⠿⠿⠛⠛⠉⠉⠀⠀⠀⠀⢿⡀⠀⠀⠀
+⠀⠀⠀⣀⣸⡇⠀⠀⠈⠙⠿⣿⣷⣯⣻⣿⣸⣧⣼⣥⣶⣶⣿⣿⡿⠿⠿⠛⠛⠋⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡇⠀⠀⠀
+⠀⠀⠀⣙⣯⣿⣦⣀⠀⠀⠀⠀⠉⠛⢿⡿⠿⠛⠛⠋⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣹⡇⠀⠀⠀
+⢠⡿⣿⣿⣭⣙⡳⣿⣷⣄⡀⠀⠀⠀⠈⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣠⣤⣤⡿⣶⣶⣦⡄
+⣾⢱⠏⣹⠛⠻⠷⣿⣿⣝⢷⣄⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣴⡶⠶⠿⠛⣛⣭⣽⠷⠿⢿⠋⠁
+⣿⢼⠀⡟⠀⠀⠀⠀⠈⠉⠻⣯⡻⣦⣀⣿⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣤⣤⡴⠶⠶⠛⠛⠋⠉⢉⣀⣤⣤⠶⠞⠛⠉⠁⠀⠀⠀⢸⠀⠀
+⣿⢺⡀⣷⠀⠀⠀⠀⠀⠀⠀⠈⠙⢷⣽⣟⣠⣤⣴⢶⣶⣿⣛⡛⠉⠉⠀⠀⠀⢀⣀⣤⣴⠶⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡀⠀
+⠹⣾⣇⣻⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠉⠉⠀⠀⠀⠀⠉⣹⠛⣿⠶⣶⠾⠟⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣾⣿⠷
+⠀⠀⢉⣹⡿⠶⢦⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡏⢰⡏⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣴⣶⣿⡿⢻⠉⠀⠀
+⠀⣾⠿⠷⣶⣦⣤⣬⣭⣟⣳⣶⣤⣄⣀⠀⠀⠀⠀⠀⠀⢸⡇⢸⡅⠀⢻⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣤⣶⣿⠿⠛⢋⡽⠋⠀⢸⠀⠀⠀
+⢠⡏⠀⠀⠀⠀⠀⠈⠉⠉⠉⠛⠛⠛⠻⠿⠷⢶⣤⣀⡀⠀⣧⢸⡇⠀⢹⠀⠀⠀⠀⣀⣠⣴⣾⣿⠿⠛⠉⠀⢀⡼⠋⠀⠀⠀⢸⠀⠀⠀
+⠰⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠳⠿⣦⣷⣀⠸⣇⣤⣶⣿⡿⠿⠿⠿⢶⣦⣤⣤⡴⠋⠀⠀⠀⠀⠀⢸⡀⠀⠀
+⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠻⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⣼⠁⠀⠀⠀⠀⠀⣠⣾⠿⠁⠀
+⠀⠸⣧⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⣠⣾⡿⠋⠀⠀⠀
+⠀⠀⠉⠉⠉⠛⠛⠛⣶⣶⣶⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⣰⣿⠋⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠙⠛⠛⠳⠶⠶⢦⣤⣤⣄⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⣠⣾⠟⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠛⠛⠛⠿⠶⠶⣶⣤⣤⣤⣀⣀⣻⣾⡟⠃⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        
+        
+        """)
+        time.sleep(1)
         print("On the top shelf of a bookshelf you see three books stacked ontop of each other. From top to bottom the titles are: ",end="")
         print(f"{', '.join(book_order[::-1])}.")
         print("However you are to small and can only reach the book at the bottom.")
@@ -36,23 +70,28 @@ def handle_look(state):
         print("Try 'take <something>' to pick it up.")
 
 def handle_take(state, item):
-    if item == book_order[0]:
-        if item == "python tutorial":
-            print("You add the Python Tutorial to your inventory.")
-            if not db_get_flag(state, "tutorial_finished"):
-                print("You can check your inventory by typing 'inventory'.")
-                print("Now you can return to the librarian by typing 'go study landscape' or 'go back'.")
-            db_add_item_to_inventory(state, "python_tutorial")
-            db_mark_room_completed(state, "library")
-            return
-        print("You take the bottom bock and lay it to the side. The outer books shift down.")
-        book_order.pop(0)
-    elif item in book_order:
-        print("You try to stretch, but you can not reach the books higher on the stack.")
-        print("Maybe you should try to take the book lower in the stack?")
+    book_order = db_get_book_list(state)
+    if book_order:
+        if item == book_order[0]:
+            if item == "python tutorial":
+                print("You add the Python Tutorial to your inventory.")
+                if not db_get_flag(state, "tutorial_finished"):
+                    print("You can check your inventory by typing 'inventory'.")
+                    print("Now you can return to the librarian by typing 'go study landscape' or 'go back'.")
+                db_add_item_to_inventory(state, "python_tutorial")
+                db_mark_room_completed(state, "library")
+                db_remove_next_book(state, item)
+                return
+            print("You take the bottom bock and lay it to the side. The outer books shift down.")
+            db_remove_next_book(state, item)
+        elif item in book_order:
+            print("You try to stretch, but you can not reach the books higher on the stack.")
+            print("Maybe you should try to take the book lower in the stack?")
+        else:
+            print(f"There is no {item} in the room.")
+            print("Type 'take <booktitle> to take a book.'")
     else:
-        print(f"There is no {item} in the room.")
-        print("Type 'take <booktitle> to take a book.'")
+        print("The shelf is already empty.")
 
 def library_commands(command, state):
     if command == "look around":

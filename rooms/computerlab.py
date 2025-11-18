@@ -10,12 +10,10 @@
 import random
 import time
 from game.db_utils import *
-from game.db import *
 from game.utils import *
 from rooms.computer_lab_db_utils import *
 
 # questions for the folders
-
 intercultural_questions = [
     ("When working with a team from different cultures, what is the best approach? "
      "\n(A) respect the differences and communicate openly, "
@@ -42,7 +40,6 @@ intercultural_questions = [
      "\n(B) it increases misunderstandings and delays "
      "\n(C) it makes decision-making slower and harder", ["a", "it leads to innovation through diverse perspectives"])
 ]
-
 python_questions = [
     ("What is the output of print(3 + 4 * 2)?", ["11"]),
     ("Which of these is a valid Python variable name? "
@@ -63,7 +60,6 @@ python_questions = [
      "\n(B) (1: 'a', 2: 'b') "
      "\n(C) [1: 'a', 2: 'b']", ["a", "{1: 'a', 2: 'b'}"])
 ]
-
 database_questions = [
     ("Which SQL command retrieves data from a table? "
      "\n(A) SELECT "
@@ -87,7 +83,6 @@ database_questions = [
      "\n(B) ALTER TABLE "
      "\n(C) CHANGE TABLE", ["b", "alter table"])
 ]
-
 professional_questions = [
     ("Best way to handle conflict with a colleague? "
      "\n(A) avoid them until the issue goes away "
@@ -115,7 +110,6 @@ professional_questions = [
      "\n(C) inform your supervisor early and provide a plan to catch up", ["c", "inform your supervisor early and provide a plan to catch up"])
 ]
 
-
 def computer_lab_enter(state):
     if db_get_room_completed(state, "computer_lab"):
         print(f"\n{Color.bold}You've already finished this room!{Color.end}")
@@ -124,8 +118,32 @@ def computer_lab_enter(state):
     print("\n💻 You step into the computer lab.")
     print("The room is dead silent. There's only one person working on their computer.")
     print("The said person looks up to look at you, but immediately turns their gaze towards the computer again.")
-
     return True
+
+def computer_lab_commands(command, state):
+    if command == "look around":
+        handle_look()
+        return True
+    elif command in  ["?", "help"]:
+        handle_help()
+        return True
+    elif command.startswith("talk "):
+        target = command[5:].strip()
+        handle_talk(target, state)
+        return True
+    elif command.startswith("ask "):
+        target = command[4:].strip()
+        handle_ask(target, state)
+        return True
+    elif command.startswith("interact "):
+        target = command[9:].strip()
+        if target == "laptop":
+            handle_interact(state)
+            return True
+        else:
+            print(f"❌ You can't interact with {target}.")
+            return True
+    return False
 
 def handle_look():
     print("\n👀 You take a look around.")
@@ -136,7 +154,6 @@ def handle_look():
     print("On the left, a large whiteboard is plastered with sticky notes. Many are half-peeled or scattered across the floor, as if they’ve given up holding on.")
     print("Maybe you should talk to the student about the laptop?")
     print("Before you could decide, a small silhouette runs past you and sits in the corner of the room.")
-
 
 def handle_talk(target, state):
     if target == "silhouette":
@@ -161,7 +178,7 @@ def handle_talk(target, state):
         print(f"⣿⣿⣿⣿⣿⣶⣄⣀⠐⢀⣸⣷⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿{Color.end}")
         print("\n\n... What the hell?")
         db_award_achievement(state, 'gnomed')
-        return None
+        return
 
     if target == "student":
         if cl_check_riddle_answer(state):
@@ -178,16 +195,15 @@ def handle_ask(target, state):
         if cl_check_riddle_answer(state):
             print("\n\tThe student looks annoyed at you.")
             print(f"{Color.orange}{Color.bold}👩 Did you forget the password? It's crypt0. {Color.end}")
-            return None
+            return
         else:
             print(f"\n{Color.orange}{Color.bold}👩 Oh, the laptop? Yeah, I know the password, but I need you to solve my riddle first! {Color.end}")
-            print(f"\n\n{Color.underline}I'm made of only ones and zeros,")
-            print("yet I can store music, pictures and prose.")
+            print(f"\n\n{Color.underline}I'm made of only ones and zeros,\nyet I can store music, pictures and prose.")
             print(f"What am I?{Color.end}")
 
             response = input("\nYour answer: ").strip().lower()
             normalized = response
-            if normalized in ["binary", "binary code", "bits", "bite"]:
+            if normalized in ["binary", "binary code", "binary data", "bit", "bits", "byte", "bytes"]:
                 print("\nThe student smiles.")
                 print(f"\n👩 {Color.orange}{Color.bold}Yeah, that's right! I was curious if you knew ")
                 print("👩 Anyway, the password to the laptop is: crypt0 ")
@@ -199,7 +215,7 @@ def handle_ask(target, state):
                 print("\n\tThe student looks amused.")
                 print(f"\n👩 {Color.orange}{Color.bold}Yeah, I think you need to think it over {Color.end}")
                 print("You return to the corridor in shame")
-                return None
+                return
     else:
         print(f"❌ There is no {target} here to ask")
 
@@ -224,12 +240,12 @@ def handle_interact(state):
         print(f"{Color.red}----------------------------------------------------------------")
         print(f"🚫 The laptop is still locked! Try again in {remaining} seconds.")
         print(f"----------------------------------------------------------------{Color.end}")
-        return None
+        return
 
     if cl_is_laptop_unlocked(state): # checks if the laptop is unlocked
         print("\nYou open the laptop again.")
         laptop_screen(state)
-        return None
+        return
     else:
         print("\n💻You inspect the laptop.")
         print("There's nothing specific about it")
@@ -259,16 +275,16 @@ def handle_interact(state):
                 print(f"{Color.red}--------------------------------------------")
                 print(f"⏳ {remaining} seconds remaining.")
                 print(f"--------------------------------------------{Color.end}")
-                return None
+                return
 
 def laptop_screen(state):
     print(f"\nOn the screen, you see folders labelled {Color.bold}'Intercultural Collaboration', 'Database & Data Structures', 'Professional Skills', 'Python Programming'{Color.end}")
     print("There also appears to be a fifth folder, which is locked behind a password.")
     print("Below the folders you see txt labelled 'README'")
     while True:
-        player_choice = input(f"\nWhat do you want to open first? {Color.bold}(Intercultural Collaboration / Database & Data Structures / Professional Skills / Python Programming / README / Secret Folder / Exit){Color.end}: ").strip().lower()
+        player_choice = input(f"\nWhat do you want to open first? {Color.bold}(Intercultural Collaboration(IC) / Database & Data Structures(DB) / Professional Skills(PS) / Python Programming(PP) / README / Secret Folder / Exit){Color.end}: ").strip().lower()
 
-        if player_choice in ["intercultural collaboration", "1"]:
+        if player_choice in ["intercultural collaboration", "1", "ic"]:
             if not cl_is_seminar_completed(state, 'intercultural collaboration'):
                 print("\n📂 You've opened the folder called Intercultural Collaboration.")
                 print("\nImmediately after opening the folder u get a pop up window.\n")
@@ -282,7 +298,7 @@ def laptop_screen(state):
                 print("\n📂 You've already completed this folder and collected the key fragment.")
                 print(f"{Color.blue}ac__ ___ h___{Color.end}")
 
-        elif player_choice in ["database & data structures", "2"]:
+        elif player_choice in ["database & data structures", "2", "db"]:
             if not cl_is_seminar_completed(state, 'database & data structures'):
                 print("\n📂 You've opened the folder called Database & Data Structures.")
                 print("\nImmediately after opening the folder u get a pop up window.\n")
@@ -297,7 +313,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}__es f__ ____{Color.end}")
 
 
-        elif player_choice in ["professional skills", "3"]:
+        elif player_choice in ["professional skills", "3", "ps"]:
             if not cl_is_seminar_completed(state, 'professional skills'):
                 print("\n📂 You've opened the folder called Professional Skills.")
                 print("\nImmediately after opening the folder u get a pop up window.\n")
@@ -312,7 +328,7 @@ def laptop_screen(state):
                 print(f"{Color.blue}____ _ly ___h{Color.end}")
 
 
-        elif player_choice in ["python programming", "4"]:
+        elif player_choice in ["python programming", "4", "pp"]:
             if not cl_is_seminar_completed(state, 'python programming'):
                 print("\n📂 You've opened the folder called Python Programming.")
                 print("\nImmediately after opening the folder u get a pop up window.\n")
@@ -381,32 +397,3 @@ def handle_help():
         print("- talk student        : Talk to the student.")
         print("- ask student         : Ask a student a question.")
         print("- interact laptop     : Interact with the laptop.")
-
-def computer_lab_commands(command, state):
-
-        if command == "look around":
-            handle_look()
-            return True
-
-        elif command == "?" or command == "help":
-            handle_help()
-            return True
-
-        elif command.startswith("talk "):
-            target = command[5:].strip()
-            handle_talk(target, state)
-            return True
-
-        elif command.startswith("ask "):
-            target = command[4:].strip()
-            handle_ask(target, state)
-            return True
-
-        elif command.startswith("interact "):
-            target = command[9:].strip()
-            if target == "laptop":
-                handle_interact(state)
-                return True
-            else:
-                print(f"❌ You can't interact with {target}.")
-                return True

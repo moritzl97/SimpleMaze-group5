@@ -27,7 +27,7 @@ def open_dialog(name, state):
 
         # Print dialog text
         print(f"{node['text']}")
-
+        grace = db_get_grace(state)
         # Call function if there is an action defined at this point in the dialog
         if "action" in node:
             #lookup the function that should be called from the dialog
@@ -54,6 +54,8 @@ def open_dialog(name, state):
                     remove_npc(argument, state)
                 elif action == "award_achievement":
                     award_achievement(argument, state)
+                elif action == "make_stronger":
+                    make_stronger(argument, state)
 
         # If there are no branching dialog options end dialog
         if "next_chapter" in node:
@@ -65,7 +67,7 @@ def open_dialog(name, state):
         print("\nChoose a number:")
         for option_number, option_entry in node["options"].items():
             # Calculate success rate and see if helpful items are in the players inventory
-            success_rate = option_entry["base_success_rate"]
+            success_rate = option_entry["base_success_rate"] + grace
             added_modifier_list = []
             for item, modifier in option_entry.get("success_modifiers", {}).items():
                 if db_is_item_in_inventory(state, item):
@@ -105,7 +107,7 @@ def open_dialog(name, state):
             else:
                 # If valid choice, calculate the success rate again
                 option_entry = node["options"][choice]
-                success_rate = option_entry["base_success_rate"]
+                success_rate = option_entry["base_success_rate"] + grace
                 for item, modifier in option_entry.get("success_modifiers", {}).items():
                     if db_is_item_in_inventory(state, item):
                         success_rate += modifier
@@ -208,6 +210,10 @@ def award_achievement(argument, state):
     # Sets the next dialog of the dragon to angry
     db_award_achievement(state, argument)
 
+def make_stronger(argument, state):
+    db_add_grace(state)
+    return
+
 #---End of action functions---#
 
 #---Command handlers---#
@@ -233,15 +239,15 @@ def handle_look(noun, state):
         items = db_get_objects_in_room(state, "items")
         if items:
             items_display_names = [item.replace("_", " ").title() for item in items]
-            print(f"You see the following items in the room: {', '.join(items_display_names)}")
+            print(f"You see the following items in the room: {Color.blue + ', '.join(items_display_names) + Color.end}")
         npcs = db_get_objects_in_room(state, "npcs")
         if npcs:
             npcs_display_names = [npc.replace("_", " ").title() for npc in npcs]
-            print(f"You can talk to the following NPCs in the room: {', '.join(npcs_display_names)}")
+            print(f"You can talk to the following NPCs in the room: {Color.blue + ', '.join(npcs_display_names) + Color.end}")
         objects = db_get_objects_in_room(state, "objects")
         if objects:
             objects_display_names = [i_object.replace("_", " ").title() for i_object in objects]
-            print(f"You see these points of interest in the room: {', '.join(objects_display_names)}")
+            print(f"You see these points of interest in the room: {Color.blue + ', '.join(objects_display_names) + Color.end}")
     return
 
 def handle_take(noun, state):
@@ -281,7 +287,7 @@ def handle_interact(noun, state):
             else:
                 #Print ASCII art if you talk with dragon
                 if noun == "dragon":
-                    print(Color.red+r"""                                              /(  /(
+                    print(Color.red+r"""                                          /(  /(
                                             /   \/   \
                               |\___/|      //||\//|| \\
                              (,\  /,)\__  // ||// || \\ \
@@ -304,6 +310,34 @@ def handle_interact(noun, state):
             print(f"There is no {noun} here to interact with.")
     return
 
+def handle_attack(noun, state):
+    # opens dialog with an object or a npc
+    if not noun:
+        print("Attack what?")
+    elif noun != "dragon" or not db_check_if_in_room(state, "dragon", "npcs"):
+        print(f"You can not attack {noun}.")
+    else:
+        print(Color.red+r"""                              /(  /(
+                                /   \/   \
+                  |\___/|      //||\//|| \\
+                 (,\  /,)\__  // ||// || \\ \
+                 /     /   /_//  |//  ||  \\ \\
+                (@_^_@)/    /_   //   ||   \\  \\
+                 W//W_/      /_ //    ||    \\   \\
+               (//) |         ///     ||     \\    \\
+             (/ /) _|_ /   )  //      ||      \\   __\
+           (// /) '/,_ _ _/  ( ; -.   ||    _ _\\.-~        .-~~~^-.
+         (( // )) ,-{        _      `-||.-~-.           .~         `.
+        (( /// ))  '/\      /                 ~-. _ .-~      .-~^-.  \
+        (( ///))      `.   {            }                   /      \  \
+         ((/ ))     .----~-.\        \-'                 .~         \  `. \^-.
+                   ///.----..>    (   \             _ -~             `.  ^-`   ^-_
+                     ///-._ _ _ _ _ _ _}^ - - - - ~                    ~--_.   .-~
+                                                                           /.-~"""+Color.end)
+
+        open_dialog("dragon", state)
+    return
+
 def handle_help(noun, state):
     # list commands
     print("\nDragon Room commands:")
@@ -312,6 +346,7 @@ def handle_help(noun, state):
     print("- talk <person>       : Talk to someone in the room")
     print("- inspect <object>    : Inspect a object.")
     print("- trade               : Trade items.")
+    print("Having the right items will increase the chance of success.")
 
 # ---Parser---#
 def parse(user_input):
@@ -380,25 +415,28 @@ def dragon_room_commands(command, state):
 
     # transforms input of the user into verb and a noun. Synonyms of verbs are converted into known commands. Removes unnecessary words like "the", "to", "with".
     verb, noun = parse(command)
-
+    command_executed = False
     if verb == "look":
         handle_look(noun, state)
-        return True
+        command_executed = True
     elif verb == "take":
         handle_take(noun, state)
-        return True
+        command_executed = True
     elif verb == "trade":
         handle_trade(noun, state)
-        return True
+        command_executed = True
     elif verb == "interact":
         handle_interact(noun, state)
-        return True
+        command_executed = True
+    elif verb in ["attack", "kill"]:
+        handle_attack(noun, state)
+        command_executed = True
     elif verb == "help":
         handle_help(noun, state)
-        return True
+        command_executed = True
 
     if db_is_item_in_inventory(state, "cursed_trophy"):
-        print("You have successfully dealt with the dragon. You can now move on to another room.")
+        print("\nYou have successfully dealt with the dragon. You can now move on to another room.")
         db_mark_room_completed(state, "dragon_room")
 
-    return False
+    return command_executed
