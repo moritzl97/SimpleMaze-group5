@@ -21,10 +21,14 @@ Type commands in the console. This are the basic commands:
 
 ## Getting Started
 
-### Prerequisites
+### Installation
+Download the executable for Windows EscapeOfTheNightmare.exe and start the game by double-clicking it. No other software is required.
+
+Or
+
+Install prerequisites
 - Python 3.9+ installed
 
-### Installation
 Clone the repository
 ```bash
 git clone https://github.com/moritzl97/SimpleMaze-group5.git
@@ -32,9 +36,9 @@ cd SimpleMaze-group5
 ```
 
 ### Launching
-Start the game by executing main.py
+Start the game by executing EscapeOfTheNightmare.py
 ```bash
-python main.py
+python EscapeOfTheNightmare.p
 ```
 
 ## Credits
